@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Dragon Quest Solitaire</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="index.js" async defer></script>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#settings">Settings</a></li>
+      </ul>
+    </nav>
+
+    <!-- TUTORIAL MODAL -->
+    <aside id="tutorial-modal">
+
+    </aside>
+
+    <!-- STATUS -->
+    <section id="status">
+      <div id="hp">
+        <div class="deck face-down stock"></div>
+        <div class="deck face-up available"></div>
+      </div>
+      <div id="fate">
+        <div class="deck face-down stock"></div>
+        <div class="deck face-up available"></div>
+      </div>
+      <div id="inventory">
+        <div class="deck face-down stock"></div>
+        <div class="deck face-up available"></div>
+      </div>
+      <div id="gems">
+        <div class="deck face-down stock"></div>
+        <div class="deck face-up available"></div>
+      </div>
+    </section>
+
+    <!-- DUNGEON -->
+    <main id="dungeon">
+      <div class="row">
+        <div class="cell"></div>
+        <div class="cell available"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="row">
+        <div class="cell available"></div>
+        <div class="cell card face-down"></div>
+        <div class="cell available"></div>
+      </div>
+      <div class="row">
+        <div class="cell"></div>
+        <div class="cell available"></div>
+        <div class="cell"></div>
+      </div>
+    </main>
+  </body>
+</html>
