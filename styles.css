@@ -22,9 +22,20 @@
 
 .cell {
   border: none;
-  outline: 1px solid lightgray;
+  outline: 1px dotted lightgray;
   padding: 10px;
   background: #fff;
+}
+
+@keyframes pulsate-green-outline {
+  0%   { outline-color: rgba(55, 205, 55, 1); }
+  50%  { outline-color: rgba(55, 205, 55, 0.2); }
+  100% { outline-color: rgba(55, 205, 55, 1); }
+}
+
+.cell.available {
+  outline: 1px solid rgba(211, 211, 211, 0.4);
+  animation: pulsate-green-outline 2s infinite;
 }
 
 .card {
@@ -41,6 +52,7 @@
 .card.card-back {
   outline: 1px solid black;
   border: 4px solid white;
+  color: white;
 
   /* diamond repeating pattern */
   background: repeating-linear-gradient(

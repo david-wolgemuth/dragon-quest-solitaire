@@ -336,15 +336,12 @@ class Game {
           [BLACK, JOKER],
         ])
       ),
-      matrix: [
-        [new Cell(), new Cell(), new Cell()],
-        [new Cell(), new Cell(), new Cell()],
-        [new Cell(), new Cell(), new Cell()],
-      ],
+      matrix: [[new Cell()]],
     };
-    const centerCell = this.dungeon.matrix[1][1];
+    const centerCell = this.dungeon.matrix[0][0];
     centerCell.card = this.dungeon.stock.pop();
     centerCell.cardFaceDown = true;
+    this.updateDungeon();
   }
 
   addCardToDungeon({ row, col }) {
@@ -353,31 +350,77 @@ class Game {
     const cell = this.dungeon.matrix[row][col];
     cell.cardFaceDown = false;
     cell.card = card;
-    this.updateDungeonAvailability();
+    this.updateDungeon();
     this.render();
   }
 
   resolveCard({ row, col }) {
     const cell = this.dungeon.matrix[row][col];
     cell.cardFaceDown = true;
-    this.updateDungeonAvailability();
+    this.updateDungeon();
     this.render();
   }
 
-  /**
-   * If dungeon width / height is less than MAX_WIDTH x MAX_HEIGHT,
-   *  should be able to add a new row / column to the dungeon.
-   *  matrix.shift([...]) / matrix.push([...]) to add a row
-   *  matrix.forEach(row => row.shift() / row.push() to add a column
-   *
-   * if a space does not yet have a card and is not already adjacent to two cards,
-   *    but is adjacent to only one exactly one card,
-   *    it should be available to add a card to
-   */
-  updateDungeonAvailability() {
-    // loop through matrix row by col
-    // find max/min row/col with card
+  updateDungeon() {
+    this._expandDungeon();
+    this._trimDungeon();
+    this._updateDungeonAvailability();
+  }
 
+  /**
+   * Mark all cells as available if they are adjacent to a cell with a card.
+   *  - If the cell has a card, mark it available if face up, otherwise mark it unavailable.
+   *  - If the cell does not have a card,
+   *    - mark it available if it is adjacent to ONLY ONE cell with a facedown card.
+   */
+  _updateDungeonAvailability() {
+    for (let row = 0; row < this.dungeon.matrix.length; row += 1) {
+      for (let col = 0; col < this.dungeon.matrix[0].length; col += 1) {
+        const cell = this.dungeon.matrix[row][col];
+        cell.available = false;
+      }
+    }
+
+    for (let row = 0; row < this.dungeon.matrix.length; row += 1) {
+      for (let col = 0; col < this.dungeon.matrix[0].length; col += 1) {
+        const cell = this.dungeon.matrix[row][col];
+        if (cell.card) {
+          cell.available = !cell.cardFaceDown;
+        } else {
+          const adjacentCellsWithCards = this._getAdjacentCells({ row, col }).filter(
+            (cell) => cell.card
+          );
+          if (adjacentCellsWithCards.length === 1 && adjacentCellsWithCards[0].cardFaceDown) {
+            cell.available = true;
+          }
+        }
+      }
+    }
+  }
+
+  _getAdjacentCells({ row, col }) {
+    const adjacentCells = [];
+    if (row > 0) {
+      adjacentCells.push(this.dungeon.matrix[row - 1][col]);
+    }
+    if (row < this.dungeon.matrix.length - 1) {
+      adjacentCells.push(this.dungeon.matrix[row + 1][col]);
+    }
+    if (col > 0) {
+      adjacentCells.push(this.dungeon.matrix[row][col - 1]);
+    }
+    if (col < this.dungeon.matrix[0].length - 1) {
+      adjacentCells.push(this.dungeon.matrix[row][col + 1]);
+    }
+    return adjacentCells;
+  }
+
+  /**
+   * Expand the dungeon if needed.
+   *  - If the dungeon is not at max width, add a column to the left or right.
+   *  - If the dungeon is not at max height, add a row to the top or bottom.
+   */
+  _expandDungeon() {
     const {
       minRow,
       maxRow,
@@ -408,36 +451,33 @@ class Game {
       for (let row = 0; row < this.dungeon.matrix.length; row += 1) {
         this.dungeon.matrix[row].unshift(new Cell());
       }
-    } else if (addToRight) {
+    }
+    if (addToRight) {
       for (let row = 0; row < this.dungeon.matrix.length; row += 1) {
         this.dungeon.matrix[row].push(new Cell());
       }
-    } else if (addToTop) {
+    }
+    if (addToTop) {
       const newRow = [];
       for (let col = 0; col < this.dungeon.matrix[0].length; col += 1) {
         newRow.push(new Cell());
       }
       this.dungeon.matrix.unshift(newRow);
-    } else if (addToBottom) {
+    }
+    if (addToBottom) {
       const newRow = [];
       for (let col = 0; col < this.dungeon.matrix[0].length; col += 1) {
         newRow.push(new Cell());
       }
       this.dungeon.matrix.push(newRow);
-    } else {
-      console.debug("no need to add row or column", {
-        minRow,
-        maxRow,
-        minCol,
-        maxCol,
-        currentWidth,
-        currentHeight,
-      });
     }
-
-    this._trimDungeon();
   }
 
+  /**
+   * Trim the dungeon if needed.
+   * - If the dungeon is at max width, remove a column from the left or right.
+   * - If the dungeon is at max height, remove a row from the top or bottom.
+   */
   _trimDungeon() {
     const {
       currentWidth,
@@ -447,7 +487,6 @@ class Game {
       minCol,
       minRow,
     } = this.getMatrixInfo();
-    console.debug('trimming dungeon', { currentWidth, currentHeight });
 
     const trimTop = (
       currentHeight === MAX_HEIGHT
@@ -562,11 +601,16 @@ class GameRenderer {
         const cellElement = document.createElement("button");
         // cellElement.innerHTML = `${row}, ${col}`;  // DEBUG
         cellElement.classList.add("cell");
+        if (cell.available) {
+          cellElement.classList.add("available");
+        } else {
+          cellElement.disabled = true;
+        }
+
         if (cell.card) {
           cellElement.classList.add("card");
           if (cell.cardFaceDown) {
             cellElement.classList.add("card-back");
-            cellElement.disabled = true;
           } else {
             // TODO disable if not valid move
             cellElement.classList.add(
@@ -585,6 +629,7 @@ class GameRenderer {
       }
 
       const dungeonStockElement = document.querySelector("#dungeon .stock");
+      dungeonStockElement.innerHTML = `${this.game.dungeon.stock.length}`;
       if (this.game.dungeon.stock.length > 0) {
         dungeonStockElement.classList.add("card");
         dungeonStockElement.classList.add("card-back");
