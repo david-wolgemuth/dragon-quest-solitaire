@@ -4,7 +4,7 @@
 
 rendering
 
-- [ ] render the dungeon squares that would be able to expand up to seven wide and five high
+- [x] render the dungeon squares that would be able to expand up to seven wide and five high
 - [ ] logic for tile placement tile placement dungeon expansion placement
 - [ ] tiled background and sprites for the various characters
 - [ ] inventory section rendered
