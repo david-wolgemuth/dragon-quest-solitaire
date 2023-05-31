@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Dragon Quest Solitaire</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="styles.css" />
     <script src="index.js" async defer></script>
   </head>
+
   <body>
+    <h1>Dragon Quest Solitaire</h1>
+
     <!-- NAV -->
     <nav>
       <ul>
@@ -19,47 +27,39 @@
     </nav>
 
     <!-- TUTORIAL MODAL -->
-    <aside id="tutorial-modal">
-
-    </aside>
+    <aside id="tutorial-modal"></aside>
 
     <!-- STATUS -->
     <section id="status">
+      <h3>Status</h3>
       <div id="hp">
-        <div class="deck face-down stock"></div>
-        <div class="deck face-up available"></div>
+        <div class="pile face-down stock"></div>
+        <div class="pile face-up available"></div>
       </div>
       <div id="fate">
-        <div class="deck face-down stock"></div>
-        <div class="deck face-up available"></div>
+        <div class="pile face-down stock"></div>
+        <div class="pile face-up available"></div>
       </div>
       <div id="inventory">
-        <div class="deck face-down stock"></div>
-        <div class="deck face-up available"></div>
+        <div class="pile face-down stock"></div>
+        <div class="pile face-up available"></div>
       </div>
       <div id="gems">
-        <div class="deck face-down stock"></div>
-        <div class="deck face-up available"></div>
+        <div class="pile face-down stock"></div>
+        <div class="pile face-up available"></div>
       </div>
     </section>
 
+
     <!-- DUNGEON -->
     <main id="dungeon">
-      <div class="row">
-        <div class="cell"></div>
-        <div class="cell available"></div>
-        <div class="cell"></div>
-      </div>
-      <div class="row">
-        <div class="cell available"></div>
-        <div class="cell card face-down"></div>
-        <div class="cell available"></div>
-      </div>
-      <div class="row">
-        <div class="cell"></div>
-        <div class="cell available"></div>
-        <div class="cell"></div>
+      <h3>Dungeon</h3>
+      <div class="stock"></div>
+
+      <div class="matrix-container">
+        <div class="matrix"></div>
       </div>
     </main>
+
   </body>
 </html>

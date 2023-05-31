@@ -25,6 +25,7 @@ infra
 
 - [ ] auto deploy GitHub pages
 - [ ] progressive web app download
+- [ ] spritesheet to images (for now, just using deck api ...)
 
 misc features
 
