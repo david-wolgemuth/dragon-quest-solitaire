@@ -6,9 +6,9 @@ rendering
 
 - [x] render the dungeon squares that would be able to expand up to seven wide and five high
 - [x] logic for tile placement tile placement dungeon expansion placement
+- [x] inventory section rendered
+- [x] the fate deck renderer
 - [ ] tiled background and sprites for the various characters
-- [ ] inventory section rendered
-- [ ] the fate deck renderer
 
 game logic
 

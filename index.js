@@ -261,7 +261,7 @@ class Game {
       ]),
     };
 
-    this.items = {
+    this.inventory = {
       stock: shuffle(
         buildPile([
           [HEARTS, JACK],
@@ -291,18 +291,21 @@ class Game {
           [DIAMONDS, ACE],
         ])
       ),
-      obtained: [],
+      available: [],
     };
 
-    this.fate = shuffle(
-      buildPile([
-        [HEARTS, SIX],
-        [HEARTS, SEVEN],
-        [HEARTS, EIGHT],
-        [HEARTS, NINE],
-        [HEARTS, TEN],
-      ])
-    );
+    this.fate = {
+      stock: shuffle(
+        buildPile([
+          [HEARTS, SIX],
+          [HEARTS, SEVEN],
+          [HEARTS, EIGHT],
+          [HEARTS, NINE],
+          [HEARTS, TEN],
+        ])
+      ),
+      available: [],
+    };
 
     this.dungeon = {
       stock: shuffle(
@@ -337,6 +340,7 @@ class Game {
         ])
       ),
       matrix: [[new Cell()]],
+      available: [],  // match pattern for status piles, but not used
     };
     const centerCell = this.dungeon.matrix[0][0];
     centerCell.card = this.dungeon.stock.pop();
@@ -558,35 +562,15 @@ class Game {
     const renderer = new GameRenderer(this);
     renderer.renderHp();
     renderer.renderDungeon();
+    renderer.renderFate();
+    renderer.renderInventory();
+    renderer.renderGems();
   }
 }
 
 class GameRenderer {
   constructor(game) {
     this.game = game;
-  }
-
-  renderHp() {
-    const hpStockElement = document.querySelector("#hp .stock");
-    if (this.game.hp.stock.length > 0) {
-      hpStockElement.classList.add("card");
-      hpStockElement.classList.add("card-back");
-    } else {
-      hpStockElement.classList.remove("card");
-      hpStockElement.classList.remove("card-back");
-    }
-
-    const hpAvailableElement = document.querySelector("#hp .available");
-    if (this.game.hp.available.length > 0) {
-      const topCard = this.game.hp.available[this.game.hp.available.length - 1];
-      hpAvailableElement.classList.add("card");
-      hpAvailableElement.classList.add(
-        `card-${topCard.suit.code}${topCard.value.code}`
-      );
-    } else {
-      hpAvailableElement.classList.remove("card");
-      hpAvailableElement.classList.remove("card-back");
-    }
   }
 
   renderDungeon() {
@@ -627,16 +611,52 @@ class GameRenderer {
         }
         dungeonMatrixElement.appendChild(cellElement);
       }
+    }
 
-      const dungeonStockElement = document.querySelector("#dungeon .stock");
-      dungeonStockElement.innerHTML = `${this.game.dungeon.stock.length}`;
-      if (this.game.dungeon.stock.length > 0) {
-        dungeonStockElement.classList.add("card");
-        dungeonStockElement.classList.add("card-back");
-      } else {
-        dungeonStockElement.classList.remove("card");
-        dungeonStockElement.classList.remove("card-back");
-      }
+    this._renderStatsPiles("dungeon");
+  }
+
+  renderHp() {
+    this._renderStatsPiles("hp");
+  }
+
+  renderInventory() {
+    this._renderStatsPiles("inventory");
+  }
+
+  renderGems() {
+    this._renderStatsPiles("gems");
+  }
+
+  renderFate() {
+    this._renderStatsPiles("fate");
+  }
+
+  _renderStatsPiles(key) {
+    const stockElement = document.querySelector(`#${key}-stock`);
+
+    if (this.game[key].stock.length > 0) {
+      const cardElement = document.createElement("div");
+      cardElement.innerHTML = `${this.game[key].stock.length}`;
+      cardElement.classList.add("card");
+      cardElement.classList.add("card-back");
+      stockElement.appendChild(cardElement);
+    } else {
+      stockElement.innerHTML = '';
+    }
+
+    const availableElement = document.querySelector(`#${key}-available`);
+    if (this.game[key].available.length > 0) {
+      const topCard = this.game[key].available[this.game[key].available.length - 1];
+      const cardElement = document.createElement("div");
+      cardElement.innerHTML = `${topCard.value.code}`;
+      cardElement.classList.add("card");
+      cardElement.classList.add(
+        `card-${topCard.suit.code}${topCard.value.code}`
+      );
+      availableElement.appendChild(cardElement);
+    } else {
+      availableElement.innerHTML = '';
     }
   }
 }

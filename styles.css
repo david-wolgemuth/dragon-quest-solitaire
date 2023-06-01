@@ -2,7 +2,7 @@
   box-sizing: border-box;
 }
 
-.matrix-container {
+#dungeon {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -20,11 +20,34 @@
   /* padding: 10px; */
 }
 
+#status-table {
+  /* evenly spaced, all columns same width, faint border, clean */
+  margin: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid lightgray;
+  width: 100%;
+}
+
+#status-table td {
+  /* all columns same width */
+  width: 20%;
+  border: 1px solid lightgray;
+  text-align: center;
+}
+
+#status-table .card {
+  /* all columns same width */
+  margin: auto;
+}
+
 .cell {
   border: none;
   outline: 1px dotted lightgray;
   padding: 10px;
   background: #fff;
+  width: 48px;
+  height: 64px;
 }
 
 @keyframes pulsate-green-outline {

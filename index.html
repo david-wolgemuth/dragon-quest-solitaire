@@ -30,35 +30,42 @@
     <aside id="tutorial-modal"></aside>
 
     <!-- STATUS -->
-    <section id="status">
-      <h3>Status</h3>
-      <div id="hp">
-        <div class="pile face-down stock"></div>
-        <div class="pile face-up available"></div>
-      </div>
-      <div id="fate">
-        <div class="pile face-down stock"></div>
-        <div class="pile face-up available"></div>
-      </div>
-      <div id="inventory">
-        <div class="pile face-down stock"></div>
-        <div class="pile face-up available"></div>
-      </div>
-      <div id="gems">
-        <div class="pile face-down stock"></div>
-        <div class="pile face-up available"></div>
-      </div>
-    </section>
+    <table id="status-table">
+      <caption>Current game status</caption>
+      <thead>
+        <tr>
+          <th>HP</th>
+          <th>Inventory</th>
+          <th>Gems</th>
+          <th>Fate</th>
+          <th>Dungeon</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="stock">
+          <td id="hp-stock"></td>
+          <td id="inventory-stock"></td>
+          <td id="gems-stock"></td>
+          <td id="fate-stock"></td>
+          <td id="dungeon-stock"></td>
+        </tr>
+        <tr id="available">
+          <td id="hp-available"></td>
+          <td id="inventory-available"></td>
+          <td id="gems-available"></td>
+          <td id="fate-available"></td>
+          <td id="dungeon-available"></td>  <!-- dungeon-available will always be empty... -->
+        </tr>
+      </tbody>
+    </table>
 
+    <br>
+    <hr>
+    <br>
 
     <!-- DUNGEON -->
     <main id="dungeon">
-      <h3>Dungeon</h3>
-      <div class="stock"></div>
-
-      <div class="matrix-container">
-        <div class="matrix"></div>
-      </div>
+      <div class="matrix"></div>
     </main>
 
   </body>
