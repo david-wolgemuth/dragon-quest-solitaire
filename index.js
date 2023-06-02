@@ -147,6 +147,7 @@ const QUEEN = VALUES.QUEEN.key;
 const KING = VALUES.KING.key;
 const JOKER = VALUES.JOKER.key;
 
+
 class Card {
   constructor(suitKey, valueKey) {
     if (!Object.keys(SUITS).includes(suitKey)) {
@@ -167,6 +168,228 @@ class Card {
     return VALUES[this.valueKey];
   }
 }
+
+function buildPitTrapCard({ hidden, damage }) {
+  if (hidden) {
+    return {
+      name: `Hidden Pit Trap (${damage} damage)`,
+
+      description: `You fall into a hidden pit.
+        Take ${damage} damage to resolve this tile, mandatory.
+        If you have gems, they will reduce the damage taken
+      `,
+      resolver: (game) => {
+        game.loseHealth(damage, { gems: true });
+      },
+    };
+  } else {
+    return {
+      name: `Visible Pit Trap (${damage} damage)`,
+      description: `Take ${damage} damage to cross the pit trap, optional.
+        If you have gems, they w reduce the damage taken`,
+      resolver: (game) => {
+        game.loseHealth(damage);
+      },
+    };
+  }
+}
+
+function buildPassageCard(suit, value) {
+  const oppositeSuit = suit === CLUBS ? SPADES : CLUBS;
+
+  return {
+    name: `Passage (${value})`,
+    description: `Impassable until you have found
+      the other end of the passage (${value} of ${oppositeSuit}})`,
+    resolver: (game) => {
+      game.foundPassage(suit, value);
+    },
+  };
+}
+
+function buildEnemyCard({
+    name,
+    minFateToDefeat,
+    damageTakenIfUnsuccessful,
+    resolveCriticalSuccess,
+    resolveCriticalSuccessDescription,
+  }) {
+  return {
+    name,
+    description: `Fight Enemy "${name}".
+      Pull a card from the Fate Deck (5 cards, 6-10 of Hearts),
+      If you pull a card with a value of ${minFateToDefeat} or higher,
+        the enemy will be defeated and you will take no damage.
+
+      If you pull a perfect 10 of Hearts (Critical Success),
+        ${resolveCriticalSuccessDescription}
+
+      If you fail to defeat the enemy,
+        you lose you will take ${damageTakenIfUnsuccessful} damage.
+        Game over if you lose all your health.
+    `,
+    resolver: (game) => {
+      const value = game.fateCheck();
+      if (value < minFateToDefeat) {
+        game.loseHealth(damageTakenIfUnsuccessful);
+      } else if (value === 10) {
+        resolveCriticalSuccess(game);
+      }
+    },
+  };
+}
+
+const DUNGEON_CARDS = {
+  [SPADES]: {
+    [ACE]: {
+      name: "Exit",
+      symbol: "⇧",
+      description: `Exit to the next level of the dungeon,
+        will reset all dungeon cards back to the deck but keep your current stats.
+
+        If you have defeated the Dragon Queen (Queen of Spades) will end the game - you have won.
+      `,
+      resolver: (game) => {
+        game.resetDungeon();
+      },
+    },
+    [TWO]: buildPitTrapCard({ hidden: true, damage: 2 }),
+    [THREE]: buildPitTrapCard({ hidden: false, damage: 1 }),
+    [FOUR]: buildPassageCard(SPADES, FOUR),
+    [FIVE]: buildPassageCard(SPADES, FIVE),
+    [SIX]: buildPassageCard(SPADES, SIX),
+    [SEVEN]: {
+      name: 'Gem',
+      description: 'Take 1 gem',
+      resolver: (game) => {
+        game.gainGem();
+      }
+    },
+    [EIGHT]: {
+      name: 'Healing',
+      description: 'Gain 2 Health, up to your max health',
+      resolver: (game) => {
+        game.gainHealth(2);
+      },
+    },
+    [NINE]: {
+      name: 'Treasure Chest',
+      description: 'Gain 1 item from the treasure chest',
+      resolver: (game) => {
+        game.gainTreasure();
+      },
+    },
+    [TEN]: buildEnemyCard({
+      name: "Slime",
+      minFateToDefeat: 7,
+      damageTakenIfUnsuccessful: 1,
+      resolveCriticalSuccess: (game) => {
+        game.gainHealth();
+      },
+      resolveCriticalSuccessDescription: "You will heal 1 health.",
+    }),
+    [JACK]: buildEnemyCard({
+      name: "Skeleton",
+      minFateToDefeat: 8,
+      damageTakenIfUnsuccessful: 1,
+      resolveCriticalSuccess: (game) => {
+        game.gainGem();
+      },
+      resolveCriticalSuccessDescription: "You will gain 1 gem.",
+    }),
+    [QUEEN]: buildEnemyCard({
+      name: "Dragon Queen",
+      minFateToDefeat: 9,
+      damageTakenIfUnsuccessful: 3,
+      resolveCriticalSuccess: (game) => {
+        game.defeatDragonQueen();
+      },
+      resolveCriticalSuccessDescription: `You will defeat the Dragon Queen
+        and win the game upon exiting the dungeon.
+      `,
+    }),
+    [KING]: buildEnemyCard({
+      name: "Troll",
+      minFateToDefeat: 9,
+      damageTakenIfUnsuccessful: 2,
+      resolveCriticalSuccess: (game) => {
+        game.gainTreasure();
+      },
+      resolveCriticalSuccessDescription: "You will gain 1 item from the treasure chest.",
+    }),
+    [JOKER]: {
+      name: "Generous Wizard",
+      description: `
+        A generous wizard offers you a choice of 4 cards.
+          Treasure, Healing, Gem, or Exit
+        `,
+      resolver: (game) => {
+        game.getUserInputWildcard();
+      },
+    },
+  },
+
+  [CLUBS]: {
+    [ACE]: {
+      name: "Merchant",
+      description: `Wildcard: Treasure, Healing, Gem, or Exit. Costs 1 one gem.`,
+      resolver: (game) => {
+        // TODO - need to get user input...
+      },
+    },
+    [TWO]: buildPitTrapCard({ damage: 2, hidden: false }),
+    [THREE]: buildPitTrapCard({ damage: 3, hidden: false }),
+    [FOUR]: buildPassageCard(CLUBS, FOUR),
+    [FIVE]: buildPassageCard(CLUBS, FIVE),
+    [SIX]: buildPassageCard(CLUBS, SIX),
+    // [SEVEN]: buildGemCard(),
+    // [EIGHT]: buildHealingCard(),
+    // [NINE]: buildTreasureChestCard(),
+    // [TEN]: buildEnemyCard({ name: "Slime" }),
+    // [JACK]: buildEnemyCard({ name: "Skeleton" }),
+    [QUEEN]: buildEnemyCard({
+      name: "Young Dragon",
+      minFateToDefeat: 10,
+      damageTakenIfUnsuccessful: 1,
+      resolveCriticalSuccess: (game) => {
+        game.gainGem(3);
+      },
+      resolveCriticalSuccessDescription: "You will gain 3 gems",
+    }),
+    [KING]: buildEnemyCard({
+      name: "Troll King",
+      minFateToDefeat: 9,
+      damageTakenIfUnsuccessful: 3,
+      resolveCriticalSuccess: (game) => {
+        game.gainGem();
+        game.gainTreasure();
+        game.gainHealth();
+      },
+      resolveCriticalSuccessDescription: "You will gain 1 gem, 1 item from the treasure chest, and 1 health.",
+    }),
+    [JOKER]: {
+      name: "Merchant Wizard",
+      description: `
+        For price of 1 gem, a merchant wizard offers you a choice of 4 cards,
+          Treasure, Healing, Gem, or Exit
+      `,
+      resolver: (game) => {
+        if (game.gems.available.length < 1) {
+          console.error('Should not be able to get here without a gem - card should be disabled');
+        }
+        game.getUserInputWildcard();
+        game.loseGem();
+      },
+    },
+  },
+}
+
+DUNGEON_CARDS[CLUBS][SEVEN] = DUNGEON_CARDS[SPADES][SEVEN];  // Gem
+DUNGEON_CARDS[CLUBS][EIGHT] = DUNGEON_CARDS[SPADES][EIGHT];  // Healing
+DUNGEON_CARDS[CLUBS][NINE] = DUNGEON_CARDS[SPADES][NINE];  // Treasure Chest
+DUNGEON_CARDS[CLUBS][TEN] = DUNGEON_CARDS[SPADES][TEN];  // Slime
+DUNGEON_CARDS[CLUBS][JACK] = DUNGEON_CARDS[SPADES][JACK];  // Skeleton
+
 
 class Cell {
   constructor() {
@@ -250,7 +473,7 @@ createStyleSheet();
 
 class Game {
   constructor() {
-    this.hp = {
+    this.health = {
       stock: [],
       available: buildPile([
         [HEARTS, ACE],
@@ -349,7 +572,6 @@ class Game {
   }
 
   addCardToDungeon({ row, col }) {
-    console.log("addCardToDungeon", { row, col });
     const card = this.dungeon.stock.pop();
     const cell = this.dungeon.matrix[row][col];
     cell.cardFaceDown = false;
@@ -360,6 +582,8 @@ class Game {
 
   resolveCard({ row, col }) {
     const cell = this.dungeon.matrix[row][col];
+    const dungeonCard = DUNGEON_CARDS[cell.card.suit.key][cell.card.value.key];
+    dungeonCard.resolver(this);
     cell.cardFaceDown = true;
     this.updateDungeon();
     this.render();
@@ -369,6 +593,50 @@ class Game {
     this._expandDungeon();
     this._trimDungeon();
     this._updateDungeonAvailability();
+  }
+
+  gainHealth(amount) {
+    this._gainCard("health", amount);
+  }
+
+  loseHealth(amount) {
+    this._loseCard("health", amount);
+  }
+
+  gainGem(amount) {
+    this._gainCard("gem", amount);
+  }
+
+  loseGem(amount) {
+    this._loseCard("gem", amount);
+  }
+
+  gainTreasure(amount) {
+    this._gainCard("treasure", amount);
+  }
+
+  loseTreasure(amount) {
+    this._loseCard("treasure", amount);
+  }
+
+  _gainCard(key, amount) {
+    for (let i = 0; i < amount; i += 1) {
+      if (this[key].stock.length === 0) {
+        return;
+      }
+      const card = this[key].stock.pop();
+      this[key].available.push(card);
+    }
+  }
+
+  _loseCard(key, amount) {
+    for (let i = 0; i < amount; i += 1) {
+      if (this[key].available.length === 0) {
+        return;
+      }
+      const card = this[key].available.pop();
+      this[key].stock.push(card);
+    }
   }
 
   /**
@@ -560,7 +828,7 @@ class Game {
 
   render() {
     const renderer = new GameRenderer(this);
-    renderer.renderHp();
+    renderer.renderhealth();
     renderer.renderDungeon();
     renderer.renderFate();
     renderer.renderInventory();
@@ -601,12 +869,21 @@ class GameRenderer {
               `card-${cell.card.suit.code}${cell.card.value.code}`
             );
             cellElement.onclick = () => {
-              this.game.resolveCard({ row, col });
+              this.addTutorialModal(`<div>
+                <div class="card card-${cell.card.suit.code}${cell.card.value.code}"></div>
+                The rules...
+              </div>`, () => {
+                this.game.resolveCard({ row, col });
+              });
             };
           }
         } else {
           cellElement.onclick = () => {
-            this.game.addCardToDungeon({ row, col });
+            this.addTutorialModal(`<div>
+              the rules about adding cards to the dungeon...
+            </div>`, () => {
+              this.game.addCardToDungeon({ row, col });
+            });
           };
         }
         dungeonMatrixElement.appendChild(cellElement);
@@ -616,8 +893,32 @@ class GameRenderer {
     this._renderStatsPiles("dungeon");
   }
 
-  renderHp() {
-    this._renderStatsPiles("hp");
+  addTutorialModal(content, onAccept) {
+
+    onAccept();
+
+    return;  // DISABLED FOR NOW !!
+
+    const tutorialModalElement = document.getElementById("tutorial-modal");
+    tutorialModalElement.classList.add("visible");
+
+    const tutorialModalContentElement = document.getElementById("tutorial-modal-inner-content");
+    tutorialModalContentElement.innerHTML = content;
+
+    const tutorialModalAcceptButton = document.getElementById("tutorial-modal-accept");
+    tutorialModalAcceptButton.onclick = () => {
+      tutorialModalElement.classList.remove("visible");
+      onAccept();
+    }
+
+    const tutorialModalCancelButton = document.getElementById("tutorial-modal-dismiss");
+    tutorialModalCancelButton.onclick = () => {
+      tutorialModalElement.classList.remove("visible");
+    }
+  }
+
+  renderhealth() {
+    this._renderStatsPiles("health");
   }
 
   renderInventory() {
@@ -634,6 +935,7 @@ class GameRenderer {
 
   _renderStatsPiles(key) {
     const stockElement = document.querySelector(`#${key}-stock`);
+    stockElement.innerHTML = '';  // clear
 
     if (this.game[key].stock.length > 0) {
       const cardElement = document.createElement("div");
@@ -641,11 +943,10 @@ class GameRenderer {
       cardElement.classList.add("card");
       cardElement.classList.add("card-back");
       stockElement.appendChild(cardElement);
-    } else {
-      stockElement.innerHTML = '';
     }
 
     const availableElement = document.querySelector(`#${key}-available`);
+    availableElement.innerHTML = '';  // clear
     if (this.game[key].available.length > 0) {
       const topCard = this.game[key].available[this.game[key].available.length - 1];
       const cardElement = document.createElement("div");
@@ -655,15 +956,19 @@ class GameRenderer {
         `card-${topCard.suit.code}${topCard.value.code}`
       );
       availableElement.appendChild(cardElement);
-    } else {
-      availableElement.innerHTML = '';
     }
   }
 }
 
 function main() {
-  const game = new Game();
+  let game = new Game();
   game.render();
+
+  const resetGameButton = document.querySelector("#reset-game");
+  resetGameButton.onclick = () => {
+    game = new Game();
+    game.render();
+  }
 }
 
 main();

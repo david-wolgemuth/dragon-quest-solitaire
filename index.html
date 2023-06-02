@@ -27,14 +27,28 @@
     </nav>
 
     <!-- TUTORIAL MODAL -->
-    <aside id="tutorial-modal"></aside>
+    <aside id="tutorial-modal">
+      <div id="tutorial-modal-content">
+        <h2>Tutorial</h2>
+        <div id="tutorial-modal-inner-content"></div>
+        <br>
+        <hr>
+        <br>
+        <div id="tutorial-modal-actions">
+          <button id="tutorial-modal-dismiss">Dismiss</button>
+          <button id="tutorial-modal-accept">Accept</button>
+        </div>
+      </div>
+    </aside>
+
+    <button id="reset-game">Reset Game</button>
 
     <!-- STATUS -->
     <table id="status-table">
       <caption>Current game status</caption>
       <thead>
         <tr>
-          <th>HP</th>
+          <th>Health</th>
           <th>Inventory</th>
           <th>Gems</th>
           <th>Fate</th>
@@ -43,14 +57,14 @@
       </thead>
       <tbody>
         <tr id="stock">
-          <td id="hp-stock"></td>
+          <td id="health-stock"></td>
           <td id="inventory-stock"></td>
           <td id="gems-stock"></td>
           <td id="fate-stock"></td>
           <td id="dungeon-stock"></td>
         </tr>
         <tr id="available">
-          <td id="hp-available"></td>
+          <td id="health-available"></td>
           <td id="inventory-available"></td>
           <td id="gems-available"></td>
           <td id="fate-available"></td>

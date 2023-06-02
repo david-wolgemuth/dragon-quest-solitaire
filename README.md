@@ -12,9 +12,10 @@ rendering
 
 game logic
 
-- [ ] game loop with reset
-- [ ] logic for gems, treasure chest, healing fountain
-- [ ] logic for slimes, skeletons, trolls, dragon
+- [x] game loop with reset
+- [x] logic for gems, treasure chest, healing fountain
+- [x] logic for slimes, skeletons, trolls, dragon
+- [ ] fate check
 - [ ] logic for item usage
 - [ ] logic for passages
 - [ ] logic for aces, dungeon next dungeon
