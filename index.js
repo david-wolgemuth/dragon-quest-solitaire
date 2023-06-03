@@ -180,6 +180,7 @@ function buildPitTrapCard({ hidden, damage }) {
       `,
       resolver: (game) => {
         game.loseHealth(damage, { gems: true });
+        return true;
       },
     };
   } else {
@@ -189,6 +190,7 @@ function buildPitTrapCard({ hidden, damage }) {
         If you have gems, they w reduce the damage taken`,
       resolver: (game) => {
         game.loseHealth(damage);
+        return true;
       },
     };
   }
@@ -202,7 +204,7 @@ function buildPassageCard(suit, value) {
     description: `Impassable until you have found
       the other end of the passage (${value} of ${oppositeSuit}})`,
     resolver: (game) => {
-      game.foundPassage(suit, value);
+      return game.foundPassage(suit, value);
     },
   };
 }
@@ -235,6 +237,7 @@ function buildEnemyCard({
       } else if (value === 10) {
         resolveCriticalSuccess(game);
       }
+      return true;  // always resolve, even if you lose
     },
   };
 }
@@ -251,6 +254,7 @@ const DUNGEON_CARDS = {
       `,
       resolver: (game) => {
         game.resetDungeon();
+        return true;
       },
     },
     [TWO]: buildPitTrapCard({ hidden: true, damage: 2 }),
@@ -263,6 +267,7 @@ const DUNGEON_CARDS = {
       description: 'Take 1 gem',
       resolver: (game) => {
         game.gainGem();
+        return true;
       }
     },
     [EIGHT]: {
@@ -270,13 +275,15 @@ const DUNGEON_CARDS = {
       description: 'Gain 2 Health, up to your max health',
       resolver: (game) => {
         game.gainHealth(2);
+        return true;
       },
     },
     [NINE]: {
       name: 'Treasure Chest',
       description: 'Gain 1 item from the treasure chest',
       resolver: (game) => {
-        game.gainTreasure();
+        game.gainInventory();
+        return true;
       },
     },
     [TEN]: buildEnemyCard({
@@ -313,28 +320,39 @@ const DUNGEON_CARDS = {
       minFateToDefeat: 9,
       damageTakenIfUnsuccessful: 2,
       resolveCriticalSuccess: (game) => {
-        game.gainTreasure();
+        game.gainInventory();
       },
       resolveCriticalSuccessDescription: "You will gain 1 item from the treasure chest.",
     }),
-    [JOKER]: {
-      name: "Generous Wizard",
-      description: `
-        A generous wizard offers you a choice of 4 cards.
-          Treasure, Healing, Gem, or Exit
-        `,
-      resolver: (game) => {
-        game.getUserInputWildcard();
-      },
-    },
   },
 
   [CLUBS]: {
     [ACE]: {
       name: "Merchant",
       description: `Wildcard: Treasure, Healing, Gem, or Exit. Costs 1 one gem.`,
+      /**
+       *
+       * @param {Game} game
+       * @returns
+       */
       resolver: (game) => {
-        // TODO - need to get user input...
+        if (game.gems.available.length < 1) {
+          game.displayMessage("You need at least 1 gem to use this card.");
+          return false;
+        }
+        game.getUserInputInventoryCardSelection(
+          "Purchase an inventory item: Treasure, Healing, Gem, or Exit",
+          (card) => {
+            game.inventory.stock = game.inventory.stock.filter((c) => {
+              return c.suitKey !== card.suitKey && c.valueKey !== card.valueKey;
+            });
+            game.inventory.available.push(card);
+            game.loseGem();
+          },
+        )
+        // TODO - does not handle the case where the user does not select a card...
+        //  should return a promise or callback to handle this case
+        return true
       },
     },
     [TWO]: buildPitTrapCard({ damage: 2, hidden: false }),
@@ -362,26 +380,37 @@ const DUNGEON_CARDS = {
       damageTakenIfUnsuccessful: 3,
       resolveCriticalSuccess: (game) => {
         game.gainGem();
-        game.gainTreasure();
+        game.gainInventory();
         game.gainHealth();
       },
       resolveCriticalSuccessDescription: "You will gain 1 gem, 1 item from the treasure chest, and 1 health.",
     }),
+  },
+
+  [BLACK]: {
     [JOKER]: {
-      name: "Merchant Wizard",
+      name: "Generous Wizard",
       description: `
-        For price of 1 gem, a merchant wizard offers you a choice of 4 cards,
+        A generous wizard offers you a choice of 4 cards.
           Treasure, Healing, Gem, or Exit
-      `,
+        `,
       resolver: (game) => {
-        if (game.gems.available.length < 1) {
-          console.error('Should not be able to get here without a gem - card should be disabled');
-        }
-        game.getUserInputWildcard();
-        game.loseGem();
+        game.getUserInputInventoryCardSelection(
+          "Choose an inventory item to gain: Treasure, Healing, Gem, or Exit",
+          (card) => {
+            game.inventory.stock = game.inventory.stock.filter((c) => {
+              return c.suitKey !== card.suitKey && c.valueKey !== card.valueKey;
+            });
+            game.inventory.available.push(card);
+            game.loseGem();
+          },
+        )
+        // TODO - does not handle the case where the user does not select a card...
+        //  should return a promise or callback to handle this case
+        return true
       },
     },
-  },
+  }
 }
 
 DUNGEON_CARDS[CLUBS][SEVEN] = DUNGEON_CARDS[SPADES][SEVEN];  // Gem
@@ -500,20 +529,18 @@ class Game {
     };
 
     this.gems = {
-      stock: shuffle(
-        buildPile([
-          [DIAMONDS, TEN],
-          [DIAMONDS, NINE],
-          [DIAMONDS, EIGHT],
-          [DIAMONDS, SEVEN],
-          [DIAMONDS, SIX],
-          [DIAMONDS, FIVE],
-          [DIAMONDS, FOUR],
-          [DIAMONDS, THREE],
-          [DIAMONDS, TWO],
-          [DIAMONDS, ACE],
-        ])
-      ),
+      stock: buildPile([
+        [DIAMONDS, TEN],
+        [DIAMONDS, NINE],
+        [DIAMONDS, EIGHT],
+        [DIAMONDS, SEVEN],
+        [DIAMONDS, SIX],
+        [DIAMONDS, FIVE],
+        [DIAMONDS, FOUR],
+        [DIAMONDS, THREE],
+        [DIAMONDS, TWO],
+        [DIAMONDS, ACE],
+      ]).reverse(),
       available: [],
     };
 
@@ -583,10 +610,14 @@ class Game {
   resolveCard({ row, col }) {
     const cell = this.dungeon.matrix[row][col];
     const dungeonCard = DUNGEON_CARDS[cell.card.suit.key][cell.card.value.key];
-    dungeonCard.resolver(this);
-    cell.cardFaceDown = true;
-    this.updateDungeon();
-    this.render();
+    const resolved = dungeonCard.resolver(this);
+    if (resolved !== false) {
+      cell.cardFaceDown = true;
+      this.updateDungeon();
+      this.render();
+    } else {
+      // assume already displayed a message
+    }
   }
 
   updateDungeon() {
@@ -604,24 +635,105 @@ class Game {
   }
 
   gainGem(amount) {
-    this._gainCard("gem", amount);
+    this._gainCard("gems", amount);
   }
 
   loseGem(amount) {
-    this._loseCard("gem", amount);
+    this._loseCard("gems", amount);
   }
 
-  gainTreasure(amount) {
-    this._gainCard("treasure", amount);
+  gainInventory(amount) {
+    this._gainCard("inventory", amount);
   }
 
-  loseTreasure(amount) {
-    this._loseCard("treasure", amount);
+  loseInventory(amount) {
+    this._loseCard("inventory", amount);
+  }
+
+  /**
+   * Check all visible cards in the dungeon,
+   *  if corresponding passage is found,
+   *  marks as resolved (flipped)
+   *
+   * @returns {boolean} true if a passage was found, false otherwise
+   */
+  foundPassage(suit, value) {
+    const oppositeSuit = suit === CLUBS ? SPADES : CLUBS;
+    for (let row = 0; row < this.dungeon.matrix.length; row += 1) {
+      for (let col = 0; col < this.dungeon.matrix[row].length; col += 1) {
+        const cell = this.dungeon.matrix[row][col];
+        if (cell.card && cell.card.suitKey === oppositeSuit && cell.card.valueKey === value) {
+          cell.cardFaceDown = true; // (resolved)
+          return true;
+        }
+      }
+    }
+    this.displayMessage("You found a passage, but it doesn't match any other passage in the dungeon.");
+    return false;
+  }
+
+  displayMessage(message) {
+    const renderer = new GameRenderer(this);
+
+    renderer.renderMessage(message);
+  }
+
+  /**
+   * when a player encounters a merchant / wizard / etc
+   *  they must choose a card to add to their inventory
+   *
+   * @param {*} message
+   * @param {*} callback
+   */
+  getUserInputInventoryCardSelection(message, callback) {
+    const renderer = new GameRenderer(this);
+
+    // include Ace of Spades as a wild card - (Exit dungeon)
+    renderer.renderUserInputCardSelection(
+      message,
+      this.inventory.stock.concat([new Card(SPADES, ACE)]),
+      callback,
+    );
+  }
+
+  /**
+   * When a red joker card is used in inventory,
+   *  the player must choose a which inventory card to use it as
+   * @param {*} message
+   * @param {*} callback
+   */
+  getUserInputUseJokerCardSelection(message, callback) {
+    const renderer = new GameRenderer(this);
+
+    renderer.renderUserInputCardSelection(
+      message,
+      [new Card(RED, JACK), new Card(RED, QUEEN), new Card(RED, KING)],
+      callback,
+    );
+  }
+
+  /**
+   *
+   * @returns {number} (6-10)
+   */
+  fateCheck() {
+    if (this.fate.stock.length === 0) {
+      this.fate.stock = shuffle(this.fate.available);
+    }
+    const card = this.fate.stock.pop();
+    this.fate.available.push(card);
+
+    return card.value.order;
   }
 
   _gainCard(key, amount) {
+    if (!amount) {
+      amount = 1;
+    }
+    console.log(`_gainCard(${key}, ${amount})`, this[key].stock.length, this[key].available.length)
     for (let i = 0; i < amount; i += 1) {
       if (this[key].stock.length === 0) {
+        console.log(`_gainCard(${key}, ${amount}) - no more cards`)
         return;
       }
       const card = this[key].stock.pop();
@@ -828,7 +940,7 @@ class Game {
 
   render() {
     const renderer = new GameRenderer(this);
-    renderer.renderhealth();
+    renderer.renderHealth();
     renderer.renderDungeon();
     renderer.renderFate();
     renderer.renderInventory();
@@ -840,6 +952,36 @@ class GameRenderer {
   constructor(game) {
     this.game = game;
   }
+
+  renderMessage(message) {
+    const messageElement = document.querySelector("#message-modal");
+    const messageTextElement = document.querySelector("#message-modal-inner-content");
+    messageTextElement.innerHTML = message;
+    messageElement.classList.add("visible");
+    messageElement.onclick = (() => {
+      // click anywhere to dismiss
+      messageElement.classList.remove("visible");
+    });
+  }
+
+  renderUserInputCardSelection(message, cards, callback) {
+    const messageElement = document.querySelector("#message-modal");
+    const messageTextElement = document.querySelector("#message-modal-inner-content");
+    messageTextElement.innerHTML = message;
+
+    for (let card of cards) {
+      const cardButton = document.createElement("button");
+      cardButton.classList.add(
+        `card-${card.suit.code}${card.value.code}`
+      );
+      cardButton.onclick = (() => {
+        callback(card);
+        messageElement.classList.remove("visible");
+        messageTextElement.innerHTML = "";
+      });
+    }
+  }
+
 
   renderDungeon() {
     const dungeonMatrixElement = document.querySelector("#dungeon .matrix");
@@ -869,9 +1011,11 @@ class GameRenderer {
               `card-${cell.card.suit.code}${cell.card.value.code}`
             );
             cellElement.onclick = () => {
+              const dungeonCard = DUNGEON_CARDS[cell.card.suit.key][cell.card.value.key];
               this.addTutorialModal(`<div>
                 <div class="card card-${cell.card.suit.code}${cell.card.value.code}"></div>
-                The rules...
+                ${dungeonCard.name}
+                ${dungeonCard.description}
               </div>`, () => {
                 this.game.resolveCard({ row, col });
               });
@@ -917,7 +1061,7 @@ class GameRenderer {
     }
   }
 
-  renderhealth() {
+  renderHealth() {
     this._renderStatsPiles("health");
   }
 
@@ -950,7 +1094,7 @@ class GameRenderer {
     if (this.game[key].available.length > 0) {
       const topCard = this.game[key].available[this.game[key].available.length - 1];
       const cardElement = document.createElement("div");
-      cardElement.innerHTML = `${topCard.value.code}`;
+      // cardElement.innerHTML = `${topCard.value.code}`;
       cardElement.classList.add("card");
       cardElement.classList.add(
         `card-${topCard.suit.code}${topCard.value.code}`
