@@ -1,4 +1,4 @@
-# Dragon Quest Solitaire
+# [WIP] Dragon Quest Solitaire
 
 ## Backlog
 
