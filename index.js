@@ -1,152 +1,6 @@
 const MAX_WIDTH = 7;
 const MAX_HEIGHT = 5;
 
-const SUITS = {
-  HEARTS: {
-    key: "HEARTS",
-    code: "H",
-    display: "♥️",
-  },
-  CLUBS: {
-    key: "CLUBS",
-    code: "C",
-
-    display: "♣️",
-  },
-  DIAMONDS: {
-    key: "DIAMONDS",
-    code: "D",
-    display: "♦️",
-  },
-  SPADES: {
-    key: "SPADES",
-    code: "S",
-    display: "♠️",
-  },
-  BLACK: {
-    key: "BLACK",
-    display: "⚫️",
-    code: "B",
-    isColor: true,
-  },
-  RED: {
-    key: "RED",
-    display: "🔴",
-    code: "R",
-    isColor: true,
-  },
-};
-
-const HEARTS = SUITS.HEARTS.key;
-const CLUBS = SUITS.CLUBS.key;
-const DIAMONDS = SUITS.DIAMONDS.key;
-const SPADES = SUITS.SPADES.key;
-const BLACK = SUITS.BLACK.key;
-const RED = SUITS.RED.key;
-
-const VALUES = {
-  ACE: {
-    key: "ACE",
-    display: "A",
-    code: "A",
-    order: 1,
-  },
-  TWO: {
-    key: "TWO",
-    display: "2",
-    code: "2",
-    order: 2,
-  },
-  THREE: {
-    key: "THREE",
-    display: "3",
-    code: "3",
-    order: 3,
-  },
-  FOUR: {
-    key: "FOUR",
-    display: "4",
-    code: "4",
-    order: 4,
-  },
-  FIVE: {
-    key: "FIVE",
-    display: "5",
-    code: "5",
-    order: 5,
-  },
-  SIX: {
-    key: "SIX",
-    display: "6",
-    code: "6",
-    order: 6,
-  },
-  SEVEN: {
-    key: "SEVEN",
-    display: "7",
-    code: "7",
-    order: 7,
-  },
-  EIGHT: {
-    key: "EIGHT",
-    display: "8",
-    code: "8",
-    order: 8,
-  },
-  NINE: {
-    key: "NINE",
-    display: "9",
-    code: "9",
-    order: 9,
-  },
-  TEN: {
-    key: "TEN",
-    display: "10",
-    code: "0",
-    order: 10,
-  },
-  JACK: {
-    key: "JACK",
-    display: "J",
-    code: "J",
-    order: 11,
-  },
-  QUEEN: {
-    key: "QUEEN",
-    display: "Q",
-    code: "Q",
-    order: 12,
-  },
-  KING: {
-    key: "KING",
-    display: "K",
-    code: "K",
-    order: 13,
-  },
-  JOKER: {
-    key: "JOKER",
-    isJoker: true,
-    code: "X",
-    display: "X",
-    value: 14,
-  },
-};
-
-const ACE = VALUES.ACE.key;
-const TWO = VALUES.TWO.key;
-const THREE = VALUES.THREE.key;
-const FOUR = VALUES.FOUR.key;
-const FIVE = VALUES.FIVE.key;
-const SIX = VALUES.SIX.key;
-const SEVEN = VALUES.SEVEN.key;
-const EIGHT = VALUES.EIGHT.key;
-const NINE = VALUES.NINE.key;
-const TEN = VALUES.TEN.key;
-const JACK = VALUES.JACK.key;
-const QUEEN = VALUES.QUEEN.key;
-const KING = VALUES.KING.key;
-const JOKER = VALUES.JOKER.key;
-
 
 class Card {
   constructor(suitKey, valueKey) {
@@ -168,257 +22,6 @@ class Card {
     return VALUES[this.valueKey];
   }
 }
-
-function buildPitTrapCard({ hidden, damage }) {
-  if (hidden) {
-    return {
-      name: `Hidden Pit Trap (${damage} damage)`,
-
-      description: `You fall into a hidden pit.
-        Take ${damage} damage to resolve this tile, mandatory.
-        If you have gems, they will reduce the damage taken
-      `,
-      resolver: (game) => {
-        game.loseHealth(damage, { gems: true });
-        return true;
-      },
-    };
-  } else {
-    return {
-      name: `Visible Pit Trap (${damage} damage)`,
-      description: `Take ${damage} damage to cross the pit trap, optional.
-        If you have gems, they w reduce the damage taken`,
-      resolver: (game) => {
-        game.loseHealth(damage);
-        return true;
-      },
-    };
-  }
-}
-
-function buildPassageCard(suit, value) {
-  const oppositeSuit = suit === CLUBS ? SPADES : CLUBS;
-
-  return {
-    name: `Passage (${value})`,
-    description: `Impassable until you have found
-      the other end of the passage (${value} of ${oppositeSuit}})`,
-    resolver: (game) => {
-      return game.foundPassage(suit, value);
-    },
-  };
-}
-
-function buildEnemyCard({
-    name,
-    minFateToDefeat,
-    damageTakenIfUnsuccessful,
-    resolveCriticalSuccess,
-    resolveCriticalSuccessDescription,
-  }) {
-  return {
-    name,
-    description: `Fight Enemy "${name}".
-      Pull a card from the Fate Deck (5 cards, 6-10 of Hearts),
-      If you pull a card with a value of ${minFateToDefeat} or higher,
-        the enemy will be defeated and you will take no damage.
-
-      If you pull a perfect 10 of Hearts (Critical Success),
-        ${resolveCriticalSuccessDescription}
-
-      If you fail to defeat the enemy,
-        you lose you will take ${damageTakenIfUnsuccessful} damage.
-        Game over if you lose all your health.
-    `,
-    resolver: (game) => {
-      const value = game.fateCheck();
-      if (value < minFateToDefeat) {
-        game.loseHealth(damageTakenIfUnsuccessful);
-      } else if (value === 10) {
-        resolveCriticalSuccess(game);
-      }
-      return true;  // always resolve, even if you lose
-    },
-  };
-}
-
-const DUNGEON_CARDS = {
-  [SPADES]: {
-    [ACE]: {
-      name: "Exit",
-      symbol: "⇧",
-      description: `Exit to the next level of the dungeon,
-        will reset all dungeon cards back to the deck but keep your current stats.
-
-        If you have defeated the Dragon Queen (Queen of Spades) will end the game - you have won.
-      `,
-      resolver: (game) => {
-        game.resetDungeon();
-        return true;
-      },
-    },
-    [TWO]: buildPitTrapCard({ hidden: true, damage: 2 }),
-    [THREE]: buildPitTrapCard({ hidden: false, damage: 1 }),
-    [FOUR]: buildPassageCard(SPADES, FOUR),
-    [FIVE]: buildPassageCard(SPADES, FIVE),
-    [SIX]: buildPassageCard(SPADES, SIX),
-    [SEVEN]: {
-      name: 'Gem',
-      description: 'Take 1 gem',
-      resolver: (game) => {
-        game.gainGem();
-        return true;
-      }
-    },
-    [EIGHT]: {
-      name: 'Healing',
-      description: 'Gain 2 Health, up to your max health',
-      resolver: (game) => {
-        game.gainHealth(2);
-        return true;
-      },
-    },
-    [NINE]: {
-      name: 'Treasure Chest',
-      description: 'Gain 1 item from the treasure chest',
-      resolver: (game) => {
-        game.gainInventory();
-        return true;
-      },
-    },
-    [TEN]: buildEnemyCard({
-      name: "Slime",
-      minFateToDefeat: 7,
-      damageTakenIfUnsuccessful: 1,
-      resolveCriticalSuccess: (game) => {
-        game.gainHealth();
-      },
-      resolveCriticalSuccessDescription: "You will heal 1 health.",
-    }),
-    [JACK]: buildEnemyCard({
-      name: "Skeleton",
-      minFateToDefeat: 8,
-      damageTakenIfUnsuccessful: 1,
-      resolveCriticalSuccess: (game) => {
-        game.gainGem();
-      },
-      resolveCriticalSuccessDescription: "You will gain 1 gem.",
-    }),
-    [QUEEN]: buildEnemyCard({
-      name: "Dragon Queen",
-      minFateToDefeat: 9,
-      damageTakenIfUnsuccessful: 3,
-      resolveCriticalSuccess: (game) => {
-        game.defeatDragonQueen();
-      },
-      resolveCriticalSuccessDescription: `You will defeat the Dragon Queen
-        and win the game upon exiting the dungeon.
-      `,
-    }),
-    [KING]: buildEnemyCard({
-      name: "Troll",
-      minFateToDefeat: 9,
-      damageTakenIfUnsuccessful: 2,
-      resolveCriticalSuccess: (game) => {
-        game.gainInventory();
-      },
-      resolveCriticalSuccessDescription: "You will gain 1 item from the treasure chest.",
-    }),
-  },
-
-  [CLUBS]: {
-    [ACE]: {
-      name: "Merchant",
-      description: `Wildcard: Treasure, Healing, Gem, or Exit. Costs 1 one gem.`,
-      /**
-       *
-       * @param {Game} game
-       * @returns
-       */
-      resolver: (game) => {
-        if (game.gems.available.length < 1) {
-          game.displayMessage("You need at least 1 gem to use this card.");
-          return false;
-        }
-        game.getUserInputInventoryCardSelection(
-          "Purchase an inventory item: Treasure, Healing, Gem, or Exit",
-          (card) => {
-            game.inventory.stock = game.inventory.stock.filter((c) => {
-              return c.suitKey !== card.suitKey && c.valueKey !== card.valueKey;
-            });
-            game.inventory.available.push(card);
-            game.loseGem();
-          },
-        )
-        // TODO - does not handle the case where the user does not select a card...
-        //  should return a promise or callback to handle this case
-        return true
-      },
-    },
-    [TWO]: buildPitTrapCard({ damage: 2, hidden: false }),
-    [THREE]: buildPitTrapCard({ damage: 3, hidden: false }),
-    [FOUR]: buildPassageCard(CLUBS, FOUR),
-    [FIVE]: buildPassageCard(CLUBS, FIVE),
-    [SIX]: buildPassageCard(CLUBS, SIX),
-    // [SEVEN]: buildGemCard(),
-    // [EIGHT]: buildHealingCard(),
-    // [NINE]: buildTreasureChestCard(),
-    // [TEN]: buildEnemyCard({ name: "Slime" }),
-    // [JACK]: buildEnemyCard({ name: "Skeleton" }),
-    [QUEEN]: buildEnemyCard({
-      name: "Young Dragon",
-      minFateToDefeat: 10,
-      damageTakenIfUnsuccessful: 1,
-      resolveCriticalSuccess: (game) => {
-        game.gainGem(3);
-      },
-      resolveCriticalSuccessDescription: "You will gain 3 gems",
-    }),
-    [KING]: buildEnemyCard({
-      name: "Troll King",
-      minFateToDefeat: 9,
-      damageTakenIfUnsuccessful: 3,
-      resolveCriticalSuccess: (game) => {
-        game.gainGem();
-        game.gainInventory();
-        game.gainHealth();
-      },
-      resolveCriticalSuccessDescription: "You will gain 1 gem, 1 item from the treasure chest, and 1 health.",
-    }),
-  },
-
-  [BLACK]: {
-    [JOKER]: {
-      name: "Generous Wizard",
-      description: `
-        A generous wizard offers you a choice of 4 cards.
-          Treasure, Healing, Gem, or Exit
-        `,
-      resolver: (game) => {
-        game.getUserInputInventoryCardSelection(
-          "Choose an inventory item to gain: Treasure, Healing, Gem, or Exit",
-          (card) => {
-            game.inventory.stock = game.inventory.stock.filter((c) => {
-              return c.suitKey !== card.suitKey && c.valueKey !== card.valueKey;
-            });
-            game.inventory.available.push(card);
-            game.loseGem();
-          },
-        )
-        // TODO - does not handle the case where the user does not select a card...
-        //  should return a promise or callback to handle this case
-        return true
-      },
-    },
-  }
-}
-
-DUNGEON_CARDS[CLUBS][SEVEN] = DUNGEON_CARDS[SPADES][SEVEN];  // Gem
-DUNGEON_CARDS[CLUBS][EIGHT] = DUNGEON_CARDS[SPADES][EIGHT];  // Healing
-DUNGEON_CARDS[CLUBS][NINE] = DUNGEON_CARDS[SPADES][NINE];  // Treasure Chest
-DUNGEON_CARDS[CLUBS][TEN] = DUNGEON_CARDS[SPADES][TEN];  // Slime
-DUNGEON_CARDS[CLUBS][JACK] = DUNGEON_CARDS[SPADES][JACK];  // Skeleton
-
 
 class Cell {
   constructor() {
@@ -626,28 +229,99 @@ class Game {
     this._updateDungeonAvailability();
   }
 
-  gainHealth(amount) {
-    this._gainCard("health", amount);
+  gainHealth(dungeonCard, amount) {
+    this.displayResolution(dungeonCard, (amount || 1), "health", () => {
+      this._gainCard("health", amount);
+      this.render();
+    });
   }
 
-  loseHealth(amount) {
-    this._loseCard("health", amount);
+  loseHealth(dungeonCard, amount) {
+    this.displayResolution(dungeonCard, -(amount || 1), "health", () => {
+      this._loseCard("health", amount);
+      this.render();
+    });
   }
 
-  gainGem(amount) {
-    this._gainCard("gems", amount);
+  gainGem(dungeonCard, amount) {
+    this.displayResolution(dungeonCard, (amount || 1), "gems", () => {
+      this._gainCard("gems", amount);
+      this.render();
+    });
   }
 
-  loseGem(amount) {
-    this._loseCard("gems", amount);
+  loseGem(dungeonCard, amount) {
+    this.displayResolution(dungeonCard, -(amount || 1), "gems", () => {
+      this._loseCard("gems", amount);
+      this.render();
+    });
   }
 
-  gainInventory(amount) {
-    this._gainCard("inventory", amount);
+  gainInventory(dungeonCard, amount) {
+    this.displayResolution(dungeonCard, (amount || 1), "inventory", () => {
+      this._gainCard("inventory", amount);
+      this.render();
+    });
   }
 
-  loseInventory(amount) {
-    this._loseCard("inventory", amount);
+  loseInventory(dungeonCard, amount) {
+    this.displayResolution(dungeonCard, -(amount || 1), "inventory", () => {
+      this._loseCard("inventory", amount);
+      this.render();
+    });
+  }
+
+  /**
+   * @description - display a message to the user about the resolution of a dungeon card
+   *            and call the callback when the user accepts the resolution
+   *
+   * @param {Object} dungeonCard - the card that triggered the resolution
+   * @param {Number} amount - the amount  to gain/lose
+   * @param {String} pileKey - (health, gems, inventory)
+   * @param {Function} callback - function to call when resolution is accepted
+   */
+  displayResolution(dungeonCard, amount, pileKey, callback) {
+    const renderer = new GameRenderer(this);
+    const acceptButton = document.createElement("button");
+    acceptButton.innerHTML = "Accept";
+    acceptButton.addEventListener("click", () => {
+      callback();
+    });
+
+
+    let pileCardSuit;
+    switch (pileKey) {
+      case "health":
+        pileCardSuit = SUITS.HEARTS.code;
+        break;
+      case "gems":
+        pileCardSuit = SUITS.DIAMONDS.code;
+        break;
+      case "inventory":
+        pileCardSuit = SUITS.RED.code;  // TODO: this can be DIAMONDS or HEARTS or RED (joker)
+        break;
+      default:
+        throw new Error(`Unknown pileKey: ${pileKey}`);
+    }
+
+    const cardClassName = `card-${pileCardSuit}${Math.abs(amount)}`;
+
+    renderer.renderFateCheckResolution(
+      `<h4>Result Your ${pileKey} pile will
+          <div class="${cardClassName}"></div>
+          ${amount > 0 ? "gain" : "lose"} ${Math.abs(amount)} cards</h4>
+
+          <hr>
+
+          <h5>${dungeonCard.name}</h5>
+          <p>${dungeonCard.description}</p>
+      `,
+      {
+        actions: [acceptButton],
+        onAccept: callback
+        // disableClickAnywhereToClose: true,
+      },
+    )
   }
 
   /**
@@ -953,10 +627,106 @@ class GameRenderer {
     this.game = game;
   }
 
-  renderMessage(message) {
+
+  /**
+   * @description Renders the main dungeon grid.
+   *
+   * This is the grid of cards that the player interacts with.
+   *
+   * Each cell in the grid is a button.
+   *   - "dungeon card" is applied to cell
+   *   - shows the card if the cell has a card.
+   *   - clickable if the cell is available (disabled otherwise)
+   * @
+   */
+  renderDungeon() {
+    const dungeonMatrixElement = document.querySelector("#dungeon .matrix");
+    dungeonMatrixElement.innerHTML = "";
+    dungeonMatrixElement.style.gridTemplateColumns = `repeat(${this.game.dungeon.matrix[0].length}, 1fr)`;
+    dungeonMatrixElement.style.gridTemplateRows = `repeat(${this.game.dungeon.matrix.length}, 1fr)`;
+
+    for (let row = 0; row < this.game.dungeon.matrix.length; row += 1) {
+      for (let col = 0; col < this.game.dungeon.matrix[0].length; col += 1) {
+
+        /**
+         * Create a button for each cell in the dungeon.
+         *  - If the cell is available, make it clickable.
+         *  - If the cell has a card, show the card.
+         *  - If the cell is not available, disable it.
+         *
+         */
+        const cell = this.game.dungeon.matrix[row][col];
+        const cellElement = document.createElement("button");
+        // cellElement.innerHTML = `${row}, ${col}`;  // DEBUG
+        cellElement.classList.add("cell");
+        if (cell.available) {
+          cellElement.classList.add("available");
+        } else {
+          cellElement.disabled = true;
+        }
+
+        if (cell.card) {
+          cellElement.classList.add("card");
+
+          /**
+           * If the card is face down,
+           *    show the back of the card.
+           * Otherwise,
+           *  show the front of the card.
+           *    and make it clickable.
+           */
+          if (cell.cardFaceDown) {
+            cellElement.classList.add("card-back");
+          } else {
+            // TODO disable if not valid move
+            cellElement.classList.add(
+              `card-${cell.card.suit.code}${cell.card.value.code}`
+            );
+            cellElement.onclick = () => {
+              const dungeonCard = DUNGEON_CARDS[cell.card.suit.key][cell.card.value.key];
+              this.addTutorialModal(`<div>
+                <div class="card card-${cell.card.suit.code}${cell.card.value.code}"></div>
+                ${dungeonCard.name}
+                ${dungeonCard.description}
+              </div>`, () => {
+                this.game.resolveCard({ row, col });
+              });
+            };
+          }
+        } else {
+
+          /**
+           * Cell does not have a card.
+           *    on click, add a card to the dungeon
+           * (if valid move)
+           */
+          cellElement.onclick = () => {
+            this.addTutorialModal(`<div>
+              the rules about adding cards to the dungeon...
+            </div>`, () => {
+              this.game.addCardToDungeon({ row, col });
+            });
+          };
+        }
+
+
+        dungeonMatrixElement.appendChild(cellElement);
+      }
+    }
+
+    this._renderStatsPiles("dungeon");
+  }
+
+  /**
+   * @description utility function
+   * add any message to the players message modal
+   *
+   * @param {String} messageHTML - HTML to display in the modal
+   */
+  renderMessage(messageHTML) {
     const messageElement = document.querySelector("#message-modal");
     const messageTextElement = document.querySelector("#message-modal-inner-content");
-    messageTextElement.innerHTML = message;
+    messageTextElement.innerHTML = messageHTML;
     messageElement.classList.add("visible");
     messageElement.onclick = (() => {
       // click anywhere to dismiss
@@ -983,60 +753,14 @@ class GameRenderer {
   }
 
 
-  renderDungeon() {
-    const dungeonMatrixElement = document.querySelector("#dungeon .matrix");
-    dungeonMatrixElement.innerHTML = "";
-    dungeonMatrixElement.style.gridTemplateColumns = `repeat(${this.game.dungeon.matrix[0].length}, 1fr)`;
-    dungeonMatrixElement.style.gridTemplateRows = `repeat(${this.game.dungeon.matrix.length}, 1fr)`;
-
-    for (let row = 0; row < this.game.dungeon.matrix.length; row += 1) {
-      for (let col = 0; col < this.game.dungeon.matrix[0].length; col += 1) {
-        const cell = this.game.dungeon.matrix[row][col];
-        const cellElement = document.createElement("button");
-        // cellElement.innerHTML = `${row}, ${col}`;  // DEBUG
-        cellElement.classList.add("cell");
-        if (cell.available) {
-          cellElement.classList.add("available");
-        } else {
-          cellElement.disabled = true;
-        }
-
-        if (cell.card) {
-          cellElement.classList.add("card");
-          if (cell.cardFaceDown) {
-            cellElement.classList.add("card-back");
-          } else {
-            // TODO disable if not valid move
-            cellElement.classList.add(
-              `card-${cell.card.suit.code}${cell.card.value.code}`
-            );
-            cellElement.onclick = () => {
-              const dungeonCard = DUNGEON_CARDS[cell.card.suit.key][cell.card.value.key];
-              this.addTutorialModal(`<div>
-                <div class="card card-${cell.card.suit.code}${cell.card.value.code}"></div>
-                ${dungeonCard.name}
-                ${dungeonCard.description}
-              </div>`, () => {
-                this.game.resolveCard({ row, col });
-              });
-            };
-          }
-        } else {
-          cellElement.onclick = () => {
-            this.addTutorialModal(`<div>
-              the rules about adding cards to the dungeon...
-            </div>`, () => {
-              this.game.addCardToDungeon({ row, col });
-            });
-          };
-        }
-        dungeonMatrixElement.appendChild(cellElement);
-      }
-    }
-
-    this._renderStatsPiles("dungeon");
-  }
-
+  /**
+   * @description Renders the tutorial modal
+   * and runs the callback when the user accepts the modal
+   *
+   * @param {String} content - HTML content to display in the modal
+   * @param {Function} onAccept - callback to run when the user accepts the modal
+   * @returns
+   */
   addTutorialModal(content, onAccept) {
 
     onAccept();
@@ -1061,18 +785,58 @@ class GameRenderer {
     }
   }
 
+  /**
+   * @description Renders a message with a button to resolve a fate check
+   * @param {String} messageHtml - HTML to display
+   * @param {Array<Element>} extraActionButtonElements - extra buttons to display
+   */
+  renderFateCheckResolution(messageHtml, { extraActionButtonElements = [], disableClickAnywhereToClose = false, onAccept } = {}) {
+    const messageElement = document.querySelector("#message-modal");
+    const messageTextElement = document.querySelector("#message-modal-inner-content");
+    messageTextElement.innerHTML = messageHtml;
+    messageElement.classList.add("visible");
+    if (!disableClickAnywhereToClose) {
+      messageElement.onclick = (() => {
+        // click anywhere to dismiss
+        messageElement.classList.remove("visible");
+        onAccept();
+      });
+    }
+
+    const messageActionsElement = document.querySelector("#message-modal-actions");
+    messageActionsElement.innerHTML = "";
+    for (let actionEl of extraActionButtonElements) {
+      actionEl.addEventListener("click", () => {
+        messageElement.classList.remove("visible");
+      });
+      messageActionsElement.appendChild(actionEl);
+    }
+  }
+
+  /**
+   * @description Renders the player's stats
+   */
   renderHealth() {
     this._renderStatsPiles("health");
   }
 
+  /**
+   * @description Renders the player's inventory
+   */
   renderInventory() {
     this._renderStatsPiles("inventory");
   }
 
+  /**
+   * @description Renders the player's gems
+   */
   renderGems() {
     this._renderStatsPiles("gems");
   }
 
+  /**
+   * @description Renders the player fate deck
+   */
   renderFate() {
     this._renderStatsPiles("fate");
   }

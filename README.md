@@ -9,14 +9,27 @@ rendering
 - [x] inventory section rendered
 - [x] the fate deck renderer
 - [ ] tiled background and sprites for the various characters
+- [ ] display message after fate check (either good or bad)
 
-game logic
+### game logic
 
 - [x] game loop with reset
 - [x] logic for gems, treasure chest, healing fountain
 - [x] logic for slimes, skeletons, trolls, dragon
-- [ ] fate check
+- [x] fate check
+
+---
+
 - [ ] logic for item usage
+  - [ ] function `handleClickItem()` from the renderer
+  - [ ] Ks - redo fate check
+  - [ ] Qs - no damage for snare
+    - [ ] then need a place to show / get user input, _after_ seeing card, _before_ receiving damage ??
+    - [ ] ? add 1 to fate check ?
+  - [ ] Js - take any secret passage / wildcard match any
+    - [ ] click at any point, then highlight card to bypass
+    - [ ] ? bypass ANY card - too OP ?
+  - [ ] Jokers - input for which of above^ (will also need user input after seeing card, before taking taking damage)
 - [ ] logic for passages
 - [ ] logic for aces, dungeon next dungeon
 - [ ] handle running out of hearts
