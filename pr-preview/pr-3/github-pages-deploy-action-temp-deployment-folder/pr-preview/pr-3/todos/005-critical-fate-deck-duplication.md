@@ -1,17 +1,8 @@
-# Todo #005: CRITICAL - Fate Deck Duplication
-
-**Status**: Open
-**Priority**: P0 - Critical (Game-Breaking)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #4
-
-## Problem
+# Fate Deck Duplication
 
 When reshuffling the fate deck, cards are duplicated instead of being moved.
 
 **Location**: `index.js:393-401` (`fateCheck`)
-
-**Impact**: After the first reshuffle, the fate deck contains duplicate cards. This breaks the probability system and gives players unfair advantages in combat.
 
 ## Current Code
 
@@ -26,6 +17,8 @@ fateCheck() {
   return card.value.order;
 }
 ```
+
+After the first reshuffle, the fate deck contains duplicate cards because `available` isn't cleared. This breaks the probability system and gives players unfair advantages in combat.
 
 ## Fix
 

@@ -1,15 +1,8 @@
-# Todo #004: CRITICAL - Missing Game Functions
-
-**Status**: Open
-**Priority**: P0 - Critical (Game-Breaking)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #3
-
-## Problem
+# Missing Game Functions
 
 Functions `defeatDragonQueen()` and `resetDungeon()` are called but don't exist in the Game class.
 
-**Location**: Referenced in `dungeon-cards.js:13, 69`
+**Referenced in**: `dungeon-cards.js:13, 69`
 
 **Impact**:
 - Exit card (Ace of Spades) crashes when clicked
@@ -18,7 +11,7 @@ Functions `defeatDragonQueen()` and `resetDungeon()` are called but don't exist 
 
 ## Required Functions
 
-### 1. `defeatDragonQueen()`
+### `defeatDragonQueen()`
 Called when Dragon Queen is defeated with a critical success (fate value 10).
 
 Should:
@@ -26,7 +19,7 @@ Should:
 - Show victory message
 - Possibly offer to continue or reset
 
-### 2. `resetDungeon()`
+### `resetDungeon()`
 Called when Exit card (Ace of Spades) is used.
 
 Should:

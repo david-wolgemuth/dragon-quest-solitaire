@@ -1,21 +1,10 @@
-# Todo #016: Handle Dungeon Deck Depletion
-
-**Status**: Open
-**Priority**: P2 - Medium (Edge Case)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #17
-
-## Problem
+# Handle Dungeon Deck Depletion
 
 No check for when dungeon deck runs out of cards (27 total cards).
 
-**Impact**: If player explores all 27 dungeon cards without winning or losing, what happens? No handling for this edge case.
+If player explores all 27 dungeon cards without winning or losing, what happens? No handling for this edge case.
 
-## Current Behavior
-
-Unknown - likely crashes or allows invalid placement.
-
-## Expected Behaviors (Choose One)
+## Possible Behaviors
 
 ### Option A: Automatic Victory
 - When all 27 cards are placed and resolved
@@ -42,15 +31,8 @@ Unknown - likely crashes or allows invalid placement.
 
 ## Implementation
 
-- [ ] Detect when dungeon deck is empty
-- [ ] Decide on behavior (discuss with game designer)
-- [ ] Implement chosen behavior
-- [ ] Show appropriate message to player
-- [ ] Update game rules documentation
-
-## Testing
-
-1. Play through all 27 dungeon cards
-2. Verify chosen behavior triggers
-3. Verify game doesn't crash
-4. Verify appropriate message is shown
+- Detect when dungeon deck is empty
+- Decide on behavior (discuss with game designer)
+- Implement chosen behavior
+- Show appropriate message to player
+- Update game rules documentation

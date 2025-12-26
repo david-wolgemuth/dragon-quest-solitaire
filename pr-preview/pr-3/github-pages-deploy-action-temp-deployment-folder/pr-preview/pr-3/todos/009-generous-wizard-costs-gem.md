@@ -1,17 +1,8 @@
-# Todo #009: Generous Wizard Costs a Gem (Should Be Free)
-
-**Status**: Open
-**Priority**: P1 - High (Major Bug)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #6
-
-## Problem
+# Generous Wizard Costs a Gem (Should Be Free)
 
 The Generous Wizard (Black Joker) calls `game.loseGem(this)`, but should be free according to game rules.
 
 **Location**: `dungeon-cards.js:162`
-
-**Impact**: Generous Wizard requires a gem when it should be free.
 
 ## Current Code
 

@@ -44,7 +44,7 @@ Everything else - larger features, design decisions needed, or lower priority:
 - [ ] P3 | S  | Printable version of rules
 - [ ] P3 | M  | Local high scores
 - [ ] P3 | L  | Online high scores (server/database)
-- [ ] P3 | M  | Store game state in URL with deck seed
+- [ ] P3 | M  | [#022](022-store-state-in-url.md) | Store game state in URL (for QA/testing/agents)
 - [ ] P3 | M  | Dark mode / style picker / deck picker
 - [ ] P3 | S  | Card flip animations
 - [ ] P3 | S  | Dungeon wipe/reset animations
