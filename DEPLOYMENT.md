@@ -8,7 +8,7 @@ The `main` branch is automatically deployed to GitHub Pages whenever changes are
 
 **URL:** `https://<username>.github.io/dragon-quest-solitaire/`
 
-The deployment is handled by the `.github/workflows/deploy-pages.yml` workflow.
+The deployment is handled by the `.github/workflows/deploy-main.yml` workflow.
 
 ## PR Preview Deployments
 
@@ -40,12 +40,17 @@ The `.pr-preview.json` file controls which files are excluded from the preview d
 
 ### First-time setup
 
-1. Go to your repository Settings → Pages
+1. Go to your repository **Settings → Pages**
 2. Under "Build and deployment":
-   - Source: **GitHub Actions**
-3. Save the settings
+   - Source: **Deploy from a branch**
+   - Branch: **gh-pages** / **(root)**
+3. Click **Save**
 
-That's it! The workflows will handle the rest automatically.
+**Important**: Make sure to select "Deploy from a branch" (NOT "GitHub Actions") and choose the `gh-pages` branch.
+
+The workflows will automatically:
+- Deploy `main` branch to the root of GitHub Pages
+- Create preview deployments for each PR under `/pr-preview/pr-<number>/`
 
 ### Testing locally
 
@@ -57,6 +62,23 @@ This runs a local server at `http://localhost:8008`.
 
 ## Workflow Files
 
-- `.github/workflows/deploy-pages.yml` - Deploys `main` branch to production
+- `.github/workflows/deploy-main.yml` - Deploys `main` branch to production (root of gh-pages)
 - `.github/workflows/pr-preview.yml` - Handles PR preview deployments and cleanup
-- `.pr-preview.json` - Configuration for which files to exclude from previews
+- `.nojekyll` - Tells GitHub Pages not to use Jekyll processing
+
+## Troubleshooting
+
+### Preview URL shows 404
+
+If the preview URL returns a 404 error:
+
+1. Check that GitHub Pages is configured to deploy from the `gh-pages` branch (not GitHub Actions)
+2. Wait a minute for GitHub Pages to rebuild after the preview is deployed
+3. Check the [deployments page](https://github.com/david-wolgemuth/dragon-quest-solitaire/deployments) to see if the deployment completed
+
+### Main site not updating
+
+If changes to `main` aren't reflected on the production site:
+
+1. Check the [Actions tab](https://github.com/david-wolgemuth/dragon-quest-solitaire/actions) to see if the workflow ran successfully
+2. Check the [deployments page](https://github.com/david-wolgemuth/dragon-quest-solitaire/deployments) to see the deployment status
