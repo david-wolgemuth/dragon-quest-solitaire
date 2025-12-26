@@ -1,8 +1,14 @@
 {
   "scripts": {
-    "start": "http-server -p 8008"
+    "start": "http-server -p 8008",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "@vitest/coverage-v8": "^4.0.16",
+    "http-server": "^14.1.1",
+    "jsdom": "^27.4.0",
+    "vitest": "^4.0.16"
   }
 }
