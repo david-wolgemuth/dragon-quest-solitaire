@@ -1,17 +1,8 @@
-# Todo #003: CRITICAL - No Game Over Detection
-
-**Status**: Open
-**Priority**: P0 - Critical (Game-Breaking)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #2
-
-## Problem
+# No Game Over Detection
 
 When the player loses all health, the game silently continues without ending.
 
 **Location**: `index.js:418-426` (`_loseCard`)
-
-**Impact**: Player can continue playing with 0 health. Game-over condition is never triggered.
 
 ## Current Code
 
@@ -26,6 +17,8 @@ _loseCard(key, amount) {
   }
 }
 ```
+
+Player can continue playing with 0 health because there's no game over trigger.
 
 ## Fix
 

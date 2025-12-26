@@ -1,11 +1,4 @@
-# Todo #002: CRITICAL - User Input Card Selection Buttons Not Rendered
-
-**Status**: Open
-**Priority**: P0 - Critical (Game-Breaking)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #1
-
-## Problem
+# User Input Card Selection Buttons Not Rendered
 
 Card buttons in `renderUserInputCardSelection` are created but never appended to the DOM.
 

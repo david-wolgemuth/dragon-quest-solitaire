@@ -1,17 +1,8 @@
-# Todo #017: Render Fate Deck During Combat
-
-**Status**: Open
-**Priority**: P2 - Medium (UX Issue)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #18
-
-## Problem
+# Render Fate Deck During Combat
 
 Combat resolution doesn't update the fate deck display until after the modal is dismissed.
 
 **Location**: `card-builders.js:63-70` (enemy resolver)
-
-**Impact**: Player doesn't see which fate card was drawn during combat. Reduces game clarity and excitement.
 
 ## Current Behavior
 
@@ -28,7 +19,7 @@ resolver: function (game) {
 }
 ```
 
-The fate card is drawn, but the UI doesn't update until the combat modal is closed.
+The fate card is drawn, but the UI doesn't update until the combat modal is closed. Player doesn't see which fate card was drawn during combat, reducing game clarity and excitement.
 
 ## Expected Behavior
 
@@ -38,7 +29,7 @@ The fate card is drawn, but the UI doesn't update until the combat modal is clos
 4. Player can see the fate card in the fate deck area
 5. Combat result is applied
 
-## Proposed Solution
+## Proposed Solutions
 
 ### Option A: Async Rendering
 ```javascript
@@ -62,13 +53,4 @@ resolver: async function (game) {
 1. First modal: "Drawing fate card..." → shows card
 2. Second modal: Combat result based on card value
 
-## Recommended
-
-**Option B** - Shows fate card in modal for immediate feedback, plus fate deck updates in background.
-
-## Testing
-
-1. Engage in combat
-2. Verify fate card is visible when result modal appears
-3. Verify player can clearly see which card was drawn
-4. Test with all combat outcomes (success, failure, critical)
+**Recommended**: Option B - Shows fate card in modal for immediate feedback, plus fate deck updates in background.

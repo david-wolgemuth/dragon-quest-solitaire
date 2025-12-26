@@ -1,10 +1,4 @@
-# Todo #001: File Organization
-
-**Status**: Open
-**Priority**: High
-**Created**: 2025-12-26
-
-## Problem
+# File Organization
 
 Currently all project files are at the top level, making the repository cluttered and hard to navigate.
 
@@ -25,11 +19,8 @@ dragon-quest-solitaire/
 │   ├── DEPLOYMENT.md
 │   └── TESTING_STRATEGY.md
 ├── todos/                  # Task tracking
-│   ├── 001-file-organization.md
-│   ├── 002-*.md
-│   └── ...
 ├── test/                   # Tests (already exists)
-├── .github/                # GitHub workflows (already exists)
+├── .github/                # GitHub workflows
 ├── AGENTS.md               # AI agent notes (MUST stay at root)
 ├── README.md
 ├── package.json
@@ -38,21 +29,13 @@ dragon-quest-solitaire/
 └── .pr-preview.json
 ```
 
-## Tasks
+## What needs updating
 
-- [ ] Create `src/` directory
-- [ ] Move source files to `src/`: index.html, index.js, cards.js, card-builders.js, dungeon-cards.js, styles.css
-- [ ] Create `docs/` directory
-- [ ] Move documentation to `docs/`: GAME_RULES.md, CODE_STRUCTURE_ANALYSIS.md, DEPLOYMENT.md, TESTING_STRATEGY.md
-- [ ] Keep AGENTS.md at root (required location)
-- [ ] Remove BUG_REPORT.md (convert to todos instead)
-- [ ] Update any references to moved files (vitest.config.js, .github workflows, etc.)
-- [ ] Update README links to documentation
-- [ ] Test that the app still works after reorganization
-
-## Considerations
-
-- Need to update build/deployment configs if they reference file paths
-- GitHub Pages deployment may need path updates
-- Test imports/paths still work
-- Vitest config may need updated paths
+- Create `src/` and `docs/` directories
+- Move source files to `src/`: index.html, index.js, cards.js, card-builders.js, dungeon-cards.js, styles.css
+- Move docs to `docs/`: GAME_RULES.md, CODE_STRUCTURE_ANALYSIS.md, DEPLOYMENT.md, TESTING_STRATEGY.md
+- Keep AGENTS.md at root (required location)
+- Update vitest.config.js paths
+- Update .github workflows paths
+- Update README links
+- Test that app still works

@@ -1,11 +1,4 @@
-# Todo #020: Context Loss in Callbacks
-
-**Status**: Open
-**Priority**: P3 - Low (Design Issue)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #14
-
-## Problem
+# Context Loss in Callbacks
 
 Inside callbacks for Merchant and Wizard, `this` refers to the card definition object, not the dungeon card instance.
 
@@ -27,13 +20,9 @@ May cause issues with:
 - Logging (card identity might be incorrect)
 - Future features that depend on card instance
 
-## Current Severity
+**Current Severity**: Low - The game appears to work despite this because `loseGem()` may not use the card parameter for critical logic.
 
-**Low** - The game appears to work despite this issue because:
-- `loseGem()` may not use the card parameter for critical logic
-- Card definition has enough info for current needs
-
-## Proper Fix
+## Fix
 
 Capture the correct context:
 
@@ -51,18 +40,4 @@ resolver: function (game) {
 }
 ```
 
-Or check what `loseGem()` actually uses from the card parameter.
-
-## Investigation Needed
-
-- [ ] Check what `loseGem(card)` does with the card parameter
-- [ ] Check if card definition vs instance matters
-- [ ] Verify current behavior is correct despite wrong context
-- [ ] Document expected vs actual behavior
-
-## Testing
-
-1. Use Merchant/Wizard
-2. Check console logs for card references
-3. Verify correct card is updated in display
-4. Ensure no side effects from wrong context
+Or check what `loseGem()` actually uses from the card parameter and whether card definition vs instance matters.
