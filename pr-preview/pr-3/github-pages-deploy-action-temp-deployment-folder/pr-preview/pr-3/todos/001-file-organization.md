@@ -21,6 +21,7 @@ dragon-quest-solitaire/
 │   └── styles.css
 ├── docs/                   # Documentation
 │   ├── GAME_RULES.md
+│   ├── AGENTS.md
 │   ├── CODE_STRUCTURE_ANALYSIS.md
 │   ├── DEPLOYMENT.md
 │   └── TESTING_STRATEGY.md
@@ -30,7 +31,6 @@ dragon-quest-solitaire/
 │   └── ...
 ├── test/                   # Tests (already exists)
 ├── .github/                # GitHub workflows (already exists)
-├── AGENTS.md               # AI agent notes (MUST stay at root)
 ├── README.md
 ├── package.json
 ├── package-lock.json
@@ -43,8 +43,7 @@ dragon-quest-solitaire/
 - [ ] Create `src/` directory
 - [ ] Move source files to `src/`: index.html, index.js, cards.js, card-builders.js, dungeon-cards.js, styles.css
 - [ ] Create `docs/` directory
-- [ ] Move documentation to `docs/`: GAME_RULES.md, CODE_STRUCTURE_ANALYSIS.md, DEPLOYMENT.md, TESTING_STRATEGY.md
-- [ ] Keep AGENTS.md at root (required location)
+- [ ] Move documentation to `docs/`: GAME_RULES.md, AGENTS.md, CODE_STRUCTURE_ANALYSIS.md, DEPLOYMENT.md, TESTING_STRATEGY.md
 - [ ] Remove BUG_REPORT.md (convert to todos instead)
 - [ ] Update any references to moved files (vitest.config.js, .github workflows, etc.)
 - [ ] Update README links to documentation
