@@ -1,11 +1,9 @@
 {
-  "type": "module",
   "scripts": {
     "start": "http-server -p 8008",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
-    "preview-url": "node generate-preview-url.js"
+    "test:coverage": "vitest --coverage"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.16",

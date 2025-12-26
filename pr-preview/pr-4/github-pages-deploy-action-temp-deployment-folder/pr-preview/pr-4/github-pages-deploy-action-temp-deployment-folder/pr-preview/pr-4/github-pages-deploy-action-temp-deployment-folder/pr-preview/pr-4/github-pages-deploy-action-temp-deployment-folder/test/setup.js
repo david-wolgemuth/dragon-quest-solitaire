@@ -77,7 +77,6 @@ const loadScript = (filename) => {
 loadScript('cards.js');
 loadScript('card-builders.js');
 loadScript('dungeon-cards.js');
-loadScript('url-state.js');
 
 // Load index.js but wrap it to prevent main() from running
 const indexPath = path.join(__dirname, '..', 'index.js');
@@ -86,18 +85,13 @@ let indexContent = fs.readFileSync(indexPath, 'utf8');
 // Remove the call to main() at the end
 indexContent = indexContent.replace(/\nmain\(\);?\s*$/, '');
 
-// Also export classes and functions to window explicitly
+// Also export classes to window explicitly
 indexContent += `
-// Make classes and functions available on window for tests
+// Make classes available on window for tests
 window.Card = Card;
 window.Cell = Cell;
 window.Game = Game;
 window.GameRenderer = GameRenderer;
-window.serializeCard = serializeCard;
-window.deserializeCard = deserializeCard;
-window.serializeGameState = serializeGameState;
-window.deserializeGameState = deserializeGameState;
-window.createSeededRNG = createSeededRNG;
 `;
 
 dom.window.eval(indexContent);
