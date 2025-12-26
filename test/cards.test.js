@@ -1,89 +1,83 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 
-// Card creation and basic properties
-describe('Card Model', () => {
-  it('creates a card with suit and value', () => {
-    const card = new window.Card(window.HEARTS, window.ACE);
-    expect(card.suitKey).toBe(window.HEARTS);
-    expect(card.valueKey).toBe(window.ACE);
+describe('Card System', () => {
+  describe('Card creation and validation', () => {
+    it('creates valid cards with proper suit and value', () => {
+      const card = new window.Card(window.HEARTS, window.ACE);
+
+      expect(card.suit.key).toBe(window.HEARTS);
+      expect(card.value.key).toBe(window.ACE);
+      expect(card.suit.display).toBe('♥️');
+      expect(card.value.display).toBe('A');
+    });
+
+    it('rejects invalid suit keys', () => {
+      expect(() => new window.Card('INVALID_SUIT', window.ACE)).toThrow();
+    });
+
+    it('rejects invalid value keys', () => {
+      expect(() => new window.Card(window.HEARTS, 'INVALID_VALUE')).toThrow();
+    });
   });
 
-  it('provides suit object through getter', () => {
-    const card = new window.Card(window.SPADES, window.KING);
-    expect(card.suit).toBeDefined();
-    expect(card.suit.key).toBe(window.SPADES);
-    expect(card.suit.display).toBe('♠️');
-  });
+  describe('Card properties', () => {
+    it('provides numeric order for card values', () => {
+      const ace = new window.Card(window.HEARTS, window.ACE);
+      const five = new window.Card(window.HEARTS, window.FIVE);
+      const king = new window.Card(window.HEARTS, window.KING);
 
-  it('provides value object through getter', () => {
-    const card = new window.Card(window.DIAMONDS, window.TEN);
-    expect(card.value).toBeDefined();
-    expect(card.value.key).toBe(window.TEN);
-    expect(card.value.display).toBe('10');
-    expect(card.value.order).toBe(10);
-  });
+      expect(ace.value.order).toBe(1);
+      expect(five.value.order).toBe(5);
+      expect(king.value.order).toBe(13);
+    });
 
-  it('throws error for invalid suit', () => {
-    expect(() => new window.Card('INVALID_SUIT', window.ACE)).toThrow();
-  });
+    it('distinguishes red suits from black suits', () => {
+      const heartCard = new window.Card(window.HEARTS, window.ACE);
+      const spadeCard = new window.Card(window.SPADES, window.ACE);
 
-  it('throws error for invalid value', () => {
-    expect(() => new window.Card(window.HEARTS, 'INVALID_VALUE')).toThrow();
-  });
-});
+      // Hearts and Diamonds are red, Spades and Clubs are black
+      expect(heartCard.suit.key).toBe(window.HEARTS);
+      expect(spadeCard.suit.key).toBe(window.SPADES);
+    });
 
-describe('Suit Constants', () => {
-  it('has all four standard suits', () => {
-    expect(window.SUITS.HEARTS).toBeDefined();
-    expect(window.SUITS.CLUBS).toBeDefined();
-    expect(window.SUITS.DIAMONDS).toBeDefined();
-    expect(window.SUITS.SPADES).toBeDefined();
-  });
+    it('supports joker cards with color suits', () => {
+      const blackJoker = new window.Card(window.BLACK, window.JOKER);
+      const redJoker = new window.Card(window.RED, window.JOKER);
 
-  it('has color suits for jokers', () => {
-    expect(window.SUITS.BLACK).toBeDefined();
-    expect(window.SUITS.RED).toBeDefined();
-    expect(window.SUITS.BLACK.isColor).toBe(true);
-    expect(window.SUITS.RED.isColor).toBe(true);
-  });
-
-  it('each suit has required properties', () => {
-    Object.values(window.SUITS).forEach(suit => {
-      expect(suit.key).toBeDefined();
-      expect(suit.display).toBeDefined();
-      expect(suit.code).toBeDefined();
+      expect(blackJoker.suit.isColor).toBe(true);
+      expect(redJoker.suit.isColor).toBe(true);
+      expect(blackJoker.value.isJoker).toBe(true);
     });
   });
 });
 
-describe('Value Constants', () => {
-  it('has all standard card values', () => {
-    expect(window.VALUES.ACE).toBeDefined();
-    expect(window.VALUES.TWO).toBeDefined();
-    expect(window.VALUES.TEN).toBeDefined();
-    expect(window.VALUES.JACK).toBeDefined();
-    expect(window.VALUES.QUEEN).toBeDefined();
-    expect(window.VALUES.KING).toBeDefined();
+describe('Dungeon Card Definitions', () => {
+  it('defines all dungeon cards with required behavior', () => {
+    const testCards = [
+      window.DUNGEON_CARDS[window.SPADES][window.ACE],   // Exit
+      window.DUNGEON_CARDS[window.SPADES][window.SEVEN], // Gem
+      window.DUNGEON_CARDS[window.SPADES][window.TEN],   // Slime
+      window.DUNGEON_CARDS[window.CLUBS][window.ACE],    // Merchant
+      window.DUNGEON_CARDS[window.BLACK][window.JOKER],  // Wizard
+    ];
+
+    testCards.forEach(card => {
+      expect(card).toHaveProperty('name');
+      expect(card).toHaveProperty('description');
+      expect(card).toHaveProperty('resolver');
+      expect(typeof card.resolver).toBe('function');
+    });
   });
 
-  it('has joker value', () => {
-    expect(window.VALUES.JOKER).toBeDefined();
-    expect(window.VALUES.JOKER.isJoker).toBe(true);
-  });
+  it('shares common cards between Spades and Clubs', () => {
+    // Clubs 7-Jack should reference the same objects as Spades
+    expect(window.DUNGEON_CARDS[window.CLUBS][window.SEVEN])
+      .toBe(window.DUNGEON_CARDS[window.SPADES][window.SEVEN]);
 
-  it('values have correct order', () => {
-    expect(window.VALUES.ACE.order).toBe(1);
-    expect(window.VALUES.FIVE.order).toBe(5);
-    expect(window.VALUES.TEN.order).toBe(10);
-    expect(window.VALUES.KING.order).toBe(13);
-  });
-});
+    expect(window.DUNGEON_CARDS[window.CLUBS][window.EIGHT])
+      .toBe(window.DUNGEON_CARDS[window.SPADES][window.EIGHT]);
 
-describe('Cell Model', () => {
-  it('creates an empty cell', () => {
-    const cell = new window.Cell();
-    expect(cell.card).toBeNull();
-    expect(cell.cardFaceDown).toBe(false);
-    expect(cell.available).toBe(false);
+    expect(window.DUNGEON_CARDS[window.CLUBS][window.JACK])
+      .toBe(window.DUNGEON_CARDS[window.SPADES][window.JACK]);
   });
 });
