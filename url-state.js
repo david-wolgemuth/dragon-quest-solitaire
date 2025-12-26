@@ -1,6 +1,23 @@
 // URL State Serialization/Deserialization
 // Enables storing and restoring game state via URL parameters
 
+// Card class definition (needed for deserialization)
+// Simplified version - full Card class with validation is in index.js
+class Card {
+  constructor(suitKey, valueKey) {
+    this.suitKey = suitKey;
+    this.valueKey = valueKey;
+  }
+
+  get suit() {
+    return window.SUITS ? window.SUITS[this.suitKey] : { key: this.suitKey };
+  }
+
+  get value() {
+    return window.VALUES ? window.VALUES[this.valueKey] : { key: this.valueKey };
+  }
+}
+
 // Serialize a card to a short string (e.g., "HA" for Hearts Ace, "RX" for Red Joker)
 function serializeCard(card) {
   const suitMap = { HEARTS: 'H', CLUBS: 'C', DIAMONDS: 'D', SPADES: 'S', BLACK: 'B', RED: 'R' };
