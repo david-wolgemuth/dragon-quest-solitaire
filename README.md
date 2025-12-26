@@ -1,55 +1,57 @@
 # [WIP] Dragon Quest Solitaire
 
-## Backlog
+A solitaire card game inspired by Dragon Quest, built with vanilla JavaScript.
 
-rendering
+## 📋 Task List
 
-- [x] render the dungeon squares that would be able to expand up to seven wide and five high
-- [x] logic for tile placement tile placement dungeon expansion placement
-- [x] inventory section rendered
-- [x] the fate deck renderer
-- [ ] tiled background and sprites for the various characters
-- [ ] display message after fate check (either good or bad)
+For detailed task tracking, see [todos/README.md](todos/README.md)
 
-### game logic
+### Critical (P0) - Must Fix 🔴
+- [#001 - File Organization](todos/001-file-organization.md) - Reorganize project structure
+- [#002 - User Input Buttons Not Rendered](todos/002-critical-user-input-buttons.md) - Fix Merchant/Wizard selection
+- [#003 - Game Over Detection](todos/003-critical-game-over-detection.md) - Implement game over when health reaches 0
+- [#004 - Missing Game Functions](todos/004-critical-missing-game-functions.md) - Implement victory and dungeon reset
+- [#005 - Fate Deck Duplication](todos/005-critical-fate-deck-duplication.md) - Fix fate deck card duplication bug
 
-- [x] game loop with reset
-- [x] logic for gems, treasure chest, healing fountain
-- [x] logic for slimes, skeletons, trolls, dragon
-- [x] fate check
+### High Priority (P1) - Should Fix 🟡
+- [#006 - Item Usage Logic](todos/006-item-usage-logic.md) - Implement King/Queen/Jack/Joker usage
+- Implement passage logic
+- Implement dungeon progression (Aces)
+- Handle running out of health
+- Handle running out of valid spaces
 
----
+### Medium Priority (P2) - Nice to Have 🟢
+- [#007 - Visual Sprites and Tiles](todos/007-visual-sprites-and-tiles.md) - Replace cards with Dragon Quest sprites
+- Display message after fate check
+- Progressive web app download
+- Tutorial mode with confirmation prompts
+- Mobile-first responsive display
 
-- [ ] logic for item usage
-  - [ ] function `handleClickItem()` from the renderer
-  - [ ] Ks - redo fate check
-  - [ ] Qs - no damage for snare
-    - [ ] then need a place to show / get user input, _after_ seeing card, _before_ receiving damage ??
-    - [ ] ? add 1 to fate check ?
-  - [ ] Js - take any secret passage / wildcard match any
-    - [ ] click at any point, then highlight card to bypass
-    - [ ] ? bypass ANY card - too OP ?
-  - [ ] Jokers - input for which of above^ (will also need user input after seeing card, before taking taking damage)
-- [ ] logic for passages
-- [ ] logic for aces, dungeon next dungeon
-- [ ] handle running out of hearts
-- [ ] handle running out of valid spaces
+### Low Priority (P3) - Future 🔵
+- Credits/about page
+- Printable rules
+- Local high scores
+- Online high scores
+- Store state in URL
+- Dark mode / style picker / deck picker
+- Card flip animations
+- Dungeon reset animations
 
-infra
+### ✅ Completed
+- Dungeon grid rendering (7 wide × 5 high)
+- Tile placement logic
+- Inventory rendering
+- Fate deck rendering
+- Game loop with reset
+- Resource card logic (gems, treasure, healing)
+- Enemy logic (slimes, skeletons, trolls, dragons)
+- Fate check system
 
-- [ ] auto deploy GitHub pages
-- [ ] progressive web app download
-- [ ] spritesheet to images (for now, just using deck api ...)
+## 📚 Documentation
 
-misc features
-
-- [ ] a tutorial mode where any click would pop up with a confirmation beforehand, could toggle on or off globally.
-- [ ] credits, about page
-- [ ] printable version of the rules, possibly generated from dock notes, but that is an extra that doesn't need to be
-- [ ] mobile first display
-- [ ] high score , local
-- [ ] high scores, saved all users
-- [ ] store state in the URL, include current seed of deck shuffle
-- [ ] dark mode, style picker, deck picker
-- [ ] animation when cards flip
-- [ ] animation when wiping, dungeon and resetting
+- [Game Rules](GAME_RULES.md) - How to play
+- [Code Structure](CODE_STRUCTURE_ANALYSIS.md) - Technical analysis
+- [Testing Strategy](TESTING_STRATEGY.md) - Test coverage
+- [Bug Report](BUG_REPORT.md) - Known issues (to be migrated to todos)
+- [Deployment](DEPLOYMENT.md) - Deployment setup
+- [Agents](AGENTS.md) - AI agent notes
