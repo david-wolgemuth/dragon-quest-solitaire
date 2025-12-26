@@ -35,10 +35,10 @@ function buildPile(keyPairs) {
   return keyPairs.map(([suitKey, valueKey]) => new Card(suitKey, valueKey));
 }
 
-function shuffle(array, rng = Math.random) {
+function shuffle(array) {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
@@ -104,40 +104,7 @@ function createStyleSheet() {
 createStyleSheet();
 
 class Game {
-  constructor(options = {}) {
-    // If state is provided, restore from it
-    if (options.state) {
-      this.health = options.state.health;
-      this.inventory = options.state.inventory;
-      this.gems = options.state.gems;
-      this.fate = options.state.fate;
-
-      // Restore dungeon matrix
-      const maxRow = Math.max(...options.state.dungeonMatrix.map(c => c.row), 0);
-      const maxCol = Math.max(...options.state.dungeonMatrix.map(c => c.col), 0);
-      this.dungeon = {
-        stock: options.state.dungeonStock,
-        matrix: Array(maxRow + 1).fill(null).map(() =>
-          Array(maxCol + 1).fill(null).map(() => new Cell())
-        ),
-        available: []
-      };
-
-      // Populate matrix cells
-      for (const cellData of options.state.dungeonMatrix) {
-        const cell = this.dungeon.matrix[cellData.row][cellData.col];
-        cell.card = cellData.card;
-        cell.cardFaceDown = cellData.cardFaceDown;
-      }
-
-      this.updateDungeon();
-      return;
-    }
-
-    // Determine RNG (seeded or random)
-    const rng = options.seed ? createSeededRNG(options.seed) : Math.random;
-
-    // Initialize new game
+  constructor() {
     this.health = {
       stock: [],
       available: buildPile([
@@ -159,8 +126,7 @@ class Game {
           [DIAMONDS, QUEEN],
           [DIAMONDS, KING],
           [RED, JOKER],
-        ]),
-        rng
+        ])
       ),
       available: [],
     };
@@ -189,8 +155,7 @@ class Game {
           [HEARTS, EIGHT],
           [HEARTS, NINE],
           [HEARTS, TEN],
-        ]),
-        rng
+        ])
       ),
       available: [],
     };
@@ -225,8 +190,7 @@ class Game {
           [SPADES, QUEEN],
           [SPADES, KING],
           [BLACK, JOKER],
-        ]),
-        rng
+        ])
       ),
       matrix: [[new Cell()]],
       available: [],  // match pattern for status piles, but not used
@@ -655,10 +619,6 @@ class Game {
     renderer.renderFate();
     renderer.renderInventory();
     renderer.renderGems();
-
-    // Update URL with current game state
-    const stateString = serializeGameState(this);
-    window.history.replaceState(null, '', `?${stateString}`);
   }
 }
 
@@ -909,32 +869,13 @@ class GameRenderer {
 }
 
 function main() {
-  // Check if URL contains game state
-  const urlParams = new URLSearchParams(window.location.search);
-  let game;
-
-  if (urlParams.toString()) {
-    // Restore game from URL
-    try {
-      const state = deserializeGameState(urlParams.toString());
-      game = new Game({ state });
-    } catch (error) {
-      console.error('Failed to restore game from URL:', error);
-      game = new Game();
-    }
-  } else {
-    // Create new game
-    game = new Game();
-  }
-
+  let game = new Game();
   game.render();
 
   const resetGameButton = document.querySelector("#reset-game");
   resetGameButton.onclick = () => {
     game = new Game();
     game.render();
-    // Clear URL when resetting
-    window.history.replaceState(null, '', window.location.pathname);
   }
 }
 
