@@ -151,4 +151,56 @@ describe('Combat Mechanics', () => {
     expect(game.fate.available.length).toBe(3);
     expect(game.fate.stock.length).toBe(2);
   });
+
+  // FIXME: Bug #4 - Fate deck duplicates cards after reshuffle
+  it.skip('should not duplicate fate cards when reshuffling', () => {
+    // Exhaust the fate deck
+    game.fateCheck(); // 1
+    game.fateCheck(); // 2
+    game.fateCheck(); // 3
+    game.fateCheck(); // 4
+    game.fateCheck(); // 5
+
+    expect(game.fate.stock.length).toBe(0);
+    expect(game.fate.available.length).toBe(5);
+
+    // Next fate check should reshuffle
+    game.fateCheck();
+
+    // Total should still be 5, not duplicated
+    const total = game.fate.stock.length + game.fate.available.length;
+    expect(total).toBe(5); // Currently fails: total becomes 6+ due to duplication
+  });
+});
+
+describe('Game Over Conditions', () => {
+  let game;
+
+  beforeEach(() => {
+    game = new window.Game();
+  });
+
+  // FIXME: Bug #2 - No game over detection when player loses all health
+  it.skip('should trigger game over when health reaches zero', () => {
+    // Mock gameOver function to track if it's called
+    let gameOverCalled = false;
+    game.gameOver = () => { gameOverCalled = true; };
+
+    // Damage player to zero health
+    game._loseCard('health', 5);
+
+    expect(game.health.available.length).toBe(0);
+    expect(gameOverCalled).toBe(true); // Currently fails: gameOver never called
+  });
+
+  // FIXME: Bug #2 - Player can continue playing with 0 health
+  it.skip('should prevent actions after game over', () => {
+    game._loseCard('health', 5);
+
+    // Try to perform an action (explore dungeon)
+    const canExplore = game.dungeon.stock.length > 0;
+
+    // Game should be over, no more actions allowed
+    expect(canExplore).toBe(false); // Currently fails: game continues
+  });
 });
