@@ -85,13 +85,18 @@ let indexContent = fs.readFileSync(indexPath, 'utf8');
 // Remove the call to main() at the end
 indexContent = indexContent.replace(/\nmain\(\);?\s*$/, '');
 
-// Also export classes to window explicitly
+// Also export classes and functions to window explicitly
 indexContent += `
-// Make classes available on window for tests
+// Make classes and functions available on window for tests
 window.Card = Card;
 window.Cell = Cell;
 window.Game = Game;
 window.GameRenderer = GameRenderer;
+window.serializeCard = serializeCard;
+window.deserializeCard = deserializeCard;
+window.serializeGameState = serializeGameState;
+window.deserializeGameState = deserializeGameState;
+window.createSeededRNG = createSeededRNG;
 `;
 
 dom.window.eval(indexContent);

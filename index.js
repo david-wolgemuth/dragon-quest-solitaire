@@ -35,13 +35,23 @@ function buildPile(keyPairs) {
   return keyPairs.map(([suitKey, valueKey]) => new Card(suitKey, valueKey));
 }
 
-function shuffle(array) {
+function shuffle(array, rng = Math.random) {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
+}
+
+// Seeded random number generator (mulberry32)
+function createSeededRNG(seed) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
 }
 
 function allCards() {
@@ -103,8 +113,146 @@ function createStyleSheet() {
 
 createStyleSheet();
 
+// Serialize a card to a short string (e.g., "HA" for Hearts Ace, "RX" for Red Joker)
+function serializeCard(card) {
+  const suitMap = { HEARTS: 'H', CLUBS: 'C', DIAMONDS: 'D', SPADES: 'S', BLACK: 'B', RED: 'R' };
+  const valueMap = { ACE: 'A', TWO: '2', THREE: '3', FOUR: '4', FIVE: '5', SIX: '6', SEVEN: '7', EIGHT: '8', NINE: '9', TEN: '0', JACK: 'J', QUEEN: 'Q', KING: 'K', JOKER: 'X' };
+  return `${valueMap[card.valueKey]}${suitMap[card.suitKey]}`;
+}
+
+// Deserialize a card from a short string
+function deserializeCard(str) {
+  const suitMap = { H: 'HEARTS', C: 'CLUBS', D: 'DIAMONDS', S: 'SPADES', B: 'BLACK', R: 'RED' };
+  const valueMap = { A: 'ACE', '2': 'TWO', '3': 'THREE', '4': 'FOUR', '5': 'FIVE', '6': 'SIX', '7': 'SEVEN', '8': 'EIGHT', '9': 'NINE', '0': 'TEN', J: 'JACK', Q: 'QUEEN', K: 'KING', X: 'JOKER' };
+  const valueKey = valueMap[str[0]];
+  const suitKey = suitMap[str[1]];
+  return new Card(suitKey, valueKey);
+}
+
+// Serialize game state to URL parameters
+function serializeGameState(game) {
+  const params = new URLSearchParams();
+
+  // Serialize resource piles (store card order and split point)
+  const serializePile = (pile) => {
+    const allCards = [...pile.stock, ...pile.available];
+    const cardStr = allCards.map(serializeCard).join('');
+    return `${cardStr}:${pile.stock.length}`;
+  };
+
+  params.set('health', serializePile(game.health));
+  params.set('inventory', serializePile(game.inventory));
+  params.set('gems', serializePile(game.gems));
+  params.set('fate', serializePile(game.fate));
+
+  // Serialize dungeon pile
+  const dungeonStock = game.dungeon.stock.map(serializeCard).join('');
+  params.set('dungeonStock', dungeonStock);
+
+  // Serialize dungeon matrix
+  const matrixData = [];
+  for (let row = 0; row < game.dungeon.matrix.length; row++) {
+    for (let col = 0; col < game.dungeon.matrix[row].length; col++) {
+      const cell = game.dungeon.matrix[row][col];
+      if (cell.card) {
+        const cardStr = serializeCard(cell.card);
+        const faceDown = cell.cardFaceDown ? '1' : '0';
+        matrixData.push(`${row},${col},${cardStr},${faceDown}`);
+      }
+    }
+  }
+  params.set('dungeonMatrix', matrixData.join('|'));
+
+  return params.toString();
+}
+
+// Deserialize game state from URL parameters
+function deserializeGameState(queryString) {
+  const params = new URLSearchParams(queryString);
+
+  const deserializePile = (pileStr) => {
+    const [cardStr, stockLengthStr] = pileStr.split(':');
+    const cards = [];
+    for (let i = 0; i < cardStr.length; i += 2) {
+      cards.push(deserializeCard(cardStr.substr(i, 2)));
+    }
+    const stockLength = parseInt(stockLengthStr, 10);
+    return {
+      stock: cards.slice(0, stockLength),
+      available: cards.slice(stockLength)
+    };
+  };
+
+  const state = {
+    health: deserializePile(params.get('health')),
+    inventory: deserializePile(params.get('inventory')),
+    gems: deserializePile(params.get('gems')),
+    fate: deserializePile(params.get('fate')),
+    dungeonStock: [],
+    dungeonMatrix: []
+  };
+
+  // Deserialize dungeon stock
+  const dungeonStockStr = params.get('dungeonStock');
+  for (let i = 0; i < dungeonStockStr.length; i += 2) {
+    state.dungeonStock.push(deserializeCard(dungeonStockStr.substr(i, 2)));
+  }
+
+  // Deserialize dungeon matrix
+  const matrixStr = params.get('dungeonMatrix');
+  if (matrixStr) {
+    const cells = matrixStr.split('|');
+    for (const cellData of cells) {
+      if (cellData) {
+        const [rowStr, colStr, cardStr, faceDownStr] = cellData.split(',');
+        state.dungeonMatrix.push({
+          row: parseInt(rowStr, 10),
+          col: parseInt(colStr, 10),
+          card: deserializeCard(cardStr),
+          cardFaceDown: faceDownStr === '1'
+        });
+      }
+    }
+  }
+
+  return state;
+}
+
 class Game {
-  constructor() {
+  constructor(options = {}) {
+    // If state is provided, restore from it
+    if (options.state) {
+      this.health = options.state.health;
+      this.inventory = options.state.inventory;
+      this.gems = options.state.gems;
+      this.fate = options.state.fate;
+
+      // Restore dungeon matrix
+      const maxRow = Math.max(...options.state.dungeonMatrix.map(c => c.row), 0);
+      const maxCol = Math.max(...options.state.dungeonMatrix.map(c => c.col), 0);
+      this.dungeon = {
+        stock: options.state.dungeonStock,
+        matrix: Array(maxRow + 1).fill(null).map(() =>
+          Array(maxCol + 1).fill(null).map(() => new Cell())
+        ),
+        available: []
+      };
+
+      // Populate matrix cells
+      for (const cellData of options.state.dungeonMatrix) {
+        const cell = this.dungeon.matrix[cellData.row][cellData.col];
+        cell.card = cellData.card;
+        cell.cardFaceDown = cellData.cardFaceDown;
+      }
+
+      this.updateDungeon();
+      return;
+    }
+
+    // Determine RNG (seeded or random)
+    const rng = options.seed ? createSeededRNG(options.seed) : Math.random;
+
+    // Initialize new game
     this.health = {
       stock: [],
       available: buildPile([
@@ -126,7 +274,8 @@ class Game {
           [DIAMONDS, QUEEN],
           [DIAMONDS, KING],
           [RED, JOKER],
-        ])
+        ]),
+        rng
       ),
       available: [],
     };
@@ -155,7 +304,8 @@ class Game {
           [HEARTS, EIGHT],
           [HEARTS, NINE],
           [HEARTS, TEN],
-        ])
+        ]),
+        rng
       ),
       available: [],
     };
@@ -190,7 +340,8 @@ class Game {
           [SPADES, QUEEN],
           [SPADES, KING],
           [BLACK, JOKER],
-        ])
+        ]),
+        rng
       ),
       matrix: [[new Cell()]],
       available: [],  // match pattern for status piles, but not used
@@ -619,6 +770,10 @@ class Game {
     renderer.renderFate();
     renderer.renderInventory();
     renderer.renderGems();
+
+    // Update URL with current game state
+    const stateString = serializeGameState(this);
+    window.history.replaceState(null, '', `?${stateString}`);
   }
 }
 
@@ -869,13 +1024,32 @@ class GameRenderer {
 }
 
 function main() {
-  let game = new Game();
+  // Check if URL contains game state
+  const urlParams = new URLSearchParams(window.location.search);
+  let game;
+
+  if (urlParams.toString()) {
+    // Restore game from URL
+    try {
+      const state = deserializeGameState(urlParams.toString());
+      game = new Game({ state });
+    } catch (error) {
+      console.error('Failed to restore game from URL:', error);
+      game = new Game();
+    }
+  } else {
+    // Create new game
+    game = new Game();
+  }
+
   game.render();
 
   const resetGameButton = document.querySelector("#reset-game");
   resetGameButton.onclick = () => {
     game = new Game();
     game.render();
+    // Clear URL when resetting
+    window.history.replaceState(null, '', window.location.pathname);
   }
 }
 
