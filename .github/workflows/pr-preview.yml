@@ -26,7 +26,6 @@ jobs:
           preview-branch: gh-pages
           umbrella-dir: pr-preview
           action: auto
-          custom-url: https://david-wolgemuth.github.io/dragon-quest-solitaire
 
       # Remove preview when PR is closed
       - name: Remove PR Preview
