@@ -1,17 +1,8 @@
-# Todo #008: Hidden Pit Trap Gem Reduction Not Implemented
-
-**Status**: Open
-**Priority**: P1 - High (Major Bug)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #5
-
-## Problem
+# Hidden Pit Trap Gem Reduction Not Implemented
 
 Hidden pit traps try to pass a `{ gems: true }` option, but `loseHealth()` doesn't accept a third parameter.
 
 **Location**: `card-builders.js:12`
-
-**Impact**: Hidden pit traps don't automatically use gems to reduce damage as described in the rules.
 
 ## Current Code
 
@@ -22,9 +13,7 @@ resolver: function (game) {
 }
 ```
 
-## Expected Behavior
-
-Hidden traps should automatically consume gems to reduce damage according to game rules.
+Hidden traps don't automatically use gems to reduce damage as described in the rules.
 
 ## Fix
 

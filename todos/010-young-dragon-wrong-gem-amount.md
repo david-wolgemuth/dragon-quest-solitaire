@@ -1,17 +1,8 @@
-# Todo #010: Young Dragon Critical Success Gives Wrong Amount
-
-**Status**: Open
-**Priority**: P1 - High (Major Bug)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #7
-
-## Problem
+# Young Dragon Critical Success Gives Wrong Amount
 
 Description says "gain 3 gems" but implementation only gives 1.
 
 **Location**: `dungeon-cards.js:129-132`
-
-**Impact**: Players only receive 1 gem instead of 3 on critical success against Young Dragon.
 
 ## Current Code
 
@@ -27,19 +18,14 @@ Description says "gain 3 gems" but implementation only gives 1.
 }),
 ```
 
-## Fix Options
+## Fix
 
-1. **Option A**: Change implementation to match description:
-   ```javascript
-   game.gainGem(this, 3);
-   ```
+Change implementation to match description:
+```javascript
+game.gainGem(this, 3);
+```
 
-2. **Option B**: Update description to match implementation:
-   ```javascript
-   resolveCriticalSuccessDescription: "You will gain 1 gem",
-   ```
-
-**Recommended**: Option A - 3 gems makes more sense for a critical success against a dragon.
+(3 gems makes more sense for a critical success against a dragon)
 
 ## Testing
 

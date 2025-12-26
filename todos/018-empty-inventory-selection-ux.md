@@ -1,11 +1,4 @@
-# Todo #018: Empty Inventory Selection UX
-
-**Status**: Open
-**Priority**: P3 - Low (Edge Case)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #19
-
-## Problem
+# Empty Inventory Selection UX
 
 If inventory stock is empty, the selection modal only shows Exit card.
 
@@ -30,13 +23,6 @@ getUserInputInventoryCardSelection(message, callback) {
 - If all items are in player's inventory, stock is empty
 - Modal only shows Exit card
 - Seems odd from gameplay perspective
-
-## Questions
-
-1. Should merchant/wizard be disabled if inventory is full?
-2. Should they offer items from the available pile (allowing duplicates)?
-3. Should Exit always be an option for "free"?
-4. Is offering only Exit intentional gameplay?
 
 ## Possible Solutions
 
@@ -63,16 +49,4 @@ if (this.inventory.stock.length === 0) {
 }
 ```
 
-### Option D: Keep Current Behavior
-Document that this is intentional - when inventory is full, merchant/wizard only offer Exit.
-
-## Recommended
-
-**Option C** - Clarify the situation to the player with an appropriate message.
-
-## Testing
-
-1. Acquire all 4 inventory items (Gem, Healing, Treasure, Exit)
-2. Encounter Merchant or Wizard
-3. Verify UX is clear about what's happening
-4. Verify selecting Exit works correctly
+**Recommended**: Option C - Clarify the situation to the player.

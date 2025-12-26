@@ -1,17 +1,8 @@
-# Todo #011: Passage Card Resolver Has Wrong Parameters
-
-**Status**: Open
-**Priority**: P1 - High (Major Bug)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #8
-
-## Problem
+# Passage Card Resolver Has Wrong Parameters
 
 Passage resolver passes incorrect parameters to `foundPassage()`.
 
 **Location**: `card-builders.js:37`
-
-**Impact**: Passage matching is completely broken due to parameter mismatch.
 
 ## Current Code
 
@@ -28,8 +19,7 @@ foundPassage(suit, value) {  // Only accepts 2 args!
 }
 ```
 
-## What Happens
-
+What happens:
 - First parameter `this` (card definition object) is treated as `suit`
 - Second parameter `suit` is treated as `value`
 - Third parameter `value` is ignored

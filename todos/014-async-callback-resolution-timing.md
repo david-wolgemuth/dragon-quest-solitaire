@@ -1,20 +1,8 @@
-# Todo #014: Async Callback Issues - Card Resolved Before Selection
-
-**Status**: Open
-**Priority**: P2 - Medium (Design Issue)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #13
-
-## Problem
+# Async Callback Issues - Card Resolved Before Selection
 
 Merchant and Wizard return `true` immediately, marking the card as resolved before the user selects an item.
 
 **Location**: `dungeon-cards.js:110, 166`
-
-**Impact**:
-- Card is marked resolved before selection completes
-- User can cancel/close modal and card stays resolved without gaining item
-- No error handling if user doesn't complete selection
 
 ## Current Code
 
@@ -31,6 +19,11 @@ game.getUserInputInventoryCardSelection(
 // Card is marked resolved immediately:
 return true
 ```
+
+**Problems**:
+- Card is marked resolved before selection completes
+- User can cancel/close modal and card stays resolved without gaining item
+- No error handling if user doesn't complete selection
 
 ## Proposed Solutions
 
@@ -61,15 +54,4 @@ resolver: function (game) {
 ### Option C: State-based Resolution
 Track selection state and only mark resolved after confirmation.
 
-## TODO Comments
-
-Code already has TODO comments acknowledging this issue.
-
-## Testing
-
-1. Click Merchant/Wizard
-2. Modal should open
-3. Close modal without selecting
-4. Verify card is NOT marked as resolved
-5. Click again and complete selection
-6. Verify card IS marked as resolved
+**Note**: Code already has TODO comments acknowledging this issue.

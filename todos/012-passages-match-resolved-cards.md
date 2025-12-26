@@ -1,17 +1,8 @@
-# Todo #012: Passages Match Against Resolved Cards
-
-**Status**: Open
-**Priority**: P1 - High (Major Bug)
-**Created**: 2025-12-26
-**Related**: BUG_REPORT.md Issue #9
-
-## Problem
+# Passages Match Against Resolved Cards
 
 The `foundPassage()` function doesn't check if the matching passage is face-up (unresolved).
 
 **Location**: `index.js:334-347`
-
-**Impact**: Players can match passages that have already been resolved (face-down), which shouldn't be possible according to game rules.
 
 ## Current Code
 
@@ -26,6 +17,8 @@ for (let row = 0; row < this.dungeon.matrix.length; row += 1) {
   }
 }
 ```
+
+Players can match passages that have already been resolved (face-down), which shouldn't be possible.
 
 ## Fix
 
