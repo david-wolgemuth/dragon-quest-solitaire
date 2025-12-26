@@ -77,6 +77,7 @@ const loadScript = (filename) => {
 loadScript('cards.js');
 loadScript('card-builders.js');
 loadScript('dungeon-cards.js');
+loadScript('url-state.js');
 
 // Load index.js but wrap it to prevent main() from running
 const indexPath = path.join(__dirname, '..', 'index.js');
