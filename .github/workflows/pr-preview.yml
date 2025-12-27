@@ -27,7 +27,7 @@ jobs:
       # Deploy preview when PR is opened, reopened, or updated
       - name: Deploy PR Preview
         if: github.event.action != 'closed'
-        uses: rossjrw/pr-preview-action@v1
+        uses: rossjrw/pr-preview-action@v1.6.3
         with:
           source-dir: ./
           preview-branch: gh-pages
@@ -37,7 +37,7 @@ jobs:
       # Remove preview when PR is closed
       - name: Remove PR Preview
         if: github.event.action == 'closed'
-        uses: rossjrw/pr-preview-action@v1
+        uses: rossjrw/pr-preview-action@v1.6.3
         with:
           source-dir: ./
           preview-branch: gh-pages
