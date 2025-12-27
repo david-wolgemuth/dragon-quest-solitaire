@@ -89,15 +89,19 @@ indexContent = indexContent.replace(/\nmain\(\);?\s*$/, '');
 // Also export classes and functions to window explicitly
 indexContent += `
 // Make classes and functions available on window for tests
-window.Card = Card;
+// Card, serializeCard, deserializeCard, serializeGameState, deserializeGameState, createSeededRNG
+// are already loaded from url-state.js
 window.Cell = Cell;
 window.Game = Game;
 window.GameRenderer = GameRenderer;
-window.serializeCard = serializeCard;
-window.deserializeCard = deserializeCard;
-window.serializeGameState = serializeGameState;
-window.deserializeGameState = deserializeGameState;
-window.createSeededRNG = createSeededRNG;
 `;
 
 dom.window.eval(indexContent);
+
+// Make sure Card and url-state functions are accessible on window for tests
+global.window.Card = dom.window.Card;
+global.window.serializeCard = dom.window.serializeCard;
+global.window.deserializeCard = dom.window.deserializeCard;
+global.window.serializeGameState = dom.window.serializeGameState;
+global.window.deserializeGameState = dom.window.deserializeGameState;
+global.window.createSeededRNG = dom.window.createSeededRNG;

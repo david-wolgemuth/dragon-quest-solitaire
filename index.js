@@ -1,27 +1,9 @@
 const MAX_WIDTH = 7;
 const MAX_HEIGHT = 5;
 
-
-class Card {
-  constructor(suitKey, valueKey) {
-    if (!Object.keys(SUITS).includes(suitKey)) {
-      throw new Error(`Invalid suit key: ${suitKey}`);
-    }
-    if (!Object.keys(VALUES).includes(valueKey)) {
-      throw new Error(`Invalid value key: ${valueKey}`);
-    }
-    this.suitKey = suitKey;
-    this.valueKey = valueKey;
-  }
-
-  get suit() {
-    return SUITS[this.suitKey];
-  }
-
-  get value() {
-    return VALUES[this.valueKey];
-  }
-}
+// Note: Card class is now defined in url-state.js to avoid class redefinition issues
+// When url-state.js loads first, it defines Card with basic getters
+// This ensures Card instances created during URL deserialization remain valid
 
 class Cell {
   constructor() {
