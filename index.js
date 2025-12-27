@@ -890,34 +890,149 @@ class GameRenderer {
   }
 }
 
-function main() {
-  // Check if URL contains game state
-  const urlParams = new URLSearchParams(window.location.search);
-  let game;
+// Show error overlay with full details
+function showErrorOverlay(title, message, error) {
+  const overlay = document.createElement('div');
+  overlay.id = 'error-overlay';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+  `;
 
-  if (urlParams.toString()) {
-    // Restore game from URL
-    try {
-      const state = deserializeGameState(urlParams.toString());
-      game = new Game({ state });
-    } catch (error) {
-      console.error('Failed to restore game from URL:', error);
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: auto;
+    font-family: monospace;
+  `;
+
+  const heading = document.createElement('h1');
+  heading.textContent = '🚨 ' + title;
+  heading.style.cssText = 'color: #d32f2f; margin-top: 0;';
+
+  const msg = document.createElement('p');
+  msg.textContent = message;
+  msg.style.cssText = 'font-size: 16px; line-height: 1.5;';
+
+  const errorBox = document.createElement('pre');
+  errorBox.style.cssText = `
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 12px;
+    border-left: 4px solid #d32f2f;
+  `;
+  errorBox.textContent = error ? (error.stack || error.toString()) : 'No error details available';
+
+  const urlInfo = document.createElement('details');
+  urlInfo.style.cssText = 'margin-top: 20px;';
+  const urlSummary = document.createElement('summary');
+  urlSummary.textContent = 'URL Parameters';
+  urlSummary.style.cssText = 'cursor: pointer; font-weight: bold; margin-bottom: 10px;';
+  const urlPre = document.createElement('pre');
+  urlPre.style.cssText = 'background: #e3f2fd; padding: 10px; border-radius: 5px; font-size: 11px;';
+  urlPre.textContent = window.location.search || '(no URL parameters)';
+  urlInfo.appendChild(urlSummary);
+  urlInfo.appendChild(urlPre);
+
+  const reloadBtn = document.createElement('button');
+  reloadBtn.textContent = 'Start Fresh Game (Clear URL)';
+  reloadBtn.style.cssText = `
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+  `;
+  reloadBtn.onclick = () => {
+    window.location.href = window.location.pathname;
+  };
+
+  content.appendChild(heading);
+  content.appendChild(msg);
+  content.appendChild(errorBox);
+  content.appendChild(urlInfo);
+  content.appendChild(reloadBtn);
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+}
+
+function main() {
+  try {
+    // Check if URL contains game state
+    const urlParams = new URLSearchParams(window.location.search);
+    let game;
+
+    if (urlParams.toString()) {
+      // Restore game from URL
+      try {
+        const state = deserializeGameState(urlParams.toString());
+        if (!state || !state.health || !state.inventory || !state.gems || !state.fate || !state.dungeonStock) {
+          throw new Error('Deserialized state is incomplete or invalid. Missing required properties.');
+        }
+        game = new Game({ state });
+      } catch (error) {
+        showErrorOverlay(
+          'Failed to Load Game State from URL',
+          'The URL contains game state parameters, but they could not be loaded. This might be because the URL is corrupted or from an old version. Click below to start a fresh game.',
+          error
+        );
+        throw error; // Re-throw to prevent further execution
+      }
+    } else {
+      // Create new game
       game = new Game();
     }
-  } else {
-    // Create new game
-    game = new Game();
-  }
 
-  game.render();
-
-  const resetGameButton = document.querySelector("#reset-game");
-  resetGameButton.onclick = () => {
-    game = new Game();
     game.render();
-    // Clear URL when resetting
-    window.history.replaceState(null, '', window.location.pathname);
+
+    const resetGameButton = document.querySelector("#reset-game");
+    resetGameButton.onclick = () => {
+      game = new Game();
+      game.render();
+      // Clear URL when resetting
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  } catch (error) {
+    // Catch any errors in main() and show overlay if one wasn't already shown
+    if (!document.getElementById('error-overlay')) {
+      showErrorOverlay(
+        'Game Initialization Failed',
+        'An unexpected error occurred while starting the game.',
+        error
+      );
+    }
   }
 }
+
+// Global error handler for uncaught errors
+window.addEventListener('error', (event) => {
+  if (!document.getElementById('error-overlay')) {
+    showErrorOverlay(
+      'Uncaught Error',
+      'An error occurred that prevented the game from working correctly.',
+      event.error
+    );
+  }
+});
 
 main();
