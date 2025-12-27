@@ -1,10 +1,17 @@
 // URL State Serialization/Deserialization
 // Enables storing and restoring game state via URL parameters
 
-// Card class definition (needed for deserialization)
-// Simplified version - full Card class with validation is in index.js
+// Card class definition (shared between url-state.js and index.js)
+// Defined here to avoid class redefinition when scripts load
 class Card {
   constructor(suitKey, valueKey) {
+    // Validation only if SUITS/VALUES are available (after cards.js loads)
+    if (window.SUITS && !Object.keys(window.SUITS).includes(suitKey)) {
+      throw new Error(`Invalid suit key: ${suitKey}`);
+    }
+    if (window.VALUES && !Object.keys(window.VALUES).includes(valueKey)) {
+      throw new Error(`Invalid value key: ${valueKey}`);
+    }
     this.suitKey = suitKey;
     this.valueKey = valueKey;
   }
@@ -131,4 +138,14 @@ function createSeededRNG(seed) {
     t ^= t + Math.imul(t ^ t >>> 7, t | 61);
     return ((t ^ t >>> 14) >>> 0) / 4294967296;
   };
+}
+
+// Make functions and classes globally available (for use in index.js and tests)
+if (typeof window !== 'undefined') {
+  window.Card = Card;
+  window.serializeCard = serializeCard;
+  window.deserializeCard = deserializeCard;
+  window.serializeGameState = serializeGameState;
+  window.deserializeGameState = deserializeGameState;
+  window.createSeededRNG = createSeededRNG;
 }

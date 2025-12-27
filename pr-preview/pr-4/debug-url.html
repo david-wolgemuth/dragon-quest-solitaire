@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Dragon Quest Solitaire - Debug</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="card-builders.js"></script>
+  <script src="cards.js"></script>
+  <script src="dungeon-cards.js"></script>
+  <script src="url-state.js"></script>
+  <script>
+    // Override console.error to display on page
+    const originalError = console.error;
+    const errors = [];
+    console.error = function(...args) {
+      errors.push(args.join(' '));
+      originalError.apply(console, args);
+    };
+
+    window.addEventListener('error', function(e) {
+      errors.push('ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
+    });
+  </script>
+  <script src="index.js"></script>
+</head>
+<body>
+  <h1>Dragon Quest Solitaire - Debug Mode</h1>
+
+  <div id="debug-info" style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace;">
+    <h2>Debug Information</h2>
+    <div id="debug-output"></div>
+  </div>
+
+  <button id="reset-game">Reset Game</button>
+
+  <table id="status-table">
+    <caption>Current game status</caption>
+    <thead>
+      <tr>
+        <th>Health</th>
+        <th>Inventory</th>
+        <th>Gems</th>
+        <th>Fate</th>
+        <th>Dungeon</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="stock">
+        <td id="health-stock"></td>
+        <td id="inventory-stock"></td>
+        <td id="gems-stock"></td>
+        <td id="fate-stock"></td>
+        <td id="dungeon-stock"></td>
+      </tr>
+      <tr id="available">
+        <td id="health-available"></td>
+        <td id="inventory-available"></td>
+        <td id="gems-available"></td>
+        <td id="fate-available"></td>
+        <td id="dungeon-available"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <br><hr><br>
+
+  <main id="dungeon">
+    <div class="matrix"></div>
+  </main>
+
+  <aside id="tutorial-modal">
+    <div id="tutorial-modal-content">
+      <div id="tutorial-modal-inner-content"></div>
+      <div id="tutorial-modal-actions">
+        <button id="tutorial-modal-dismiss">Dismiss</button>
+        <button id="tutorial-modal-accept">Accept</button>
+      </div>
+    </div>
+  </aside>
+
+  <aside id="message-modal">
+    <div id="message-modal-content">
+      <div id="message-modal-inner-content"></div>
+      <div id="message-modal-actions">
+        <button id="message-modal-accept">Accept</button>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    // Display debug info after page loads
+    setTimeout(() => {
+      const debugOutput = document.getElementById('debug-output');
+
+      const info = [];
+      info.push('<strong>URL:</strong> ' + window.location.search);
+      info.push('<strong>URL Params:</strong> ' + new URLSearchParams(window.location.search).toString());
+
+      if (errors.length > 0) {
+        info.push('<strong style="color: red;">ERRORS:</strong>');
+        errors.forEach(err => {
+          info.push('<span style="color: red;">' + err + '</span>');
+        });
+      } else {
+        info.push('<strong style="color: green;">No errors detected</strong>');
+      }
+
+      // Check if game state was loaded
+      if (window.location.search) {
+        info.push('<strong>Attempting to load state from URL...</strong>');
+      } else {
+        info.push('<strong>No URL state - fresh game</strong>');
+      }
+
+      debugOutput.innerHTML = info.join('<br>');
+    }, 100);
+  </script>
+</body>
+</html>
