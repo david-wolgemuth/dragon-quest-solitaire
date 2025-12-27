@@ -1,27 +1,9 @@
 const MAX_WIDTH = 7;
 const MAX_HEIGHT = 5;
 
-
-class Card {
-  constructor(suitKey, valueKey) {
-    if (!Object.keys(SUITS).includes(suitKey)) {
-      throw new Error(`Invalid suit key: ${suitKey}`);
-    }
-    if (!Object.keys(VALUES).includes(valueKey)) {
-      throw new Error(`Invalid value key: ${valueKey}`);
-    }
-    this.suitKey = suitKey;
-    this.valueKey = valueKey;
-  }
-
-  get suit() {
-    return SUITS[this.suitKey];
-  }
-
-  get value() {
-    return VALUES[this.valueKey];
-  }
-}
+// Note: Card class is now defined in url-state.js to avoid class redefinition issues
+// When url-state.js loads first, it defines Card with basic getters
+// This ensures Card instances created during URL deserialization remain valid
 
 class Cell {
   constructor() {
@@ -35,10 +17,10 @@ function buildPile(keyPairs) {
   return keyPairs.map(([suitKey, valueKey]) => new Card(suitKey, valueKey));
 }
 
-function shuffle(array) {
+function shuffle(array, rng = Math.random) {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
@@ -104,7 +86,40 @@ function createStyleSheet() {
 createStyleSheet();
 
 class Game {
-  constructor() {
+  constructor(options = {}) {
+    // If state is provided, restore from it
+    if (options.state) {
+      this.health = options.state.health;
+      this.inventory = options.state.inventory;
+      this.gems = options.state.gems;
+      this.fate = options.state.fate;
+
+      // Restore dungeon matrix
+      const maxRow = Math.max(...options.state.dungeonMatrix.map(c => c.row), 0);
+      const maxCol = Math.max(...options.state.dungeonMatrix.map(c => c.col), 0);
+      this.dungeon = {
+        stock: options.state.dungeonStock,
+        matrix: Array(maxRow + 1).fill(null).map(() =>
+          Array(maxCol + 1).fill(null).map(() => new Cell())
+        ),
+        available: []
+      };
+
+      // Populate matrix cells
+      for (const cellData of options.state.dungeonMatrix) {
+        const cell = this.dungeon.matrix[cellData.row][cellData.col];
+        cell.card = cellData.card;
+        cell.cardFaceDown = cellData.cardFaceDown;
+      }
+
+      this.updateDungeon();
+      return;
+    }
+
+    // Determine RNG (seeded or random)
+    const rng = options.seed ? createSeededRNG(options.seed) : Math.random;
+
+    // Initialize new game
     this.health = {
       stock: [],
       available: buildPile([
@@ -126,7 +141,8 @@ class Game {
           [DIAMONDS, QUEEN],
           [DIAMONDS, KING],
           [RED, JOKER],
-        ])
+        ]),
+        rng
       ),
       available: [],
     };
@@ -155,7 +171,8 @@ class Game {
           [HEARTS, EIGHT],
           [HEARTS, NINE],
           [HEARTS, TEN],
-        ])
+        ]),
+        rng
       ),
       available: [],
     };
@@ -190,7 +207,8 @@ class Game {
           [SPADES, QUEEN],
           [SPADES, KING],
           [BLACK, JOKER],
-        ])
+        ]),
+        rng
       ),
       matrix: [[new Cell()]],
       available: [],  // match pattern for status piles, but not used
@@ -619,6 +637,10 @@ class Game {
     renderer.renderFate();
     renderer.renderInventory();
     renderer.renderGems();
+
+    // Update URL with current game state
+    const stateString = serializeGameState(this);
+    window.history.replaceState(null, '', `?${stateString}`);
   }
 }
 
@@ -868,15 +890,149 @@ class GameRenderer {
   }
 }
 
-function main() {
-  let game = new Game();
-  game.render();
+// Show error overlay with full details
+function showErrorOverlay(title, message, error) {
+  const overlay = document.createElement('div');
+  overlay.id = 'error-overlay';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+  `;
 
-  const resetGameButton = document.querySelector("#reset-game");
-  resetGameButton.onclick = () => {
-    game = new Game();
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: auto;
+    font-family: monospace;
+  `;
+
+  const heading = document.createElement('h1');
+  heading.textContent = '🚨 ' + title;
+  heading.style.cssText = 'color: #d32f2f; margin-top: 0;';
+
+  const msg = document.createElement('p');
+  msg.textContent = message;
+  msg.style.cssText = 'font-size: 16px; line-height: 1.5;';
+
+  const errorBox = document.createElement('pre');
+  errorBox.style.cssText = `
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 12px;
+    border-left: 4px solid #d32f2f;
+  `;
+  errorBox.textContent = error ? (error.stack || error.toString()) : 'No error details available';
+
+  const urlInfo = document.createElement('details');
+  urlInfo.style.cssText = 'margin-top: 20px;';
+  const urlSummary = document.createElement('summary');
+  urlSummary.textContent = 'URL Parameters';
+  urlSummary.style.cssText = 'cursor: pointer; font-weight: bold; margin-bottom: 10px;';
+  const urlPre = document.createElement('pre');
+  urlPre.style.cssText = 'background: #e3f2fd; padding: 10px; border-radius: 5px; font-size: 11px;';
+  urlPre.textContent = window.location.search || '(no URL parameters)';
+  urlInfo.appendChild(urlSummary);
+  urlInfo.appendChild(urlPre);
+
+  const reloadBtn = document.createElement('button');
+  reloadBtn.textContent = 'Start Fresh Game (Clear URL)';
+  reloadBtn.style.cssText = `
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+  `;
+  reloadBtn.onclick = () => {
+    window.location.href = window.location.pathname;
+  };
+
+  content.appendChild(heading);
+  content.appendChild(msg);
+  content.appendChild(errorBox);
+  content.appendChild(urlInfo);
+  content.appendChild(reloadBtn);
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+}
+
+function main() {
+  try {
+    // Check if URL contains game state
+    const urlParams = new URLSearchParams(window.location.search);
+    let game;
+
+    if (urlParams.toString()) {
+      // Restore game from URL
+      try {
+        const state = deserializeGameState(urlParams.toString());
+        if (!state || !state.health || !state.inventory || !state.gems || !state.fate || !state.dungeonStock) {
+          throw new Error('Deserialized state is incomplete or invalid. Missing required properties.');
+        }
+        game = new Game({ state });
+      } catch (error) {
+        showErrorOverlay(
+          'Failed to Load Game State from URL',
+          'The URL contains game state parameters, but they could not be loaded. This might be because the URL is corrupted or from an old version. Click below to start a fresh game.',
+          error
+        );
+        throw error; // Re-throw to prevent further execution
+      }
+    } else {
+      // Create new game
+      game = new Game();
+    }
+
     game.render();
+
+    const resetGameButton = document.querySelector("#reset-game");
+    resetGameButton.onclick = () => {
+      game = new Game();
+      game.render();
+      // Clear URL when resetting
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  } catch (error) {
+    // Catch any errors in main() and show overlay if one wasn't already shown
+    if (!document.getElementById('error-overlay')) {
+      showErrorOverlay(
+        'Game Initialization Failed',
+        'An unexpected error occurred while starting the game.',
+        error
+      );
+    }
   }
 }
+
+// Global error handler for uncaught errors
+window.addEventListener('error', (event) => {
+  if (!document.getElementById('error-overlay')) {
+    showErrorOverlay(
+      'Uncaught Error',
+      'An error occurred that prevented the game from working correctly.',
+      event.error
+    );
+  }
+});
 
 main();

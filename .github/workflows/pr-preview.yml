@@ -17,10 +17,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Clean up any temporary directories that might interfere with deployment
+      - name: Clean temporary directories
+        if: github.event.action != 'closed'
+        run: |
+          rm -rf bare_pr_preview || true
+          rm -rf github-pages-deploy-action-temp-deployment-folder || true
+
       # Deploy preview when PR is opened, reopened, or updated
       - name: Deploy PR Preview
         if: github.event.action != 'closed'
-        uses: rossjrw/pr-preview-action@v1
+        uses: rossjrw/pr-preview-action@v1.6.3
         with:
           source-dir: ./
           preview-branch: gh-pages
@@ -30,7 +37,7 @@ jobs:
       # Remove preview when PR is closed
       - name: Remove PR Preview
         if: github.event.action == 'closed'
-        uses: rossjrw/pr-preview-action@v1
+        uses: rossjrw/pr-preview-action@v1.6.3
         with:
           source-dir: ./
           preview-branch: gh-pages
