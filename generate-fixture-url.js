@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { serializeGameState } from './url-state.js';
+import { loadFixtureFile, fixtureToURL } from './lib/fixture-utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -31,54 +31,16 @@ try {
     throw new Error(`Fixture not found: ${fixturePath}`);
   }
 
-  const fixtureData = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
-  const state = fixtureData.state;
-
-  // Create a mock game object that serializeGameState can use
-  const mockGame = {
-    health: state.health,
-    inventory: state.inventory,
-    gems: state.gems,
-    fate: state.fate,
-    dungeon: {
-      stock: state.dungeonStock,
-      matrix: []
-    }
-  };
-
-  // Reconstruct the matrix
-  const matrixRows = state.matrixRows || 1;
-  const matrixCols = state.matrixCols || 1;
-
-  for (let r = 0; r < matrixRows; r++) {
-    const row = [];
-    for (let c = 0; c < matrixCols; c++) {
-      row.push({
-        card: null,
-        cardFaceDown: false,
-        available: false
-      });
-    }
-    mockGame.dungeon.matrix.push(row);
-  }
-
-  // Place cards from dungeonMatrix
-  for (const cellData of state.dungeonMatrix) {
-    mockGame.dungeon.matrix[cellData.row][cellData.col] = {
-      card: cellData.card,
-      cardFaceDown: cellData.cardFaceDown,
-      available: false
-    };
-  }
-
-  // Serialize to URL
-  const stateString = serializeGameState(mockGame);
-  const baseUrl = `https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-${prNumber}/`;
-  const fullUrl = `${baseUrl}?${stateString}`;
+  const fixtureData = loadFixtureFile(fixturePath);
+  const fullUrl = fixtureToURL(fixtureData, prNumber);
 
   if (urlOnly) {
     console.log(fullUrl);
   } else {
+    const state = fixtureData.state;
+    const matrixRows = state.matrixRows || Math.max(...state.dungeonMatrix.map(c => c.row), 0) + 1;
+    const matrixCols = state.matrixCols || Math.max(...state.dungeonMatrix.map(c => c.col), 0) + 1;
+
     console.log(`\n🎮 Preview URL for fixture "${fixtureName}" (PR #${prNumber}):\n`);
     console.log(`${fullUrl}\n`);
     console.log(`📊 Fixture: ${fixtureData.description || fixtureName}`);

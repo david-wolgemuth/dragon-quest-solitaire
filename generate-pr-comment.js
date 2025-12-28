@@ -10,7 +10,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { serializeGameState } from './url-state.js';
+import { loadFixtureFile, fixtureToURL } from './lib/fixture-utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -44,43 +44,10 @@ const fixtureLinks = [];
 
 for (const file of fixtureFiles) {
   const fixturePath = path.join(fixturesDir, file);
-  const fixtureData = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+  const fixtureData = loadFixtureFile(fixturePath);
 
-  const { name, description, metadata = {}, state } = fixtureData;
-
-  // Reconstruct game object for serialization
-  const matrixRows = state.matrixRows ||
-    Math.max(...state.dungeonMatrix.map(c => c.row), 0) + 1;
-  const matrixCols = state.matrixCols ||
-    Math.max(...state.dungeonMatrix.map(c => c.col), 0) + 1;
-
-  const mockGame = {
-    health: state.health,
-    inventory: state.inventory,
-    gems: state.gems,
-    fate: state.fate,
-    dungeon: {
-      stock: state.dungeonStock,
-      matrix: Array(matrixRows).fill(null).map(() =>
-        Array(matrixCols).fill(null).map(() => ({
-          card: null,
-          cardFaceDown: false
-        }))
-      )
-    }
-  };
-
-  // Place cards from dungeonMatrix
-  for (const cellData of state.dungeonMatrix) {
-    mockGame.dungeon.matrix[cellData.row][cellData.col] = {
-      card: cellData.card,
-      cardFaceDown: cellData.cardFaceDown
-    };
-  }
-
-  const stateString = serializeGameState(mockGame);
-  const baseUrl = `https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-${prNumber}`;
-  const fullUrl = `${baseUrl}/?${stateString}`;
+  const { name, description } = fixtureData;
+  const fullUrl = fixtureToURL(fixtureData, prNumber);
 
   const emoji = getEmoji(name);
   fixtureLinks.push(`${emoji} [**${description}**](${fullUrl})`);
