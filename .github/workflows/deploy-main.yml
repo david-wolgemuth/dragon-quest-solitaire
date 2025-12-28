@@ -32,17 +32,11 @@ jobs:
         run: |
           cd gh-pages-repo
 
-          # Remove all files/folders at root EXCEPT pr-preview/
+          # Remove all files/folders at root EXCEPT pr-preview/ and .git
           find . -maxdepth 1 -not -name '.' -not -name '..' -not -name '.git' -not -name 'pr-preview' -exec rm -rf {} +
 
-          # Copy main repo files to root
-          cp -r ../main-repo/* ../main-repo/.??* . 2>/dev/null || true
-
-          # Remove .git directory we just copied (we want to keep gh-pages .git)
-          rm -rf .git
-
-          # Restore the .git from gh-pages
-          git restore --staged .git || true
+          # Copy main repo files to root (excluding .git to preserve gh-pages .git)
+          rsync -av --exclude='.git' ../main-repo/ .
 
       - name: Commit and push to gh-pages
         run: |
