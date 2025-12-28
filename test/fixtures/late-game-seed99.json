@@ -1,0 +1,269 @@
+{
+  "name": "late-game-seed99",
+  "description": "Late-game state after 8 additions and 0 resolutions (seed: 99)",
+  "createdAt": "2025-12-28T12:04:01.281Z",
+  "state": {
+    "health": {
+      "stock": [],
+      "available": [
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "ACE"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "TWO"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "THREE"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "FOUR"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "FIVE"
+        }
+      ]
+    },
+    "inventory": {
+      "stock": [
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "JACK"
+        },
+        {
+          "suitKey": "RED",
+          "valueKey": "JOKER"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "JACK"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "KING"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "KING"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "QUEEN"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "QUEEN"
+        }
+      ],
+      "available": []
+    },
+    "gems": {
+      "stock": [
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "ACE"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "TWO"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "THREE"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "FOUR"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "FIVE"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "SIX"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "SEVEN"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "EIGHT"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "NINE"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "TEN"
+        }
+      ],
+      "available": []
+    },
+    "fate": {
+      "stock": [
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "NINE"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "EIGHT"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "SEVEN"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "TEN"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "SIX"
+        }
+      ],
+      "available": []
+    },
+    "dungeonStock": [
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "QUEEN"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "EIGHT"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "TWO"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "ACE"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "QUEEN"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "ACE"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "JACK"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "FOUR"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "KING"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "FOUR"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "THREE"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "SEVEN"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "SEVEN"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "JACK"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "TEN"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "KING"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "SIX"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "NINE"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "EIGHT"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "THREE"
+      },
+      {
+        "suitKey": "BLACK",
+        "valueKey": "JOKER"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "FIVE"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "SIX"
+      }
+    ],
+    "matrixRows": 6,
+    "matrixCols": 3,
+    "dungeonMatrix": [
+      {
+        "row": 1,
+        "col": 1,
+        "card": {
+          "suitKey": "SPADES",
+          "valueKey": "FIVE"
+        },
+        "cardFaceDown": false
+      },
+      {
+        "row": 2,
+        "col": 1,
+        "card": {
+          "suitKey": "CLUBS",
+          "valueKey": "NINE"
+        },
+        "cardFaceDown": true
+      },
+      {
+        "row": 3,
+        "col": 1,
+        "card": {
+          "suitKey": "CLUBS",
+          "valueKey": "TWO"
+        },
+        "cardFaceDown": true
+      },
+      {
+        "row": 4,
+        "col": 1,
+        "card": {
+          "suitKey": "CLUBS",
+          "valueKey": "TEN"
+        },
+        "cardFaceDown": true
+      }
+    ]
+  }
+}

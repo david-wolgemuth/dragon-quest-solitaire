@@ -651,6 +651,37 @@ class Game {
     // Update URL with current game state
     const stateString = serializeGameState(this);
     window.history.replaceState(null, '', `?${stateString}`);
+
+    // Update test debug div with serialized state (for integration tests)
+    this._updateTestDebugDiv(stateString);
+  }
+
+  _updateTestDebugDiv(stateString) {
+    let debugDiv = document.getElementById('test-debug-state');
+    if (!debugDiv) {
+      debugDiv = document.createElement('pre');
+      debugDiv.id = 'test-debug-state';
+      debugDiv.style.cssText = `
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.8);
+        color: #0f0;
+        font-family: monospace;
+        font-size: 10px;
+        padding: 4px;
+        max-width: 200px;
+        max-height: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        border: 1px solid #0f0;
+        z-index: 9999;
+      `;
+      document.body.appendChild(debugDiv);
+    }
+    debugDiv.textContent = stateString;
+    debugDiv.dataset.state = stateString;
   }
 }
 
