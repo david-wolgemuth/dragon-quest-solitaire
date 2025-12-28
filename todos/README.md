@@ -25,6 +25,7 @@ Quick wins and critical fixes - sorted by impact and ease of implementation:
 Everything else - larger features, design decisions needed, or lower priority:
 
 - [ ] P2 | S  | [#AAX](AAX-remove-test-code-from-production.md) | Remove test debug code from production
+- [ ] P2 | M  | [#AAY](AAY-rules-modal-with-html-card-descriptions.md) | Rules/about modal with HTML card descriptions
 - [ ] P2 | M  | [#AAN](AAN-async-callback-resolution-timing.md) | Async callback resolution timing for Merchant/Wizard
 - [ ] P2 | M  | [#AAP](AAP-dungeon-depletion-handling.md) | Handle dungeon deck depletion (27 cards)
 - [ ] P2 | M  | [#AAQ](AAQ-render-after-fate-check.md) | Show fate card during combat
@@ -39,8 +40,6 @@ Everything else - larger features, design decisions needed, or lower priority:
 - [ ] P2 | L  | Progressive web app download
 - [ ] P2 | M  | Tutorial mode with confirmation prompts
 - [ ] P2 | M  | Mobile-first responsive display
-- [ ] P3 | M  | Credits/about page
-- [ ] P3 | S  | Printable version of rules
 - [ ] P3 | M  | Local high scores
 - [ ] P3 | L  | Online high scores (server/database)
 - [ ] P3 | M  | Dark mode / style picker / deck picker
