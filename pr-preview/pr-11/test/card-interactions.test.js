@@ -360,8 +360,7 @@ describe('Passage Cards (4-6 of Clubs/Spades)', () => {
     game = setupTestGame();
   });
 
-  // FIXME: Bug #8 - Passage matching currently broken due to wrong parameters
-  it.skip('matches opposite suit passage and resolves both', () => {
+  it('matches opposite suit passage and resolves both', () => {
     // Setup: Place two matching passages (4 of Clubs and 4 of Spades)
     placeCard(game, window.CLUBS, window.FOUR, 1, 1);
     placeCard(game, window.SPADES, window.FOUR, 2, 2);
@@ -374,16 +373,12 @@ describe('Passage Cards (4-6 of Clubs/Spades)', () => {
     expect(game.dungeon.matrix[2][2].cardFaceDown).toBe(true);
   });
 
-  // FIXME: Bug #8 - Passage resolver passes wrong parameters to foundPassage()
-  it.skip('should pass correct parameters to foundPassage', () => {
-    // This test will fail because resolver passes (this, suit, value)
-    // but foundPassage expects (suit, value)
+  it('should pass correct parameters to foundPassage', () => {
     placeCard(game, window.CLUBS, window.FIVE, 1, 1);
     placeCard(game, window.SPADES, window.FIVE, 2, 2);
 
     game.resolveCard({ row: 1, col: 1 });
 
-    // Currently broken: passages won't match correctly
     expect(game.dungeon.matrix[2][2].cardFaceDown).toBe(true);
   });
 

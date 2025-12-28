@@ -1,7 +1,7 @@
 {
   "name": "deterministic-seed777",
   "description": "Fixture for verifying deterministic gameplay",
-  "createdAt": "2025-12-28T22:19:28.272Z",
+  "createdAt": "2025-12-28T22:30:47.747Z",
   "metadata": {
     "seed": 777,
     "turnCount": 6
