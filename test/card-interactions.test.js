@@ -526,6 +526,19 @@ describe('Generous Wizard (Black Joker)', () => {
     callbackFn(treasureCard);
 
     // Assert: Should not cost a gem
-    expect(game.gems.available.length).toBe(gemsBefore); // Currently fails: loses 1 gem
+    expect(game.gems.available.length).toBe(gemsBefore);
+  });
+
+  it('should display selection modal when clicked', () => {
+    // Action: Use Generous Wizard
+    game.resolveCard({ row: 1, col: 1 });
+
+    // Assert: Modal should be visible
+    const modal = document.querySelector('#message-modal');
+    expect(modal.classList.contains('visible')).toBe(true);
+
+    // Assert: Modal should contain selection buttons
+    const buttons = document.querySelectorAll('#message-modal-inner-content button');
+    expect(buttons.length).toBeGreaterThan(0); // Should have at least Exit card
   });
 });
