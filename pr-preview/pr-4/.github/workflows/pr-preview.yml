@@ -83,17 +83,16 @@ jobs:
         run: |
           cd pr-repo
           PR_NUMBER=${{ github.event.pull_request.number }}
-          BASE_URL="https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-$PR_NUMBER/"
 
           # Install dependencies if needed
           npm install 2>/dev/null || true
 
-          # Generate different game state scenarios
-          EARLY_GAME=$(node generate-preview-url.js $PR_NUMBER 1000 | tail -1)
-          MID_GAME=$(node generate-preview-url.js $PR_NUMBER 2000 | tail -1)
-          LATE_GAME=$(node generate-preview-url.js $PR_NUMBER 3000 | tail -1)
-          SCENARIO_1=$(node generate-preview-url.js $PR_NUMBER 4444 | tail -1)
-          SCENARIO_2=$(node generate-preview-url.js $PR_NUMBER 7777 | tail -1)
+          # Generate different game state scenarios using --url-only flag
+          EARLY_GAME=$(node generate-preview-url.js --url-only $PR_NUMBER 1000)
+          MID_GAME=$(node generate-preview-url.js --url-only $PR_NUMBER 2000)
+          LATE_GAME=$(node generate-preview-url.js --url-only $PR_NUMBER 3000)
+          SCENARIO_1=$(node generate-preview-url.js --url-only $PR_NUMBER 4444)
+          SCENARIO_2=$(node generate-preview-url.js --url-only $PR_NUMBER 7777)
 
           # Export for use in comment
           {
