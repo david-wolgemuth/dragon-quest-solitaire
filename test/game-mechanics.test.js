@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
+// Import required modules (sets window globals)
+import '../src/cards/suits.js';
+import '../src/cards/values.js';
+import '../src/cards/card.js';
+import '../src/core/game.js';
+import '../src/core/game-renderer.js';
+
 describe('Game Initialization', () => {
   let game;
 
