@@ -976,21 +976,69 @@ function showErrorOverlay(title, message, error) {
   document.body.appendChild(overlay);
 }
 
+// Create debug log element at bottom of screen
+function createDebugLog() {
+  const debugDiv = document.createElement('div');
+  debugDiv.id = 'debug-log';
+  debugDiv.style.cssText = `
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: #0f0;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 9999;
+    border-top: 2px solid #0f0;
+  `;
+  document.body.appendChild(debugDiv);
+  return debugDiv;
+}
+
+function logDebug(message, isError = false) {
+  let debugDiv = document.getElementById('debug-log');
+  if (!debugDiv) {
+    debugDiv = createDebugLog();
+  }
+  const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+  const color = isError ? '#f00' : '#0f0';
+  const line = document.createElement('div');
+  line.style.color = color;
+  line.textContent = `[${timestamp}] ${message}`;
+  debugDiv.appendChild(line);
+  debugDiv.scrollTop = debugDiv.scrollHeight;
+}
+
 function main() {
   try {
     // Check if URL contains game state
     const urlParams = new URLSearchParams(window.location.search);
     let game;
 
+    logDebug('🎮 Game initializing...');
+
     if (urlParams.toString()) {
+      logDebug(`📥 Found URL params: ${urlParams.toString().substring(0, 100)}...`);
+      logDebug('🔄 Attempting to load state from URL...');
+
       // Restore game from URL
       try {
         const state = deserializeGameState(urlParams.toString());
+        logDebug('✅ State deserialized successfully');
+
         if (!state || !state.health || !state.inventory || !state.gems || !state.fate || !state.dungeonStock) {
           throw new Error('Deserialized state is incomplete or invalid. Missing required properties.');
         }
+
+        logDebug('✅ State validation passed');
         game = new Game({ state });
+        logDebug('✅ Game created from URL state');
       } catch (error) {
+        logDebug(`❌ Failed to load state: ${error.message}`, true);
         showErrorOverlay(
           'Failed to Load Game State from URL',
           'The URL contains game state parameters, but they could not be loaded. This might be because the URL is corrupted or from an old version. Click below to start a fresh game.',
@@ -999,20 +1047,25 @@ function main() {
         throw error; // Re-throw to prevent further execution
       }
     } else {
+      logDebug('🆕 No URL params found, creating fresh game');
       // Create new game
       game = new Game();
     }
 
     game.render();
+    logDebug('✅ Game rendered successfully');
 
     const resetGameButton = document.querySelector("#reset-game");
     resetGameButton.onclick = () => {
+      logDebug('🔄 Resetting game...');
       game = new Game();
       game.render();
       // Clear URL when resetting
       window.history.replaceState(null, '', window.location.pathname);
+      logDebug('✅ Game reset complete');
     }
   } catch (error) {
+    logDebug(`❌ Fatal error in main(): ${error.message}`, true);
     // Catch any errors in main() and show overlay if one wasn't already shown
     if (!document.getElementById('error-overlay')) {
       showErrorOverlay(
