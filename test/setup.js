@@ -5,6 +5,7 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { Card, serializeCard, deserializeCard, serializeGameState, deserializeGameState, createSeededRNG } from '../url-state.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -77,7 +78,14 @@ const loadScript = (filename) => {
 loadScript('cards.js');
 loadScript('card-builders.js');
 loadScript('dungeon-cards.js');
-loadScript('url-state.js');
+
+// url-state.js is now an ES module, so we import it at the top and assign to window
+window.Card = Card;
+window.serializeCard = serializeCard;
+window.deserializeCard = deserializeCard;
+window.serializeGameState = serializeGameState;
+window.deserializeGameState = deserializeGameState;
+window.createSeededRNG = createSeededRNG;
 
 // Load index.js but wrap it to prevent main() from running
 const indexPath = path.join(__dirname, '..', 'index.js');
