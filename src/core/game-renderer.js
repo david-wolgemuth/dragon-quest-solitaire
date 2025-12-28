@@ -241,6 +241,89 @@ export class GameRenderer {
       availableElement.appendChild(cardElement);
     }
   }
+
+  /**
+   * Show game over modal with stats
+   * Static method that can be called without a renderer instance
+   * @param {Object} stats - Game statistics
+   */
+  static showGameOver(stats) {
+    const messageModal = document.getElementById('message-modal');
+    const messageContent = document.getElementById('message-modal-inner-content');
+    const messageActions = document.getElementById('message-modal-actions');
+
+    if (!messageModal || !messageContent || !messageActions) {
+      console.error('Game over modal elements not found');
+      return;
+    }
+
+    // Build game over message following design philosophy:
+    // - Clear explanation of what happened
+    // - Show relevant stats so player can see their performance
+    // - Keep board visible (modal already has semi-transparent overlay)
+    const gameOverHTML = `
+      <h2 style="margin-top: 0; color: #d32f2f;">Game Over</h2>
+      <p style="font-size: 1.2em; margin: 1em 0;">
+        <strong>You ran out of health! ♥️</strong>
+      </p>
+      <div style="margin: 1.5em 0; text-align: left; max-width: 300px; margin-left: auto; margin-right: auto;">
+        <h3 style="margin-top: 0; margin-bottom: 0.5em; border-bottom: 1px solid #ccc; padding-bottom: 0.5em;">Final Stats:</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 0.4em 0;">Cards Explored:</td>
+            <td style="padding: 0.4em 0; text-align: right; font-weight: bold;">${stats.cardsExplored}</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.4em 0;">Total Cards Placed:</td>
+            <td style="padding: 0.4em 0; text-align: right; font-weight: bold;">${stats.totalCardsPlaced}</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.4em 0;">Gems Collected:</td>
+            <td style="padding: 0.4em 0; text-align: right; font-weight: bold;">${stats.gemsCollected} 💎</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.4em 0;">Inventory Items:</td>
+            <td style="padding: 0.4em 0; text-align: right; font-weight: bold;">${stats.inventoryItems}</td>
+          </tr>
+          <tr style="border-top: 1px solid #eee;">
+            <td style="padding: 0.4em 0; padding-top: 0.8em;">Cards Remaining:</td>
+            <td style="padding: 0.4em 0; padding-top: 0.8em; text-align: right; font-weight: bold;">${stats.dungeonCardsRemaining}</td>
+          </tr>
+        </table>
+      </div>
+      <p style="font-size: 0.9em; color: #666; margin-top: 1.5em;">
+        Try again to explore deeper into the dungeon!
+      </p>
+    `;
+
+    messageContent.innerHTML = gameOverHTML;
+
+    // Clear existing action buttons and add reset button
+    messageActions.innerHTML = '';
+    const resetButton = document.createElement('button');
+    resetButton.id = 'game-over-reset';
+    resetButton.textContent = 'Reset Game';
+    resetButton.style.cssText = 'padding: 0.8em 2em; font-size: 1.1em; cursor: pointer;';
+
+    resetButton.onclick = () => {
+      // Reload the page to reset the game (clears URL state too)
+      window.location.href = window.location.pathname;
+    };
+
+    messageActions.appendChild(resetButton);
+
+    // Show the modal
+    messageModal.classList.add('visible');
+
+    // Make modal persistent (can't be dismissed by clicking outside)
+    messageModal.onclick = (e) => {
+      // Only close if clicking the reset button
+      if (e.target.id === 'game-over-reset') {
+        return;
+      }
+      e.stopPropagation();
+    };
+  }
 }
 
 // Make globally available for browser backwards compatibility

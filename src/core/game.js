@@ -31,6 +31,9 @@ export class Game {
    * @param {number} [options.seed] - Random seed for deterministic gameplay
    */
   constructor(options = {}) {
+    // Track game over state
+    this.isGameOver = false;
+
     // If state is provided, restore from it
     if (options.state) {
       this.health = options.state.health;
@@ -452,6 +455,11 @@ export class Game {
       const card = this[key].available.pop();
       this[key].stock.push(card);
     }
+
+    // Check for game over when health is depleted
+    if (key === 'health' && this.health.available.length === 0) {
+      this.gameOver();
+    }
   }
 
   /**
@@ -740,6 +748,46 @@ export class Game {
   defeatDragonQueen() {
     // TODO: Implement Dragon Queen defeat logic
     logDebug('👑 Dragon Queen defeated! (not yet implemented)');
+  }
+
+  /**
+   * Get current game statistics
+   * @returns {Object} Game statistics
+   */
+  getGameStats() {
+    const exploredCards = this.dungeon.matrix.flat()
+      .filter(cell => cell.card && !cell.cardFaceDown).length;
+
+    const totalCardsPlaced = this.dungeon.matrix.flat()
+      .filter(cell => cell.card).length;
+
+    return {
+      cardsExplored: exploredCards,
+      totalCardsPlaced: totalCardsPlaced,
+      gemsCollected: this.gems.available.length,
+      inventoryItems: this.inventory.available.length,
+      healthRemaining: this.health.available.length,
+      dungeonCardsRemaining: this.dungeon.stock.length,
+    };
+  }
+
+  /**
+   * Trigger game over state
+   * This is called when the player runs out of health
+   */
+  gameOver() {
+    if (this.isGameOver) {
+      return; // Already game over, don't trigger again
+    }
+
+    this.isGameOver = true;
+    logDebug('💀 GAME OVER - Player health depleted');
+
+    // Show game over modal via renderer if available
+    if (window.GameRenderer && window.GameRenderer.showGameOver) {
+      const stats = this.getGameStats();
+      window.GameRenderer.showGameOver(stats);
+    }
   }
 }
 
