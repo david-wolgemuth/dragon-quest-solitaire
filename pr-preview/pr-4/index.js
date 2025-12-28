@@ -657,31 +657,55 @@ class Game {
   }
 
   _updateTestDebugDiv(stateString) {
+    // Keep hidden div for test access via dataset.state
     let debugDiv = document.getElementById('test-debug-state');
     if (!debugDiv) {
       debugDiv = document.createElement('pre');
       debugDiv.id = 'test-debug-state';
       debugDiv.style.cssText = `
-        position: fixed;
-        bottom: 0;
-        right: 0;
-        background: rgba(0, 0, 0, 0.8);
-        color: #0f0;
-        font-family: monospace;
-        font-size: 10px;
-        padding: 4px;
-        max-width: 200px;
-        max-height: 100px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        border: 1px solid #0f0;
-        z-index: 9999;
+        display: none;
       `;
       document.body.appendChild(debugDiv);
     }
     debugDiv.textContent = stateString;
     debugDiv.dataset.state = stateString;
+
+    // Also update debug log with state info
+    let debugLogDiv = document.getElementById('debug-log-state');
+    if (!debugLogDiv) {
+      const debugLog = document.getElementById('debug-log');
+      if (debugLog) {
+        debugLogDiv = document.createElement('div');
+        debugLogDiv.id = 'debug-log-state';
+        debugLogDiv.style.cssText = `
+          margin-top: 10px;
+          padding-top: 10px;
+          border-top: 1px solid #ccc;
+          font-size: 10px;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        `;
+        const label = document.createElement('div');
+        label.textContent = 'Serialized State:';
+        label.style.fontWeight = 'bold';
+        label.style.marginBottom = '5px';
+        debugLogDiv.appendChild(label);
+
+        const stateContent = document.createElement('div');
+        stateContent.id = 'debug-log-state-content';
+        stateContent.style.cssText = `
+          max-height: 200px;
+          overflow-y: auto;
+          white-space: pre-wrap;
+        `;
+        debugLogDiv.appendChild(stateContent);
+        debugLog.appendChild(debugLogDiv);
+      }
+    }
+    const stateContent = document.getElementById('debug-log-state-content');
+    if (stateContent) {
+      stateContent.textContent = stateString;
+    }
   }
 }
 
@@ -1025,32 +1049,31 @@ function createDebugLog() {
 
   const header = document.createElement('div');
   header.id = 'debug-log-header';
-  header.innerHTML = '🪵 Debug Log';
+  header.innerHTML = 'Debug';
   header.style.cssText = `
-    background: rgba(0, 0, 0, 0.9);
-    color: #0f0;
+    background: white;
+    color: blue;
     font-family: monospace;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 8px 12px;
+    font-size: 11px;
+    padding: 4px 8px;
     cursor: pointer;
-    border: 2px solid #0f0;
-    border-radius: 4px 0 0 4px;
+    border: 1px solid blue;
+    border-radius: 3px 0 0 3px;
     user-select: none;
   `;
 
   const debugDiv = document.createElement('div');
   debugDiv.id = 'debug-log';
   debugDiv.style.cssText = `
-    background: rgba(0, 0, 0, 0.9);
-    color: #0f0;
+    background: white;
+    color: #333;
     font-family: monospace;
     font-size: 11px;
     padding: 10px;
     overflow-y: auto;
-    border: 2px solid #0f0;
+    border: 1px solid blue;
     border-top: none;
-    border-radius: 0 0 0 4px;
+    border-radius: 0 0 0 3px;
   `;
 
   container.style.cssText = `
@@ -1095,7 +1118,7 @@ function logDebug(message, isError = false) {
     debugDiv = createDebugLog();
   }
   const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-  const color = isError ? '#f00' : '#0f0';
+  const color = isError ? 'red' : '#333';
   const line = document.createElement('div');
   line.style.color = color;
   line.textContent = `[${timestamp}] ${message}`;
