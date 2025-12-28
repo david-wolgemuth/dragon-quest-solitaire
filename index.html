@@ -58,7 +58,67 @@
       </div>
     </aside>
 
+    <!-- RULES MODAL -->
+    <aside id="rules-modal" class="rules-modal">
+      <div class="rules-modal-overlay"></div>
+      <div class="rules-modal-content">
+        <button class="rules-modal-close" aria-label="Close rules">&times;</button>
+        <div class="rules-modal-inner">
+          <h2>Game Rules & Card Reference</h2>
+
+          <nav class="rules-tabs">
+            <button class="rules-tab active" data-tab="overview">Overview</button>
+            <button class="rules-tab" data-tab="cards">Card Reference</button>
+          </nav>
+
+          <div class="rules-tab-content">
+            <!-- Overview Tab -->
+            <section id="rules-overview" class="rules-section active">
+              <h3>Objective</h3>
+              <p>Defeat the Dragon Queen and exit the dungeon to win!</p>
+
+              <h3>Setup</h3>
+              <ul>
+                <li><strong>Health:</strong> Start with 5 health (Hearts A-5)</li>
+                <li><strong>Gems:</strong> 10 gems available (Diamonds A-10)</li>
+                <li><strong>Inventory:</strong> 7 items shuffled (Hearts J-K, Diamonds J-K, Red Joker)</li>
+                <li><strong>Fate Deck:</strong> 5 cards (Hearts 6-10) for combat</li>
+                <li><strong>Dungeon:</strong> 27 cards (all Spades, all Clubs, Black Joker)</li>
+              </ul>
+
+              <h3>How to Play</h3>
+              <p>Start with one face-down card in the center. Each turn:</p>
+              <ol>
+                <li><strong>Place a card:</strong> Add an adjacent card from the dungeon deck (next to face-down cards)</li>
+                <li><strong>Resolve a card:</strong> Click a face-down card to flip and resolve it</li>
+              </ol>
+
+              <h3>Combat</h3>
+              <p>When fighting enemies, draw from the Fate Deck:</p>
+              <ul>
+                <li><strong>Success:</strong> Meet or exceed required value = no damage</li>
+                <li><strong>Critical (10):</strong> Bonus reward!</li>
+                <li><strong>Failure:</strong> Take damage from the enemy</li>
+              </ul>
+
+              <h3>Winning & Losing</h3>
+              <ul>
+                <li><strong>Win:</strong> Defeat Dragon Queen (Queen of Spades), then reach an Exit (Ace)</li>
+                <li><strong>Lose:</strong> Health drops to 0</li>
+              </ul>
+            </section>
+
+            <!-- Cards Tab -->
+            <section id="rules-cards" class="rules-section">
+              <div id="card-reference-content"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </aside>
+
     <button id="reset-game">Reset Game</button>
+    <button id="open-rules">Rules</button>
 
     <!-- STATUS -->
     <table id="status-table">

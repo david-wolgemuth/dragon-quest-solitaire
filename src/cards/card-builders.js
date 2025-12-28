@@ -21,6 +21,11 @@ export function buildPitTrapCard({ hidden, damage }) {
         Take ${damage} damage to resolve this tile, mandatory.
         If you have gems, they will reduce the damage taken
       `,
+      descriptionHtml: `
+        <p>You fall into a <strong>hidden pit trap</strong>.</p>
+        <p><strong>Effect:</strong> Take <strong>${damage} damage</strong> to resolve this tile (mandatory).</p>
+        <p><em>Note: If you have gems, they will reduce the damage taken.</em></p>
+      `,
       resolver: function (game) {
         game.loseHealth(this, damage, { gems: true });
         return true;
@@ -30,7 +35,12 @@ export function buildPitTrapCard({ hidden, damage }) {
     return {
       name: `Visible Pit Trap (${damage} damage)`,
       description: `Take ${damage} damage to cross the pit trap, optional.
-        If you have gems, they w reduce the damage taken`,
+        If you have gems, they will reduce the damage taken`,
+      descriptionHtml: `
+        <p>A <strong>visible pit trap</strong> blocks your path.</p>
+        <p><strong>Effect:</strong> Take <strong>${damage} damage</strong> to cross the pit trap (optional).</p>
+        <p><em>Note: If you have gems, they will reduce the damage taken.</em></p>
+      `,
       resolver: function (game) {
         game.loseHealth(this, damage);
         return true;
@@ -52,6 +62,11 @@ export function buildPassageCard(suit, value) {
     name: `Passage (${value})`,
     description: `Impassable until you have found
       the other end of the passage (${value} of ${oppositeSuit}})`,
+    descriptionHtml: `
+      <p>A mysterious <strong>passage</strong> leads elsewhere in the dungeon.</p>
+      <p><strong>Effect:</strong> Impassable until you find the other end (${value} of ${oppositeSuit}).</p>
+      <p>Once both ends are revealed, you can pass through freely.</p>
+    `,
     resolver: function (game) {
       return game.foundPassage(this, suit, value);
     },
@@ -88,6 +103,16 @@ export function buildEnemyCard({
       If you fail to defeat the enemy,
         you lose you will take ${damageTakenIfUnsuccessful} damage.
         Game over if you lose all your health.
+    `,
+    descriptionHtml: `
+      <p>Fight enemy: <strong>${name}</strong></p>
+      <p><strong>Fate Check:</strong> Pull a card from the Fate Deck (Hearts 6-10).</p>
+      <ul>
+        <li><strong>Success (${minFateToDefeat}+):</strong> Enemy defeated, no damage taken.</li>
+        <li><strong>Critical Success (10):</strong> ${resolveCriticalSuccessDescription}</li>
+        <li><strong>Failure (&lt;${minFateToDefeat}):</strong> Take <strong>${damageTakenIfUnsuccessful} damage</strong>.</li>
+      </ul>
+      <p><em>Game over if you lose all your health.</em></p>
     `,
     resolver: function (game) {
       const value = game.fateCheck();
