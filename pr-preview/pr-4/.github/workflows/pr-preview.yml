@@ -87,20 +87,14 @@ jobs:
           # Install dependencies if needed
           npm install 2>/dev/null || true
 
-          # Generate different game state scenarios using --url-only flag
+          # Generate different game state scenarios
           EARLY_GAME=$(node generate-preview-url.js --url-only $PR_NUMBER 1000)
-          MID_GAME=$(node generate-preview-url.js --url-only $PR_NUMBER 2000)
-          LATE_GAME=$(node generate-preview-url.js --url-only $PR_NUMBER 3000)
-          SCENARIO_1=$(node generate-preview-url.js --url-only $PR_NUMBER 4444)
-          SCENARIO_2=$(node generate-preview-url.js --url-only $PR_NUMBER 7777)
+          MID_GAME=$(node generate-fixture-url.js --url-only mid-game $PR_NUMBER)
 
           # Export for use in comment
           {
             echo "early_game=$EARLY_GAME"
             echo "mid_game=$MID_GAME"
-            echo "late_game=$LATE_GAME"
-            echo "scenario_1=$SCENARIO_1"
-            echo "scenario_2=$SCENARIO_2"
           } >> $GITHUB_OUTPUT
 
       - name: Comment PR with preview URL
@@ -115,11 +109,8 @@ jobs:
             🎮 [**Base Game**](https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-${{ github.event.pull_request.number }}/) - Fresh start, no URL state
 
             ### Test Scenarios with URL State
-            🌱 [**Early Game** (seed: 1000)](${{ steps.scenarios.outputs.early_game }})
-            🎯 [**Mid Game** (seed: 2000)](${{ steps.scenarios.outputs.mid_game }})
-            🏆 [**Late Game** (seed: 3000)](${{ steps.scenarios.outputs.late_game }})
-            🎲 [**Test Scenario 1** (seed: 4444)](${{ steps.scenarios.outputs.scenario_1 }})
-            🎲 [**Test Scenario 2** (seed: 7777)](${{ steps.scenarios.outputs.scenario_2 }})
+            🌱 [**Early Game** (seed: 1000)](${{ steps.scenarios.outputs.early_game }}) - Just started, one card revealed
+            🎯 [**Mid Game** (fixture)](${{ steps.scenarios.outputs.mid_game }}) - Several moves played, health taken
 
             <details>
             <summary>ℹ️ About URL State</summary>
@@ -129,7 +120,7 @@ jobs:
             - Share exact game states for debugging
             - QA specific scenarios without manual setup
 
-            The seed determines the initial shuffle and game state.
+            The early game uses a seeded shuffle. The mid game uses a test fixture from actual gameplay.
             </details>
 
             *Updated for commit ${{ github.event.pull_request.head.sha }}*

@@ -6,7 +6,10 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "preview-url": "node generate-preview-url.js"
+    "preview-url": "node generate-preview-url.js",
+    "fixture:create": "node create-mid-game-fixture.js",
+    "fixture:save": "node save-fixture.js",
+    "fixture:url": "node generate-fixture-url.js"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.16",
