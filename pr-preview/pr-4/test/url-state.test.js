@@ -161,31 +161,33 @@ describe('Seeded Game Creation', () => {
 describe('Card Serialization', () => {
   it('serializes cards correctly', () => {
     const testCases = [
-      { card: new window.Card('HEARTS', 'ACE'), expected: 'AH' },
-      { card: new window.Card('CLUBS', 'KING'), expected: 'KC' },
-      { card: new window.Card('DIAMONDS', 'TEN'), expected: '0D' },
-      { card: new window.Card('SPADES', 'FIVE'), expected: '5S' },
-      { card: new window.Card('RED', 'JOKER'), expected: 'XR' },
-      { card: new window.Card('BLACK', 'JOKER'), expected: 'XB' },
+      { card: new window.Card('HEARTS', 'ACE'), expected: { suit: 'HEARTS', value: 'ACE' } },
+      { card: new window.Card('CLUBS', 'KING'), expected: { suit: 'CLUBS', value: 'KING' } },
+      { card: new window.Card('DIAMONDS', 'TEN'), expected: { suit: 'DIAMONDS', value: 'TEN' } },
+      { card: new window.Card('SPADES', 'FIVE'), expected: { suit: 'SPADES', value: 'FIVE' } },
+      { card: new window.Card('RED', 'JOKER'), expected: { suit: 'RED', value: 'JOKER' } },
+      { card: new window.Card('BLACK', 'JOKER'), expected: { suit: 'BLACK', value: 'JOKER' } },
     ];
 
     for (const { card, expected } of testCases) {
-      expect(window.serializeCard(card)).toBe(expected);
+      const serialized = window.serializeCard(card);
+      expect(serialized.suit).toBe(expected.suit);
+      expect(serialized.value).toBe(expected.value);
     }
   });
 
   it('deserializes cards correctly', () => {
     const testCases = [
-      { str: 'AH', expected: { suitKey: 'HEARTS', valueKey: 'ACE' } },
-      { str: 'KC', expected: { suitKey: 'CLUBS', valueKey: 'KING' } },
-      { str: '0D', expected: { suitKey: 'DIAMONDS', valueKey: 'TEN' } },
-      { str: '5S', expected: { suitKey: 'SPADES', valueKey: 'FIVE' } },
-      { str: 'XR', expected: { suitKey: 'RED', valueKey: 'JOKER' } },
-      { str: 'XB', expected: { suitKey: 'BLACK', valueKey: 'JOKER' } },
+      { obj: { suit: 'HEARTS', value: 'ACE' }, expected: { suitKey: 'HEARTS', valueKey: 'ACE' } },
+      { obj: { suit: 'CLUBS', value: 'KING' }, expected: { suitKey: 'CLUBS', valueKey: 'KING' } },
+      { obj: { suit: 'DIAMONDS', value: 'TEN' }, expected: { suitKey: 'DIAMONDS', valueKey: 'TEN' } },
+      { obj: { suit: 'SPADES', value: 'FIVE' }, expected: { suitKey: 'SPADES', valueKey: 'FIVE' } },
+      { obj: { suit: 'RED', value: 'JOKER' }, expected: { suitKey: 'RED', valueKey: 'JOKER' } },
+      { obj: { suit: 'BLACK', value: 'JOKER' }, expected: { suitKey: 'BLACK', valueKey: 'JOKER' } },
     ];
 
-    for (const { str, expected } of testCases) {
-      const card = window.deserializeCard(str);
+    for (const { obj, expected } of testCases) {
+      const card = window.deserializeCard(obj);
       expect(card.suitKey).toBe(expected.suitKey);
       expect(card.valueKey).toBe(expected.valueKey);
     }
