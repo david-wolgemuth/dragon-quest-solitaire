@@ -10,9 +10,6 @@ This directory contains all task tracking for the project. Each todo is a separa
 
 Quick wins and critical fixes - sorted by impact and ease of implementation:
 
-- [ ] P0 | XS | [#AAE](AAE-critical-fate-deck-duplication.md) | Fate deck duplication - add 1 line to clear array
-- [ ] P0 | XS | [#AAB](AAB-critical-user-input-buttons.md) | User input buttons not rendered - add appendChild
-- [ ] P1 | XS | [#AAI](AAI-generous-wizard-costs-gem.md) | Generous Wizard costs gem - remove 1 line
 - [ ] P1 | XS | [#AAJ](AAJ-young-dragon-wrong-gem-amount.md) | Young Dragon gives 1 gem instead of 3 - change parameter
 - [ ] P1 | XS | [#AAK](AAK-passage-resolver-wrong-parameters.md) | Passage resolver wrong parameters - remove `this`
 - [ ] P2 | XS | [#AAM](AAM-typos-fix.md) | Fix typos in card descriptions
@@ -50,7 +47,10 @@ Everything else - larger features, design decisions needed, or lower priority:
 ## Completed
 
 - [x] [#AAA](AAA-file-organization.md) | Reorganize files into src/ and docs/ - Completed in #5
+- [x] [#AAB](AAB-critical-user-input-buttons.md) | User input buttons not rendered - Completed with PR (modal visibility + render calls)
 - [x] [#AAC](AAC-critical-game-over-detection.md) | No game over detection - add health check - Completed in #6
+- [x] [#AAE](AAE-critical-fate-deck-duplication.md) | Fate deck duplication - Already fixed during refactoring
+- [x] [#AAI](AAI-generous-wizard-costs-gem.md) | Generous Wizard costs gem - Completed with PR (removed gem cost + added render)
 - [x] [#AAV](AAV-store-state-in-url.md) | Store game state in URL for QA/testing/agents - Completed in #4
 - [x] [#AAW](AAW-refactor-fixture-code-duplication.md) | Extract shared fixture reconstruction logic - Completed in #5
 - [x] Dungeon grid rendering (7 wide × 5 high)
