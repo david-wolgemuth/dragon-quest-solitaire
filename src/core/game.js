@@ -353,7 +353,7 @@ export class Game {
     for (let row = 0; row < this.dungeon.matrix.length; row += 1) {
       for (let col = 0; col < this.dungeon.matrix[row].length; col += 1) {
         const cell = this.dungeon.matrix[row][col];
-        if (cell.card && cell.card.suitKey === oppositeSuit && cell.card.valueKey === value) {
+        if (cell.card && !cell.cardFaceDown && cell.card.suitKey === oppositeSuit && cell.card.valueKey === value) {
           cell.cardFaceDown = true; // (resolved)
           return true;
         }

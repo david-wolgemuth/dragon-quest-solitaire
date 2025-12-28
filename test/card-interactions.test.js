@@ -382,8 +382,7 @@ describe('Passage Cards (4-6 of Clubs/Spades)', () => {
     expect(game.dungeon.matrix[2][2].cardFaceDown).toBe(true);
   });
 
-  // FIXME: Bug #9 - Passages can match against already-resolved (face-down) cards
-  it.skip('should not match passages that are already resolved', () => {
+  it('should not match passages that are already resolved', () => {
     placeCard(game, window.CLUBS, window.SIX, 1, 1);
     placeCard(game, window.SPADES, window.SIX, 2, 2);
 
@@ -394,7 +393,6 @@ describe('Passage Cards (4-6 of Clubs/Spades)', () => {
     game.resolveCard({ row: 1, col: 1 });
 
     // Assert: Should not find match (passage already resolved)
-    // Currently broken: will incorrectly match the face-down card
     expect(game.dungeon.matrix[1][1].cardFaceDown).toBe(false); // Should not resolve
   });
 });
