@@ -164,7 +164,7 @@ export const DUNGEON_CARDS = {
       minFateToDefeat: 10,
       damageTakenIfUnsuccessful: 1,
       resolveCriticalSuccess: function (game) {
-        game.gainGem(this);
+        game.gainGem(this, 3);
       },
       resolveCriticalSuccessDescription: "You will gain 3 gems",
     }),

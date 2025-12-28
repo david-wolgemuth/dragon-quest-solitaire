@@ -445,15 +445,15 @@ describe('Young Dragon (Queen of Clubs)', () => {
     expect(game.health.available.length).toBe(healthBefore - 1);
   });
 
-  // FIXME: Bug #7 - Young Dragon critical success gives 1 gem instead of 3
-  it.skip('should gain 3 gems on critical success (fate 10)', () => {
+  // Fixed: Bug #AAJ - Young Dragon critical success now gives 3 gems
+  it('should gain 3 gems on critical success (fate 10)', () => {
     game.fateCheck = () => 10;
 
     const gemsBefore = game.gems.available.length;
 
     game.resolveCard({ row: 1, col: 1 });
 
-    // Description says "gain 3 gems" but implementation only gives 1
+    // Description says "gain 3 gems" and implementation now matches
     expect(game.gems.available.length).toBe(gemsBefore + 3);
   });
 });
