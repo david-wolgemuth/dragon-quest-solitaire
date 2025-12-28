@@ -89,7 +89,8 @@ function deserializeGameState(queryString) {
     }
 
     // Decode base64 and parse JSON
-    const json = atob(decodeURIComponent(base64));
+    // Note: URLSearchParams.get() already URL-decodes, so no need for decodeURIComponent
+    const json = atob(base64);
     const state = JSON.parse(json);
 
     // Deserialize piles
