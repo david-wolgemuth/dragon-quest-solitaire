@@ -59,8 +59,8 @@ export class GameRenderer {
               const dungeonCard = DUNGEON_CARDS[cell.card.suit.key][cell.card.value.key];
               this.addTutorialModal(`<div>
                 <div class="card card-${cell.card.suit.code}${cell.card.value.code}"></div>
-                ${dungeonCard.name}
-                ${dungeonCard.description}
+                <h3>${dungeonCard.name}</h3>
+                ${dungeonCard.descriptionHtml || `<p>${dungeonCard.description}</p>`}
               </div>`, () => {
                 this.game.resolveCard({ row, col });
               });

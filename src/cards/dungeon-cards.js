@@ -23,6 +23,11 @@ export const DUNGEON_CARDS = {
 
         If you have defeated the Dragon Queen (Queen of Spades) will end the game - you have won.
       `,
+      descriptionHtml: `
+        <p>Exit to the <strong>next level of the dungeon</strong>.</p>
+        <p><strong>Effect:</strong> All dungeon cards are reset back to the deck, but you keep your current stats (health, gems, inventory).</p>
+        <p><strong>Victory condition:</strong> If you have defeated the Dragon Queen (Queen of Spades), exiting will end the game - <strong>you win!</strong></p>
+      `,
       resolver: function (game) {
         game.resetDungeon();
         return true;
@@ -36,6 +41,10 @@ export const DUNGEON_CARDS = {
     [SEVEN]: {
       name: 'Gem',
       description: 'Take 1 gem',
+      descriptionHtml: `
+        <p><strong>Effect:</strong> Gain <strong>1 gem</strong>.</p>
+        <p>Gems can be used to reduce damage from traps and enemies, or to purchase items from the Merchant.</p>
+      `,
       resolver: function (game) {
         game.gainGem(this);
         return true;
@@ -44,6 +53,9 @@ export const DUNGEON_CARDS = {
     [EIGHT]: {
       name: 'Healing',
       description: 'Gain 2 Health, up to your max health',
+      descriptionHtml: `
+        <p><strong>Effect:</strong> Restore <strong>2 health</strong> (up to your maximum of 5).</p>
+      `,
       resolver: function (game) {
         game.gainHealth(this, 2);
         return true;
@@ -52,6 +64,10 @@ export const DUNGEON_CARDS = {
     [NINE]: {
       name: 'Treasure Chest',
       description: 'Gain 1 item from the treasure chest',
+      descriptionHtml: `
+        <p><strong>Effect:</strong> Gain <strong>1 random item</strong> from the treasure chest.</p>
+        <p>Items can include: Jack (weapon), Queen (shield), King (armor), or Red Joker (special).</p>
+      `,
       resolver: function (game) {
         game.gainInventory(this);
         return true;
@@ -101,6 +117,17 @@ export const DUNGEON_CARDS = {
     [ACE]: {
       name: "Merchant",
       description: `Wildcard: Treasure, Healing, Gem, or Exit. Costs 1 one gem.`,
+      descriptionHtml: `
+        <p>A <strong>merchant</strong> offers you a choice of items.</p>
+        <p><strong>Cost:</strong> 1 gem</p>
+        <p><strong>Effect:</strong> Choose one item to gain:</p>
+        <ul>
+          <li>Treasure (random inventory item)</li>
+          <li>Healing (2 health)</li>
+          <li>Gem (1 gem)</li>
+          <li>Exit (advance to next level)</li>
+        </ul>
+      `,
       /**
        * @param {Game} game
        * @returns {boolean}
@@ -161,6 +188,17 @@ export const DUNGEON_CARDS = {
         A generous wizard offers you a choice of 4 cards.
           Treasure, Healing, Gem, or Exit
         `,
+      descriptionHtml: `
+        <p>A <strong>generous wizard</strong> offers you a gift.</p>
+        <p><strong>Cost:</strong> Free!</p>
+        <p><strong>Effect:</strong> Choose one item to gain:</p>
+        <ul>
+          <li>Treasure (random inventory item)</li>
+          <li>Healing (2 health)</li>
+          <li>Gem (1 gem)</li>
+          <li>Exit (advance to next level)</li>
+        </ul>
+      `,
       resolver: function (game) {
         game.getUserInputInventoryCardSelection(
           "Choose an inventory item to gain: Treasure, Healing, Gem, or Exit",

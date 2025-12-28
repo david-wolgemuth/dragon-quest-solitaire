@@ -25,6 +25,7 @@ import {
   deserializeGameState,
   createSeededRNG
 } from './state/url-state.js';
+import { initRulesModal } from './ui/rules-modal.js';
 
 // Make key classes and functions globally available for backwards compatibility
 // and for dynamic access from the browser console
@@ -153,6 +154,10 @@ function main() {
       window.history.replaceState(null, '', window.location.pathname);
       logDebug('✅ Game reset complete');
     }
+
+    // Initialize rules modal
+    initRulesModal();
+    logDebug('✅ Rules modal initialized');
   } catch (error) {
     logDebug(`❌ Fatal error in main(): ${error.message}`, true);
     // Catch any errors in main() and show overlay if one wasn't already shown
