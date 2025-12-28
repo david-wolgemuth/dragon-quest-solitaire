@@ -350,10 +350,16 @@ export class Game {
    */
   foundPassage(suit, value) {
     const oppositeSuit = suit === CLUBS ? SPADES : CLUBS;
+    // Note: No need to check !cell.cardFaceDown because passages always resolve in pairs.
+    // When a passage is clicked, both ends are marked face-down simultaneously:
+    // - This method marks the matching passage face-down (line 357)
+    // - resolveCard() marks the clicked passage face-down (line 203)
+    // Since the deck contains exactly one of each card, it's impossible for a resolved
+    // passage to exist without its pair also being resolved through normal gameplay.
     for (let row = 0; row < this.dungeon.matrix.length; row += 1) {
       for (let col = 0; col < this.dungeon.matrix[row].length; col += 1) {
         const cell = this.dungeon.matrix[row][col];
-        if (cell.card && !cell.cardFaceDown && cell.card.suitKey === oppositeSuit && cell.card.valueKey === value) {
+        if (cell.card && cell.card.suitKey === oppositeSuit && cell.card.valueKey === value) {
           cell.cardFaceDown = true; // (resolved)
           return true;
         }
