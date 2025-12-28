@@ -122,6 +122,9 @@ export class GameRenderer {
       });
       messageTextElement.appendChild(cardButton);
     }
+
+    // Show the modal
+    messageElement.classList.add("visible");
   }
 
   /**
