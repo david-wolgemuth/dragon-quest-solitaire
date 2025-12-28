@@ -5,8 +5,8 @@
  */
 
 import { Card } from '../cards/card.js';
-import { SUITS, BLACK, RED, JOKER } from '../cards/suits.js';
-import { VALUES } from '../cards/values.js';
+import { SUITS, BLACK, RED } from '../cards/suits.js';
+import { VALUES, JOKER } from '../cards/values.js';
 
 /**
  * Build a pile of cards from key pairs
