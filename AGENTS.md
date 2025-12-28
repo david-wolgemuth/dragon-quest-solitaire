@@ -206,11 +206,13 @@ DUNGEON_CARDS[SPADES][SEVEN] = {
 
 ## Documentation
 
+- **CONTRIBUTING.md** - How to contribute (pick tasks, write tests, create fixtures)
 - **GAME_RULES.md** - Complete gameplay rules and mechanics
 - **CODE_STRUCTURE_ANALYSIS.md** - Detailed architecture analysis
 - **BUG_REPORT.md** - Known issues (20 bugs documented)
 - **TESTING_STRATEGY.md** - Testing approach and recommendations
 - **test/README.md** - Test suite documentation
+- **todos/README.md** - Task list with priorities and T-shirt sizes
 
 ## Tech Stack
 
@@ -238,6 +240,43 @@ DUNGEON_CARDS[SPADES][SEVEN] = {
 6. Check win/lose conditions
 7. Repeat from step 2
 ```
+
+## Contributing
+
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for detailed guidelines on how to contribute to this project.
+
+### Quick Contributing Guide
+
+1. **Pick a task** from [todos/README.md](todos/README.md)
+2. **Write tests** that prove the issue exists (test should FAIL initially)
+3. **Fix the issue** and ensure all tests pass
+4. **Create a fixture** for manual QA testing
+5. **Submit a PR** with the fixture URL included
+
+### Test-Driven Development Workflow
+
+Contributors should follow a TDD approach:
+
+1. Read the task file in `todos/` to understand the issue
+2. Write a test that reproduces the bug (test will fail)
+3. Implement the fix
+4. Verify the test now passes
+5. Create a fixture URL showing the fix in action
+6. Include the fixture URL in the PR for reviewers to test
+
+### Fixture URLs for QA
+
+Every PR should include a **fixture URL** that allows reviewers to manually test the fix:
+
+```bash
+# Create fixture after setting up scenario in browser
+node save-fixture.js "descriptive-fixture-name"
+
+# Generate the URL
+node generate-fixture-url.js descriptive-fixture-name
+```
+
+Include this URL in your PR description so reviewers can click and verify the fix works.
 
 ## Win Conditions
 

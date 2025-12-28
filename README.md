@@ -8,6 +8,7 @@ See **[todos/README.md](todos/README.md)** for the complete task list with check
 
 ## 📚 Documentation
 
+- **[Contributing Guide](CONTRIBUTING.md)** - How to grab a task and contribute
 - [Game Rules](GAME_RULES.md) - How to play
 - [Code Structure](CODE_STRUCTURE_ANALYSIS.md) - Technical analysis
 - [Testing Strategy](TESTING_STRATEGY.md) - Test coverage
