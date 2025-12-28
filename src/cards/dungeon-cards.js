@@ -168,7 +168,6 @@ export const DUNGEON_CARDS = {
               return c.suitKey !== card.suitKey && c.valueKey !== card.valueKey;
             });
             game.inventory.available.push(card);
-            game.loseGem(this);
           },
         )
         // TODO - does not handle the case where the user does not select a card...

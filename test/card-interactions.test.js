@@ -501,16 +501,29 @@ describe('Generous Wizard (Black Joker)', () => {
 
   beforeEach(() => {
     game = setupTestGame();
-    placeCard(game, window.CLUBS, window.JOKER, 1, 1);
+    placeCard(game, window.BLACK, window.JOKER, 1, 1);
   });
 
-  // FIXME: Bug #6 - Generous Wizard costs 1 gem but should be free
-  it.skip('should be free (not cost a gem)', () => {
+  // Bug #AAI - Generous Wizard costs 1 gem but should be free
+  it('should be free (not cost a gem)', () => {
     game._gainCard('gems', 1);
     const gemsBefore = game.gems.available.length;
 
+    // Mock getUserInputInventoryCardSelection to simulate user selecting an item
+    let callbackFn;
+    game.getUserInputInventoryCardSelection = (message, callback) => {
+      callbackFn = callback;
+    };
+
+    // Mock render to prevent rendering errors with incomplete card objects
+    game.render = () => {};
+
     // Action: Use Generous Wizard
     game.resolveCard({ row: 1, col: 1 });
+
+    // Simulate selecting a treasure card (Hearts Jack)
+    const treasureCard = { suitKey: 'hearts', valueKey: 'jack' };
+    callbackFn(treasureCard);
 
     // Assert: Should not cost a gem
     expect(game.gems.available.length).toBe(gemsBefore); // Currently fails: loses 1 gem
