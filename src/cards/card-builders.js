@@ -68,7 +68,7 @@ export function buildPassageCard(suit, value) {
       <p>Once both ends are revealed, you can pass through freely.</p>
     `,
     resolver: function (game) {
-      return game.foundPassage(this, suit, value);
+      return game.foundPassage(suit, value);
     },
   };
 }
