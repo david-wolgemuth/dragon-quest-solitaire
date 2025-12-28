@@ -224,6 +224,7 @@ class Game {
     const cell = this.dungeon.matrix[row][col];
     cell.cardFaceDown = false;
     cell.card = card;
+    logDebug(`🃏 Added ${card.suitKey[0]}${card.valueKey[0]} to (${row},${col})`);
     this.updateDungeon();
     this.render();
   }
@@ -231,12 +232,15 @@ class Game {
   resolveCard({ row, col }) {
     const cell = this.dungeon.matrix[row][col];
     const dungeonCard = DUNGEON_CARDS[cell.card.suit.key][cell.card.value.key];
+    logDebug(`⚔️ Resolving ${cell.card.suitKey[0]}${cell.card.valueKey[0]} at (${row},${col}): ${dungeonCard.name}`);
     const resolved = dungeonCard.resolver(this);
     if (resolved !== false) {
       cell.cardFaceDown = true;
       this.updateDungeon();
       this.render();
+      logDebug(`✅ Card resolved, flipped face down`);
     } else {
+      logDebug(`❌ Card not resolved`);
       // assume already displayed a message
     }
   }
@@ -1036,8 +1040,29 @@ function main() {
 
         logDebug('✅ State validation passed');
         logDebug(`📊 State: health=${state.health.available.length}/${state.health.stock.length}, inv=${state.inventory.stock.length}, dungeon stock=${state.dungeonStock.length}, matrix=${state.dungeonMatrix.length} cells`);
+
+        // Log matrix cell details
+        const matrixDetails = state.dungeonMatrix.map(c => {
+          const card = c.card.suitKey?.[0] + c.card.valueKey?.[0] || `${c.card.suit?.[0] || '?'}${c.card.value?.[0] || '?'}`;
+          return `(${c.row},${c.col}):${card}${c.cardFaceDown ? '↓' : '↑'}`;
+        }).join(' ');
+        logDebug(`🎴 Matrix cells: ${matrixDetails}`);
+
         game = new Game({ state });
         logDebug(`📊 Game: health=${game.health.available.length}/${game.health.stock.length}, inv=${game.inventory.stock.length}, dungeon stock=${game.dungeon.stock.length}, matrix=${game.dungeon.matrix.length}x${game.dungeon.matrix[0].length}`);
+
+        // Log game matrix cell details after construction
+        const gameMatrixCells = [];
+        for (let r = 0; r < game.dungeon.matrix.length; r++) {
+          for (let c = 0; c < game.dungeon.matrix[0].length; c++) {
+            const cell = game.dungeon.matrix[r][c];
+            if (cell.card) {
+              const card = cell.card.suitKey?.[0] + cell.card.valueKey?.[0];
+              gameMatrixCells.push(`(${r},${c}):${card}${cell.cardFaceDown ? '↓' : '↑'}`);
+            }
+          }
+        }
+        logDebug(`🎴 Game matrix cells: ${gameMatrixCells.join(' ')}`);
         logDebug('✅ Game created from URL state');
       } catch (error) {
         logDebug(`❌ Failed to load state: ${error.message}`, true);
