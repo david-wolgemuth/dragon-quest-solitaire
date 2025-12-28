@@ -87,14 +87,16 @@ jobs:
           # Install dependencies if needed
           npm install 2>/dev/null || true
 
-          # Generate different game state scenarios
-          EARLY_GAME=$(node generate-preview-url.js --url-only $PR_NUMBER 1000)
-          MID_GAME=$(node generate-fixture-url.js --url-only mid-game $PR_NUMBER)
+          # Generate different game state scenarios from test-generated fixtures
+          EARLY_GAME=$(node generate-fixture-url.js --url-only early-game-seed1000 $PR_NUMBER)
+          MID_GAME=$(node generate-fixture-url.js --url-only mid-game-seed42 $PR_NUMBER)
+          LATE_GAME=$(node generate-fixture-url.js --url-only late-game-seed99 $PR_NUMBER)
 
           # Export for use in comment
           {
             echo "early_game=$EARLY_GAME"
             echo "mid_game=$MID_GAME"
+            echo "late_game=$LATE_GAME"
           } >> $GITHUB_OUTPUT
 
       - name: Comment PR with preview URL
@@ -109,8 +111,9 @@ jobs:
             🎮 [**Base Game**](https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-${{ github.event.pull_request.number }}/) - Fresh start, no URL state
 
             ### Test Scenarios with URL State
-            🌱 [**Early Game** (seed: 1000)](${{ steps.scenarios.outputs.early_game }}) - Just started, one card revealed
-            🎯 [**Mid Game** (fixture)](${{ steps.scenarios.outputs.mid_game }}) - Several moves played, health taken
+            🌱 [**Early Game**](${{ steps.scenarios.outputs.early_game }}) - Just started, one card revealed
+            🎯 [**Mid Game**](${{ steps.scenarios.outputs.mid_game }}) - Several cards placed, fate card drawn
+            ⚔️ [**Late Game**](${{ steps.scenarios.outputs.late_game }}) - Extended dungeon, multiple turns played
 
             <details>
             <summary>ℹ️ About URL State</summary>
@@ -120,7 +123,7 @@ jobs:
             - Share exact game states for debugging
             - QA specific scenarios without manual setup
 
-            The early game uses a seeded shuffle. The mid game uses a test fixture from actual gameplay.
+            All scenarios use test fixtures generated from actual gameplay with deterministic seeds.
             </details>
 
             *Updated for commit ${{ github.event.pull_request.head.sha }}*

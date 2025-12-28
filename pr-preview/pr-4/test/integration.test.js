@@ -22,14 +22,25 @@ describe('Game Integration Tests', () => {
     expect(matrix).toBeTruthy();
     expect(matrix.children.length).toBeGreaterThan(0);
 
-    // Check health cards
-    const healthAvailable = document.querySelectorAll('#health .available .card');
-    expect(healthAvailable.length).toBe(5); // Starting with 5 health
+    // Check health cards - game starts with 5 available health
+    expect(game.health.available.length).toBe(5);
+    // The renderer only shows the top card, so there should be 1 card element
+    const healthCard = document.querySelector('#health-available .card');
+    expect(healthCard).toBeTruthy();
 
     // Check dungeon has cards
     expect(game.dungeon.stock.length).toBeGreaterThan(0);
-    expect(game.dungeon.matrix.length).toBe(1);
-    expect(game.dungeon.matrix[0].length).toBe(1);
+    // Fresh game starts with 3x3 matrix (expanded from initial 1x1)
+    expect(game.dungeon.matrix.length).toBe(3);
+    expect(game.dungeon.matrix[0].length).toBe(3);
+    // Should have 1 card in the matrix (the initial card at center)
+    let cardsInMatrix = 0;
+    for (let row of game.dungeon.matrix) {
+      for (let cell of row) {
+        if (cell.card) cardsInMatrix++;
+      }
+    }
+    expect(cardsInMatrix).toBe(1);
   });
 
   it('loads game state from serialized string and renders correct matrix', () => {
