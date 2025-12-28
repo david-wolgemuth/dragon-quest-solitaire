@@ -32,10 +32,31 @@ dragon-quest-solitaire/
 ## What needs updating
 
 - Create `src/` and `docs/` directories
-- Move source files to `src/`: index.html, index.js, cards.js, card-builders.js, dungeon-cards.js, styles.css
+- Move source files to `src/`: index.html, index.js, cards.js, card-builders.js, dungeon-cards.js, styles.css, url-state.js
 - Move docs to `docs/`: GAME_RULES.md, CODE_STRUCTURE_ANALYSIS.md, DEPLOYMENT.md, TESTING_STRATEGY.md
 - Keep AGENTS.md at root (required location)
 - Update vitest.config.js paths
 - Update .github workflows paths
 - Update README links
 - Test that app still works
+
+## ES Module Conversion
+
+**Current problem:** Most files use browser globals (`window.SUITS`, `window.DUNGEON_CARDS`) instead of ES modules. This forces Node scripts to use `eval()` hacks with fake `window` objects.
+
+**Files to convert:**
+- `cards.js` → Export `SUITS`, `VALUES` constants
+- `card-builders.js` → Export builder functions
+- `dungeon-cards.js` → Import/export, remove `window` dependencies
+- `index.js` → Export `Game`, `GameRenderer` classes
+
+**Benefits:**
+- Remove all `eval()` hacks from Node scripts
+- Proper imports in `generate-preview-url.js`, `create-*-fixture.js`, test setup
+- Better code organization and dependency tracking
+- Easier testing and mocking
+
+**Prerequisites:**
+- Should be done AFTER file organization (to minimize path updates)
+- Update `index.html` to use `<script type="module">` for all scripts
+- Update test setup to import modules properly
