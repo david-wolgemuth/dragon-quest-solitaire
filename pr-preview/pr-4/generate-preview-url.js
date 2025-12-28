@@ -6,6 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { Card, serializeGameState, createSeededRNG } from './url-state.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,20 +23,13 @@ globalThis.window = globalThis;
 // Load cards.js (sets window.SUITS, window.VALUES, etc.)
 eval(loadScript('cards.js'));
 
-// Load url-state.js functions (use indirect eval to make functions global)
-(1, eval)(loadScript('url-state.js'));
+// Load dungeon-cards.js
+eval(loadScript('dungeon-cards.js'));
 
 // Use window constants directly
 const { HEARTS, CLUBS, DIAMONDS, SPADES, BLACK, RED, ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, JOKER } = window;
 
-// Define minimal classes and functions needed
-class Card {
-  constructor(suitKey, valueKey) {
-    this.suitKey = suitKey;
-    this.valueKey = valueKey;
-  }
-}
-
+// Cell class (needed for Game)
 class Cell {
   constructor() {
     this.card = null;
@@ -57,7 +51,7 @@ function shuffle(array, rng = Math.random) {
   return shuffled;
 }
 
-// Simplified Game class for state generation
+// Simplified Game class for state generation (matches browser's initial state)
 class Game {
   constructor(options = {}) {
     const rng = options.seed ? createSeededRNG(options.seed) : Math.random;

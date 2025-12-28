@@ -1,32 +1,13 @@
 // URL State Serialization/Deserialization
 // Enables storing and restoring game state via URL parameters
 
-// Card class definition (shared between url-state.js and index.js)
-// Defined here to avoid class redefinition when scripts load
-class Card {
-  constructor(suitKey, valueKey) {
-    // Validation only if SUITS/VALUES are available (after cards.js loads)
-    if (window.SUITS && !Object.keys(window.SUITS).includes(suitKey)) {
-      throw new Error(`Invalid suit key: ${suitKey}`);
-    }
-    if (window.VALUES && !Object.keys(window.VALUES).includes(valueKey)) {
-      throw new Error(`Invalid value key: ${valueKey}`);
-    }
-    this.suitKey = suitKey;
-    this.valueKey = valueKey;
-  }
-
-  get suit() {
-    return window.SUITS ? window.SUITS[this.suitKey] : { key: this.suitKey };
-  }
-
-  get value() {
-    return window.VALUES ? window.VALUES[this.valueKey] : { key: this.valueKey };
-  }
-}
+import { Card } from './src/card.js';
 
 // Serialize a card to a plain object
 function serializeCard(card) {
+  if (!card || !card.suitKey || !card.valueKey) {
+    throw new Error('Invalid card: missing suitKey or valueKey');
+  }
   return {
     suit: card.suitKey,
     value: card.valueKey
@@ -35,6 +16,12 @@ function serializeCard(card) {
 
 // Deserialize a card from a plain object
 function deserializeCard(obj) {
+  if (!obj || typeof obj !== 'object') {
+    throw new Error('Invalid card object: expected object, got ' + typeof obj);
+  }
+  if (!obj.suit || !obj.value) {
+    throw new Error('Invalid card object: missing suit or value');
+  }
   return new Card(obj.suit, obj.value);
 }
 
@@ -93,25 +80,106 @@ function deserializeGameState(queryString) {
     const json = atob(base64);
     const state = JSON.parse(json);
 
-    // Deserialize piles
-    const deserializePile = (pile) => ({
-      stock: pile.stock.map(deserializeCard),
-      available: pile.available.map(deserializeCard)
-    });
+    // Validate state structure
+    if (!state || typeof state !== 'object') {
+      throw new Error('State is not an object');
+    }
 
-    return {
-      health: deserializePile(state.health),
-      inventory: deserializePile(state.inventory),
-      gems: deserializePile(state.gems),
-      fate: deserializePile(state.fate),
-      dungeonStock: state.dungeon.stock.map(deserializeCard),
-      dungeonMatrix: state.dungeon.matrix.map(cell => ({
-        row: cell.row,
-        col: cell.col,
-        card: deserializeCard(cell.card),
-        cardFaceDown: cell.faceDown
-      }))
+    const required = ['health', 'inventory', 'gems', 'fate', 'dungeon'];
+    for (const field of required) {
+      if (!state[field]) {
+        throw new Error(`Missing required field: ${field}`);
+      }
+    }
+
+    // Validate pile structure
+    const validatePile = (pile, name) => {
+      if (!pile || typeof pile !== 'object') {
+        throw new Error(`${name} is not an object`);
+      }
+      if (!Array.isArray(pile.stock)) {
+        throw new Error(`${name}.stock is not an array`);
+      }
+      if (!Array.isArray(pile.available)) {
+        throw new Error(`${name}.available is not an array`);
+      }
     };
+
+    validatePile(state.health, 'health');
+    validatePile(state.inventory, 'inventory');
+    validatePile(state.gems, 'gems');
+    validatePile(state.fate, 'fate');
+
+    // Validate dungeon structure
+    if (!Array.isArray(state.dungeon.stock)) {
+      throw new Error('dungeon.stock is not an array');
+    }
+    if (!Array.isArray(state.dungeon.matrix)) {
+      throw new Error('dungeon.matrix is not an array');
+    }
+
+    // Deserialize piles
+    const deserializePile = (pile, name) => {
+      try {
+        return {
+          stock: pile.stock.map((card, i) => {
+            try {
+              return deserializeCard(card);
+            } catch (e) {
+              throw new Error(`${name}.stock[${i}]: ${e.message}`);
+            }
+          }),
+          available: pile.available.map((card, i) => {
+            try {
+              return deserializeCard(card);
+            } catch (e) {
+              throw new Error(`${name}.available[${i}]: ${e.message}`);
+            }
+          })
+        };
+      } catch (e) {
+        throw new Error(`Failed to deserialize ${name}: ${e.message}`);
+      }
+    };
+
+    const result = {
+      health: deserializePile(state.health, 'health'),
+      inventory: deserializePile(state.inventory, 'inventory'),
+      gems: deserializePile(state.gems, 'gems'),
+      fate: deserializePile(state.fate, 'fate'),
+      dungeonStock: state.dungeon.stock.map((card, i) => {
+        try {
+          return deserializeCard(card);
+        } catch (e) {
+          throw new Error(`dungeon.stock[${i}]: ${e.message}`);
+        }
+      }),
+      dungeonMatrix: state.dungeon.matrix.map((cell, i) => {
+        if (!cell || typeof cell !== 'object') {
+          throw new Error(`dungeon.matrix[${i}] is not an object`);
+        }
+        if (typeof cell.row !== 'number') {
+          throw new Error(`dungeon.matrix[${i}].row is not a number`);
+        }
+        if (typeof cell.col !== 'number') {
+          throw new Error(`dungeon.matrix[${i}].col is not a number`);
+        }
+        if (!cell.card) {
+          throw new Error(`dungeon.matrix[${i}].card is missing`);
+        }
+        if (typeof cell.faceDown !== 'boolean') {
+          throw new Error(`dungeon.matrix[${i}].faceDown is not a boolean`);
+        }
+        return {
+          row: cell.row,
+          col: cell.col,
+          card: deserializeCard(cell.card),
+          cardFaceDown: cell.faceDown
+        };
+      })
+    };
+
+    return result;
   } catch (error) {
     throw new Error(`Failed to deserialize state: ${error.message}`);
   }
@@ -127,7 +195,17 @@ function createSeededRNG(seed) {
   };
 }
 
-// Make functions and classes globally available (for use in index.js and tests)
+// Export for ES modules
+export {
+  Card,
+  serializeCard,
+  deserializeCard,
+  serializeGameState,
+  deserializeGameState,
+  createSeededRNG
+};
+
+// Make functions and classes globally available for browser (backwards compat)
 if (typeof window !== 'undefined') {
   window.Card = Card;
   window.serializeCard = serializeCard;

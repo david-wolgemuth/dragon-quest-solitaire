@@ -1035,7 +1035,9 @@ function main() {
         }
 
         logDebug('✅ State validation passed');
+        logDebug(`📊 State: health=${state.health.available.length}/${state.health.stock.length}, inv=${state.inventory.stock.length}, dungeon stock=${state.dungeonStock.length}, matrix=${state.dungeonMatrix.length} cells`);
         game = new Game({ state });
+        logDebug(`📊 Game: health=${game.health.available.length}/${game.health.stock.length}, inv=${game.inventory.stock.length}, dungeon stock=${game.dungeon.stock.length}, matrix=${game.dungeon.matrix.length}x${game.dungeon.matrix[0].length}`);
         logDebug('✅ Game created from URL state');
       } catch (error) {
         logDebug(`❌ Failed to load state: ${error.message}`, true);
