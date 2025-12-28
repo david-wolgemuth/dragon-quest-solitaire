@@ -541,4 +541,28 @@ describe('Generous Wizard (Black Joker)', () => {
     const buttons = document.querySelectorAll('#message-modal-inner-content button');
     expect(buttons.length).toBeGreaterThan(0); // Should have at least Exit card
   });
+
+  it('should add selected item to inventory', () => {
+    const inventoryBefore = game.inventory.available.length;
+
+    // Mock getUserInputInventoryCardSelection to simulate user selecting an item
+    let callbackFn;
+    game.getUserInputInventoryCardSelection = (message, callback) => {
+      callbackFn = callback;
+    };
+
+    // Mock render to prevent rendering errors with incomplete card objects
+    game.render = () => {};
+
+    // Action: Use Generous Wizard
+    game.resolveCard({ row: 1, col: 1 });
+
+    // Simulate selecting a treasure card (Hearts Jack)
+    const treasureCard = { suitKey: 'hearts', valueKey: 'jack' };
+    callbackFn(treasureCard);
+
+    // Assert: Item should be added to inventory
+    expect(game.inventory.available.length).toBe(inventoryBefore + 1);
+    expect(game.inventory.available[game.inventory.available.length - 1]).toEqual(treasureCard);
+  });
 });
