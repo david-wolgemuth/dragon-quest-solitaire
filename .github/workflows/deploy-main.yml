@@ -10,18 +10,49 @@ permissions:
   contents: write
 
 jobs:
-  deploy:
+  deploy-main:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
 
-      - name: Deploy to gh-pages root
-        uses: JamesIves/github-pages-deploy-action@v4
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
         with:
-          folder: .
-          branch: gh-pages
-          target-folder: /
-          clean: false  # Don't delete pr-preview folder
-          clean-exclude: |
-            pr-preview/
+          path: main-repo
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-repo
+
+      - name: Update root with main build (preserve PR previews)
+        run: |
+          cd gh-pages-repo
+
+          # Remove all files/folders at root EXCEPT pr-preview/
+          find . -maxdepth 1 -not -name '.' -not -name '..' -not -name '.git' -not -name 'pr-preview' -exec rm -rf {} +
+
+          # Copy main repo files to root
+          cp -r ../main-repo/* ../main-repo/.??* . 2>/dev/null || true
+
+          # Remove .git directory we just copied (we want to keep gh-pages .git)
+          rm -rf .git
+
+          # Restore the .git from gh-pages
+          git restore --staged .git || true
+
+      - name: Commit and push to gh-pages
+        run: |
+          cd gh-pages-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Deploy main site 🚀"
+            git push origin gh-pages
+          fi

@@ -9,37 +9,92 @@ permissions:
   pull-requests: write
 
 jobs:
-  deploy-preview:
+  deploy-pr:
     runs-on: ubuntu-latest
-    concurrency: preview-${{ github.ref }}
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
 
     steps:
-      - name: Checkout
+      - name: Checkout PR
+        if: github.event.action != 'closed'
         uses: actions/checkout@v4
+        with:
+          path: pr-repo
 
-      # Clean up any temporary directories that might interfere with deployment
-      - name: Clean temporary directories
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-repo
+
+      - name: Update PR preview folder
         if: github.event.action != 'closed'
         run: |
-          rm -rf bare_pr_preview || true
-          rm -rf github-pages-deploy-action-temp-deployment-folder || true
+          cd gh-pages-repo
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_PATH="pr-preview/pr-$PR_NUMBER"
 
-      # Deploy preview when PR is opened, reopened, or updated
-      - name: Deploy PR Preview
-        if: github.event.action != 'closed'
-        uses: rossjrw/pr-preview-action@v1.6.3
-        with:
-          source-dir: ./
-          preview-branch: gh-pages
-          umbrella-dir: pr-preview
-          action: auto
+          # Remove existing PR preview if it exists
+          rm -rf "$PR_PATH"
 
-      # Remove preview when PR is closed
-      - name: Remove PR Preview
+          # Create PR preview directory
+          mkdir -p "$PR_PATH"
+
+          # Copy PR files into preview folder
+          cp -r ../pr-repo/* ../pr-repo/.??* "$PR_PATH/" 2>/dev/null || true
+
+          # Remove .git from the copied files
+          rm -rf "$PR_PATH/.git"
+
+      - name: Remove PR preview folder
         if: github.event.action == 'closed'
-        uses: rossjrw/pr-preview-action@v1.6.3
+        run: |
+          cd gh-pages-repo
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_PATH="pr-preview/pr-$PR_NUMBER"
+
+          # Remove PR preview directory
+          rm -rf "$PR_PATH"
+
+      - name: Commit and push to gh-pages
+        run: |
+          cd gh-pages-repo
+          PR_NUMBER=${{ github.event.pull_request.number }}
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            if [ "${{ github.event.action }}" = "closed" ]; then
+              git commit -m "Remove preview for PR #$PR_NUMBER 🛬"
+            else
+              git commit -m "Deploy preview for PR #$PR_NUMBER 🛫"
+            fi
+            git push origin gh-pages
+          fi
+
+      - name: Comment PR with preview URL
+        if: github.event.action != 'closed'
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          source-dir: ./
-          preview-branch: gh-pages
-          umbrella-dir: pr-preview
-          action: remove
+          header: pr-preview
+          message: |
+            🚀 **Preview deployed!**
+
+            **Preview URL:** https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-${{ github.event.pull_request.number }}/
+
+            *Updated for commit ${{ github.event.pull_request.head.sha }}*
+
+      - name: Comment PR on removal
+        if: github.event.action == 'closed'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-preview
+          message: |
+            🛬 **Preview removed**
+
+            PR #${{ github.event.pull_request.number }} has been closed and the preview has been removed.
