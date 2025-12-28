@@ -77,6 +77,33 @@ jobs:
             git push origin gh-pages
           fi
 
+      - name: Generate test scenario URLs
+        if: github.event.action != 'closed'
+        id: scenarios
+        run: |
+          cd pr-repo
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          BASE_URL="https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-$PR_NUMBER/"
+
+          # Install dependencies if needed
+          npm install 2>/dev/null || true
+
+          # Generate different game state scenarios
+          EARLY_GAME=$(node generate-preview-url.js $PR_NUMBER 1000 | tail -1)
+          MID_GAME=$(node generate-preview-url.js $PR_NUMBER 2000 | tail -1)
+          LATE_GAME=$(node generate-preview-url.js $PR_NUMBER 3000 | tail -1)
+          SCENARIO_1=$(node generate-preview-url.js $PR_NUMBER 4444 | tail -1)
+          SCENARIO_2=$(node generate-preview-url.js $PR_NUMBER 7777 | tail -1)
+
+          # Export for use in comment
+          {
+            echo "early_game=$EARLY_GAME"
+            echo "mid_game=$MID_GAME"
+            echo "late_game=$LATE_GAME"
+            echo "scenario_1=$SCENARIO_1"
+            echo "scenario_2=$SCENARIO_2"
+          } >> $GITHUB_OUTPUT
+
       - name: Comment PR with preview URL
         if: github.event.action != 'closed'
         uses: marocchino/sticky-pull-request-comment@v2
@@ -85,7 +112,26 @@ jobs:
           message: |
             🚀 **Preview deployed!**
 
-            **Preview URL:** https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-${{ github.event.pull_request.number }}/
+            ### Base Preview
+            🎮 [**Base Game**](https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-${{ github.event.pull_request.number }}/) - Fresh start, no URL state
+
+            ### Test Scenarios with URL State
+            🌱 [**Early Game** (seed: 1000)](${{ steps.scenarios.outputs.early_game }})
+            🎯 [**Mid Game** (seed: 2000)](${{ steps.scenarios.outputs.mid_game }})
+            🏆 [**Late Game** (seed: 3000)](${{ steps.scenarios.outputs.late_game }})
+            🎲 [**Test Scenario 1** (seed: 4444)](${{ steps.scenarios.outputs.scenario_1 }})
+            🎲 [**Test Scenario 2** (seed: 7777)](${{ steps.scenarios.outputs.scenario_2 }})
+
+            <details>
+            <summary>ℹ️ About URL State</summary>
+
+            Each scenario link includes the game state in the URL. This allows you to:
+            - Test specific game situations reproducibly
+            - Share exact game states for debugging
+            - QA specific scenarios without manual setup
+
+            The seed determines the initial shuffle and game state.
+            </details>
 
             *Updated for commit ${{ github.event.pull_request.head.sha }}*
 
