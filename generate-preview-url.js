@@ -164,11 +164,16 @@ class Game {
 
 // Parse command line arguments
 const args = process.argv.slice(2);
-const prNumber = args[0] || '4';
-const seed = args[1] ? parseInt(args[1], 10) : Date.now();
+const urlOnly = args.includes('--url-only');
+const nonFlagArgs = args.filter(arg => !arg.startsWith('--'));
+const prNumber = nonFlagArgs[0] || '4';
+const seed = nonFlagArgs[1] ? parseInt(nonFlagArgs[1], 10) : Date.now();
 
 // Generate game state
-console.log(`\n🎮 Generating game state with seed: ${seed}\n`);
+if (!urlOnly) {
+  console.log(`\n🎮 Generating game state with seed: ${seed}\n`);
+}
+
 const game = new Game({ seed });
 const stateString = serializeGameState(game);
 
@@ -176,8 +181,14 @@ const stateString = serializeGameState(game);
 const baseUrl = `https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-${prNumber}/`;
 const fullUrl = `${baseUrl}?${stateString}`;
 
-console.log(`🔗 Preview URL for PR #${prNumber}:\n`);
-console.log(`${fullUrl}\n`);
-console.log(`📋 To copy: Ctrl+Click (or Cmd+Click) on the URL above\n`);
-console.log(`💡 Tip: Use a different seed to generate different game states`);
-console.log(`   Example: npm run preview-url ${prNumber} 12345\n`);
+if (urlOnly) {
+  // Just output the URL for CI/scripts
+  console.log(fullUrl);
+} else {
+  // Pretty output for manual use
+  console.log(`🔗 Preview URL for PR #${prNumber}:\n`);
+  console.log(`${fullUrl}\n`);
+  console.log(`📋 To copy: Ctrl+Click (or Cmd+Click) on the URL above\n`);
+  console.log(`💡 Tip: Use a different seed to generate different game states`);
+  console.log(`   Example: npm run preview-url ${prNumber} 12345\n`);
+}
