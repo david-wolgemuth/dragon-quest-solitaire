@@ -251,7 +251,8 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for detailed guidelines on how to con
 2. **Write tests** that prove the issue exists (test should FAIL initially)
 3. **Fix the issue** and ensure all tests pass
 4. **Create a fixture** for manual QA testing
-5. **Submit a PR** with the fixture URL included
+5. **Mark the todo as complete** in todos/README.md
+6. **Submit a PR** with the fixture URL included
 
 ### Test-Driven Development Workflow
 
