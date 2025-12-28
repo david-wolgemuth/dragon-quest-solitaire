@@ -8,7 +8,8 @@ Thank you for your interest in contributing! This guide will walk you through th
 2. **Write tests** to verify the issue exists
 3. **Fix the issue** and ensure tests pass
 4. **Create a fixture** for QA testing
-5. **Submit your PR** with the fixture link
+5. **Mark the todo as complete** in todos/README.md
+6. **Submit your PR** with the fixture link
 
 ---
 
@@ -180,12 +181,52 @@ node generate-all-fixture-urls.js
 
 ---
 
-## Step 5: Submit Your Pull Request
+## Step 5: Mark the Todo as Complete
+
+Update the todo list to mark your task as complete. This keeps the project organized and helps others see what's been done.
+
+### Update todos/README.md
+
+Find your task in the list and move it from the **On Deck** or **Backlog** section to the **Completed** section:
+
+```markdown
+## Completed
+
+- [x] [#AAJ](AAJ-young-dragon-wrong-gem-amount.md) | Young Dragon gives 3 gems on critical - Fixed in PR #XX
+- [x] [#AAA](AAA-file-organization.md) | Reorganize files into src/ and docs/ - Completed in #5
+```
+
+**Important**:
+- Change `[ ]` to `[x]` to mark it as done
+- Add a note about which PR fixed it (you can add the PR number after it's created)
+- Move the entire line to the Completed section at the bottom
+
+### Example Change
+
+**Before:**
+```markdown
+## On Deck
+
+- [ ] P1 | XS | [#AAJ](AAJ-young-dragon-wrong-gem-amount.md) | Young Dragon gives 1 gem instead of 3
+```
+
+**After:**
+```markdown
+## Completed
+
+- [x] [#AAJ](AAJ-young-dragon-wrong-gem-amount.md) | Young Dragon gives 3 gems on critical - Fixed in PR #10
+```
+
+This change should be **included in your PR** so reviewers can see you've properly tracked your work.
+
+---
+
+## Step 6: Submit Your Pull Request
 
 ### Commit Your Changes
 
 ```bash
-# Add your changes
+# Add your changes (including the todos/README.md update)
 git add .
 
 # Commit with a clear message
@@ -193,7 +234,8 @@ git commit -m "Fix #AAJ: Young Dragon now gives 3 gems on critical success
 
 - Updated resolveCriticalSuccess to call game.gainGem(this, 3)
 - Added test to verify 3 gems are gained
-- Test fixture: young-dragon-critical-success"
+- Test fixture: young-dragon-critical-success
+- Marked #AAJ as complete in todos/README.md"
 
 # Push to your branch
 git push origin your-branch-name
@@ -213,6 +255,7 @@ Fixes #AAJ - Young Dragon gives 3 gems on critical success (was only giving 1)
 - Updated `dungeon-cards.js` to call `game.gainGem(this, 3)` instead of `game.gainGem(this)`
 - Added test case to verify critical success gives 3 gems
 - Test initially failed (confirmed bug), now passes (confirmed fix)
+- Marked #AAJ as complete in `todos/README.md`
 
 ## Testing
 
@@ -237,6 +280,7 @@ Test this fix with the following fixture:
 
 - [x] Tests written and passing
 - [x] Fixture URL created for QA
+- [x] Todo marked as complete in `todos/README.md`
 - [x] Code follows project style
 - [x] No unrelated changes included
 ```
@@ -252,6 +296,7 @@ Test this fix with the following fixture:
 - **Keep changes focused**: One issue per PR
 - **Test thoroughly**: Run the full test suite
 - **Create fixtures**: Make it easy for reviewers to verify
+- **Mark todos complete**: Update todos/README.md to track progress
 - **Update docs**: If you change behavior, update relevant docs
 - **Follow existing patterns**: Look at how similar code is written
 
@@ -363,12 +408,18 @@ node save-fixture.js "young-dragon-critical-success"
 # 8. Generate fixture URL
 node generate-fixture-url.js young-dragon-critical-success
 
-# 9. Commit and push
+# 9. Mark todo as complete
+# Edit todos/README.md:
+# - Move task from "On Deck" to "Completed" section
+# - Change [ ] to [x]
+# - Add "Fixed in PR #XX" note
+
+# 10. Commit and push
 git add .
 git commit -m "Fix #AAJ: Young Dragon gives 3 gems on critical success"
 git push origin fix/young-dragon-gems
 
-# 10. Create PR with fixture link
+# 11. Create PR with fixture link
 # Use the PR template above
 ```
 
