@@ -986,27 +986,76 @@ function showErrorOverlay(title, message, error) {
   document.body.appendChild(overlay);
 }
 
-// Create debug log element at bottom of screen
+// Create debug log element at top right corner (minimized by default)
 function createDebugLog() {
+  const container = document.createElement('div');
+  container.id = 'debug-log-container';
+  container.className = 'minimized';
+
+  const header = document.createElement('div');
+  header.id = 'debug-log-header';
+  header.innerHTML = '🪵 Debug Log';
+  header.style.cssText = `
+    background: rgba(0, 0, 0, 0.9);
+    color: #0f0;
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 8px 12px;
+    cursor: pointer;
+    border: 2px solid #0f0;
+    border-radius: 4px 0 0 4px;
+    user-select: none;
+  `;
+
   const debugDiv = document.createElement('div');
   debugDiv.id = 'debug-log';
   debugDiv.style.cssText = `
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.9);
     color: #0f0;
     font-family: monospace;
     font-size: 11px;
     padding: 10px;
-    max-height: 150px;
     overflow-y: auto;
-    z-index: 9999;
-    border-top: 2px solid #0f0;
+    border: 2px solid #0f0;
+    border-top: none;
+    border-radius: 0 0 0 4px;
   `;
-  document.body.appendChild(debugDiv);
+
+  container.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 0;
+    z-index: 9999;
+    transition: all 0.3s ease;
+  `;
+
+  // Minimized state
+  container.classList.add('minimized');
+  updateDebugLogStyle(container, debugDiv, true);
+
+  // Toggle on click
+  header.addEventListener('click', () => {
+    const isMinimized = container.classList.toggle('minimized');
+    updateDebugLogStyle(container, debugDiv, isMinimized);
+  });
+
+  container.appendChild(header);
+  container.appendChild(debugDiv);
+  document.body.appendChild(container);
   return debugDiv;
+}
+
+function updateDebugLogStyle(container, debugDiv, isMinimized) {
+  if (isMinimized) {
+    debugDiv.style.display = 'none';
+    container.style.width = 'auto';
+  } else {
+    debugDiv.style.display = 'block';
+    debugDiv.style.maxHeight = 'calc(100vh - 60px)';
+    debugDiv.style.width = '600px';
+    debugDiv.style.maxWidth = '90vw';
+  }
 }
 
 function logDebug(message, isError = false) {
