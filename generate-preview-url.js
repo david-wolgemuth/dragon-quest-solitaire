@@ -23,11 +23,11 @@ globalThis.window = globalThis;
 // Load cards.js (sets window.SUITS, window.VALUES, etc.)
 eval(loadScript('cards.js'));
 
-// Load dungeon-cards.js
-eval(loadScript('dungeon-cards.js'));
-
-// Use window constants directly
+// Use window constants directly (destructure before loading other scripts)
 const { HEARTS, CLUBS, DIAMONDS, SPADES, BLACK, RED, ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, JOKER } = window;
+
+// Note: We don't need dungeon-cards.js for preview URL generation
+// The Game class only needs the suit/value constants, not the card behaviors
 
 // Cell class (needed for Game)
 class Cell {
