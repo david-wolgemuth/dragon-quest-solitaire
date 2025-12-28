@@ -261,7 +261,8 @@ export class Game {
    * @param {number} [amount=1] - Amount of gems to lose
    */
   loseGem(dungeonCard, amount) {
-    this.displayResolution(dungeonCard, -(amount || 1), "gems", () => {
+    amount = amount || 1;
+    this.displayResolution(dungeonCard, -amount, "gems", () => {
       this._loseCard("gems", amount);
       this.render();
     });

@@ -1,10 +1,16 @@
 {
-  "name": "early-game-seed1000",
-  "description": "Early-game state - just started",
-  "createdAt": "2025-12-28T17:08:31.648Z",
+  "name": "bug-aai-generous-wizard-5gems",
+  "description": "QA Fixture: Generous Wizard with 5 gems - makes it easier to verify no cost",
+  "createdAt": "2025-12-28T17:08:31.464Z",
   "metadata": {
-    "seed": 1000,
-    "turnCount": 0
+    "bug": "AAI",
+    "gems": 5,
+    "health": 5,
+    "wizardPosition": {
+      "row": 1,
+      "col": 1
+    },
+    "note": "With 5 gems, it is very obvious if a gem is lost"
   },
   "state": {
     "health": {
@@ -36,14 +42,14 @@
       "stock": [
         {
           "suitKey": "HEARTS",
-          "valueKey": "QUEEN"
+          "valueKey": "JACK"
         },
         {
-          "suitKey": "HEARTS",
+          "suitKey": "DIAMONDS",
           "valueKey": "KING"
         },
         {
-          "suitKey": "HEARTS",
+          "suitKey": "DIAMONDS",
           "valueKey": "JACK"
         },
         {
@@ -52,14 +58,14 @@
         },
         {
           "suitKey": "DIAMONDS",
-          "valueKey": "JACK"
-        },
-        {
-          "suitKey": "DIAMONDS",
           "valueKey": "QUEEN"
         },
         {
-          "suitKey": "DIAMONDS",
+          "suitKey": "HEARTS",
+          "valueKey": "QUEEN"
+        },
+        {
+          "suitKey": "HEARTS",
           "valueKey": "KING"
         }
       ],
@@ -86,18 +92,12 @@
         {
           "suitKey": "DIAMONDS",
           "valueKey": "FIVE"
-        },
+        }
+      ],
+      "available": [
         {
           "suitKey": "DIAMONDS",
-          "valueKey": "SIX"
-        },
-        {
-          "suitKey": "DIAMONDS",
-          "valueKey": "SEVEN"
-        },
-        {
-          "suitKey": "DIAMONDS",
-          "valueKey": "EIGHT"
+          "valueKey": "TEN"
         },
         {
           "suitKey": "DIAMONDS",
@@ -105,23 +105,22 @@
         },
         {
           "suitKey": "DIAMONDS",
-          "valueKey": "TEN"
+          "valueKey": "EIGHT"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "SEVEN"
+        },
+        {
+          "suitKey": "DIAMONDS",
+          "valueKey": "SIX"
         }
-      ],
-      "available": []
+      ]
     },
     "fate": {
       "stock": [
         {
           "suitKey": "HEARTS",
-          "valueKey": "NINE"
-        },
-        {
-          "suitKey": "HEARTS",
-          "valueKey": "TEN"
-        },
-        {
-          "suitKey": "HEARTS",
           "valueKey": "EIGHT"
         },
         {
@@ -131,74 +130,46 @@
         {
           "suitKey": "HEARTS",
           "valueKey": "SEVEN"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "TEN"
+        },
+        {
+          "suitKey": "HEARTS",
+          "valueKey": "NINE"
         }
       ],
       "available": []
     },
     "dungeonStock": [
       {
-        "suitKey": "CLUBS",
-        "valueKey": "QUEEN"
-      },
-      {
         "suitKey": "SPADES",
-        "valueKey": "QUEEN"
-      },
-      {
-        "suitKey": "SPADES",
-        "valueKey": "ACE"
-      },
-      {
-        "suitKey": "SPADES",
-        "valueKey": "SEVEN"
-      },
-      {
-        "suitKey": "SPADES",
-        "valueKey": "SIX"
+        "valueKey": "KING"
       },
       {
         "suitKey": "CLUBS",
-        "valueKey": "TEN"
-      },
-      {
-        "suitKey": "CLUBS",
-        "valueKey": "FOUR"
+        "valueKey": "JACK"
       },
       {
         "suitKey": "SPADES",
         "valueKey": "THREE"
-      },
-      {
-        "suitKey": "CLUBS",
-        "valueKey": "EIGHT"
-      },
-      {
-        "suitKey": "CLUBS",
-        "valueKey": "NINE"
       },
       {
         "suitKey": "BLACK",
         "valueKey": "JOKER"
       },
       {
-        "suitKey": "CLUBS",
-        "valueKey": "TWO"
-      },
-      {
-        "suitKey": "CLUBS",
-        "valueKey": "THREE"
+        "suitKey": "SPADES",
+        "valueKey": "QUEEN"
       },
       {
         "suitKey": "SPADES",
-        "valueKey": "FOUR"
+        "valueKey": "ACE"
       },
       {
         "suitKey": "SPADES",
         "valueKey": "TEN"
-      },
-      {
-        "suitKey": "CLUBS",
-        "valueKey": "SIX"
       },
       {
         "suitKey": "SPADES",
@@ -210,7 +181,39 @@
       },
       {
         "suitKey": "CLUBS",
-        "valueKey": "JACK"
+        "valueKey": "ACE"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "NINE"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "SEVEN"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "FOUR"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "SIX"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "FOUR"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "TWO"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "KING"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "QUEEN"
       },
       {
         "suitKey": "CLUBS",
@@ -218,27 +221,31 @@
       },
       {
         "suitKey": "SPADES",
-        "valueKey": "KING"
+        "valueKey": "SIX"
       },
       {
         "suitKey": "CLUBS",
-        "valueKey": "ACE"
+        "valueKey": "NINE"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "FIVE"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "THREE"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "TEN"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "EIGHT"
       },
       {
         "suitKey": "SPADES",
         "valueKey": "JACK"
-      },
-      {
-        "suitKey": "CLUBS",
-        "valueKey": "KING"
-      },
-      {
-        "suitKey": "SPADES",
-        "valueKey": "NINE"
-      },
-      {
-        "suitKey": "CLUBS",
-        "valueKey": "FIVE"
       }
     ],
     "matrixRows": 3,
@@ -248,10 +255,10 @@
         "row": 1,
         "col": 1,
         "card": {
-          "suitKey": "SPADES",
-          "valueKey": "FIVE"
+          "suitKey": "BLACK",
+          "valueKey": "JOKER"
         },
-        "cardFaceDown": true
+        "cardFaceDown": false
       }
     ]
   }
