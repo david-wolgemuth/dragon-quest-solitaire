@@ -25,109 +25,95 @@ class Card {
   }
 }
 
-// Serialize a card to a short string (e.g., "HA" for Hearts Ace, "RX" for Red Joker)
+// Serialize a card to a plain object
 function serializeCard(card) {
-  const suitMap = { HEARTS: 'H', CLUBS: 'C', DIAMONDS: 'D', SPADES: 'S', BLACK: 'B', RED: 'R' };
-  const valueMap = { ACE: 'A', TWO: '2', THREE: '3', FOUR: '4', FIVE: '5', SIX: '6', SEVEN: '7', EIGHT: '8', NINE: '9', TEN: '0', JACK: 'J', QUEEN: 'Q', KING: 'K', JOKER: 'X' };
-  return `${valueMap[card.valueKey]}${suitMap[card.suitKey]}`;
+  return {
+    suit: card.suitKey,
+    value: card.valueKey
+  };
 }
 
-// Deserialize a card from a short string
-function deserializeCard(str) {
-  const suitMap = { H: 'HEARTS', C: 'CLUBS', D: 'DIAMONDS', S: 'SPADES', B: 'BLACK', R: 'RED' };
-  const valueMap = { A: 'ACE', '2': 'TWO', '3': 'THREE', '4': 'FOUR', '5': 'FIVE', '6': 'SIX', '7': 'SEVEN', '8': 'EIGHT', '9': 'NINE', '0': 'TEN', J: 'JACK', Q: 'QUEEN', K: 'KING', X: 'JOKER' };
-  const valueKey = valueMap[str[0]];
-  const suitKey = suitMap[str[1]];
-  return new Card(suitKey, valueKey);
+// Deserialize a card from a plain object
+function deserializeCard(obj) {
+  return new Card(obj.suit, obj.value);
 }
 
-// Serialize game state to URL parameters
+// Serialize game state to URL parameter (single base64-encoded JSON)
 function serializeGameState(game) {
-  const params = new URLSearchParams();
+  const serializePile = (pile) => ({
+    stock: pile.stock.map(serializeCard),
+    available: pile.available.map(serializeCard)
+  });
 
-  // Serialize resource piles (store card order and split point)
-  const serializePile = (pile) => {
-    const allCards = [...pile.stock, ...pile.available];
-    const cardStr = allCards.map(serializeCard).join('');
-    return `${cardStr}:${pile.stock.length}`;
+  const state = {
+    health: serializePile(game.health),
+    inventory: serializePile(game.inventory),
+    gems: serializePile(game.gems),
+    fate: serializePile(game.fate),
+    dungeon: {
+      stock: game.dungeon.stock.map(serializeCard),
+      matrix: []
+    }
   };
 
-  params.set('health', serializePile(game.health));
-  params.set('inventory', serializePile(game.inventory));
-  params.set('gems', serializePile(game.gems));
-  params.set('fate', serializePile(game.fate));
-
-  // Serialize dungeon pile
-  const dungeonStock = game.dungeon.stock.map(serializeCard).join('');
-  params.set('dungeonStock', dungeonStock);
-
   // Serialize dungeon matrix
-  const matrixData = [];
   for (let row = 0; row < game.dungeon.matrix.length; row++) {
     for (let col = 0; col < game.dungeon.matrix[row].length; col++) {
       const cell = game.dungeon.matrix[row][col];
       if (cell.card) {
-        const cardStr = serializeCard(cell.card);
-        const faceDown = cell.cardFaceDown ? '1' : '0';
-        matrixData.push(`${row},${col},${cardStr},${faceDown}`);
-      }
-    }
-  }
-  params.set('dungeonMatrix', matrixData.join('|'));
-
-  return params.toString();
-}
-
-// Deserialize game state from URL parameters
-function deserializeGameState(queryString) {
-  const params = new URLSearchParams(queryString);
-
-  const deserializePile = (pileStr) => {
-    const [cardStr, stockLengthStr] = pileStr.split(':');
-    const cards = [];
-    for (let i = 0; i < cardStr.length; i += 2) {
-      cards.push(deserializeCard(cardStr.substr(i, 2)));
-    }
-    const stockLength = parseInt(stockLengthStr, 10);
-    return {
-      stock: cards.slice(0, stockLength),
-      available: cards.slice(stockLength)
-    };
-  };
-
-  const state = {
-    health: deserializePile(params.get('health')),
-    inventory: deserializePile(params.get('inventory')),
-    gems: deserializePile(params.get('gems')),
-    fate: deserializePile(params.get('fate')),
-    dungeonStock: [],
-    dungeonMatrix: []
-  };
-
-  // Deserialize dungeon stock
-  const dungeonStockStr = params.get('dungeonStock');
-  for (let i = 0; i < dungeonStockStr.length; i += 2) {
-    state.dungeonStock.push(deserializeCard(dungeonStockStr.substr(i, 2)));
-  }
-
-  // Deserialize dungeon matrix
-  const matrixStr = params.get('dungeonMatrix');
-  if (matrixStr) {
-    const cells = matrixStr.split('|');
-    for (const cellData of cells) {
-      if (cellData) {
-        const [rowStr, colStr, cardStr, faceDownStr] = cellData.split(',');
-        state.dungeonMatrix.push({
-          row: parseInt(rowStr, 10),
-          col: parseInt(colStr, 10),
-          card: deserializeCard(cardStr),
-          cardFaceDown: faceDownStr === '1'
+        state.dungeon.matrix.push({
+          row,
+          col,
+          card: serializeCard(cell.card),
+          faceDown: cell.cardFaceDown
         });
       }
     }
   }
 
-  return state;
+  // Convert to JSON and base64 encode
+  const json = JSON.stringify(state);
+  const base64 = btoa(json);
+
+  return `state=${encodeURIComponent(base64)}`;
+}
+
+// Deserialize game state from URL parameter
+function deserializeGameState(queryString) {
+  try {
+    const params = new URLSearchParams(queryString);
+    const base64 = params.get('state');
+
+    if (!base64) {
+      throw new Error('No state parameter found in URL');
+    }
+
+    // Decode base64 and parse JSON
+    const json = atob(decodeURIComponent(base64));
+    const state = JSON.parse(json);
+
+    // Deserialize piles
+    const deserializePile = (pile) => ({
+      stock: pile.stock.map(deserializeCard),
+      available: pile.available.map(deserializeCard)
+    });
+
+    return {
+      health: deserializePile(state.health),
+      inventory: deserializePile(state.inventory),
+      gems: deserializePile(state.gems),
+      fate: deserializePile(state.fate),
+      dungeonStock: state.dungeon.stock.map(deserializeCard),
+      dungeonMatrix: state.dungeon.matrix.map(cell => ({
+        row: cell.row,
+        col: cell.col,
+        card: deserializeCard(cell.card),
+        cardFaceDown: cell.faceDown
+      }))
+    };
+  } catch (error) {
+    throw new Error(`Failed to deserialize state: ${error.message}`);
+  }
 }
 
 // Seeded random number generator (mulberry32)
