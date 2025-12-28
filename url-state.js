@@ -39,6 +39,8 @@ function serializeGameState(game) {
     fate: serializePile(game.fate),
     dungeon: {
       stock: game.dungeon.stock.map(serializeCard),
+      matrixRows: game.dungeon.matrix.length,
+      matrixCols: game.dungeon.matrix[0]?.length || 0,
       matrix: []
     }
   };
@@ -154,6 +156,8 @@ function deserializeGameState(queryString) {
           throw new Error(`dungeon.stock[${i}]: ${e.message}`);
         }
       }),
+      matrixRows: state.dungeon.matrixRows,
+      matrixCols: state.dungeon.matrixCols,
       dungeonMatrix: state.dungeon.matrix.map((cell, i) => {
         if (!cell || typeof cell !== 'object') {
           throw new Error(`dungeon.matrix[${i}] is not an object`);

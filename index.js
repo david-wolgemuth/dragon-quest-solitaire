@@ -95,12 +95,16 @@ class Game {
       this.fate = options.state.fate;
 
       // Restore dungeon matrix
-      const maxRow = Math.max(...options.state.dungeonMatrix.map(c => c.row), 0);
-      const maxCol = Math.max(...options.state.dungeonMatrix.map(c => c.col), 0);
+      // Use saved matrix dimensions if available, otherwise calculate from cell positions
+      const matrixRows = options.state.matrixRows ||
+        Math.max(...options.state.dungeonMatrix.map(c => c.row), 0) + 1;
+      const matrixCols = options.state.matrixCols ||
+        Math.max(...options.state.dungeonMatrix.map(c => c.col), 0) + 1;
+
       this.dungeon = {
         stock: options.state.dungeonStock,
-        matrix: Array(maxRow + 1).fill(null).map(() =>
-          Array(maxCol + 1).fill(null).map(() => new Cell())
+        matrix: Array(matrixRows).fill(null).map(() =>
+          Array(matrixCols).fill(null).map(() => new Cell())
         ),
         available: []
       };
@@ -112,7 +116,9 @@ class Game {
         cell.cardFaceDown = cellData.cardFaceDown;
       }
 
-      this.updateDungeon();
+      // Update availability only - don't expand/trim the dungeon since
+      // the state already has the correct matrix size
+      this._updateDungeonAvailability();
       return;
     }
 
