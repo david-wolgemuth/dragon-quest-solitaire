@@ -25,8 +25,6 @@ Quick wins and critical fixes - sorted by impact and ease of implementation:
 
 Everything else - larger features, design decisions needed, or lower priority:
 
-- [ ] P2 | M  | [#001](001-file-organization.md) | Reorganize files into src/ and docs/
-- [ ] P2 | S  | [#023](023-refactor-fixture-code-duplication.md) | Extract shared fixture reconstruction logic
 - [ ] P2 | S  | [#024](024-remove-test-code-from-production.md) | Remove test debug code from production
 - [ ] P2 | M  | [#014](014-async-callback-resolution-timing.md) | Async callback resolution timing for Merchant/Wizard
 - [ ] P2 | M  | [#016](016-dungeon-depletion-handling.md) | Handle dungeon deck depletion (27 cards)
@@ -52,7 +50,9 @@ Everything else - larger features, design decisions needed, or lower priority:
 
 ## Completed
 
-- [x] [#022](022-store-state-in-url.md) | Store game state in URL for QA/testing/agents
+- [x] [#001](001-file-organization.md) | Reorganize files into src/ and docs/ - Completed in #5
+- [x] [#022](022-store-state-in-url.md) | Store game state in URL for QA/testing/agents - Completed in #4
+- [x] [#023](023-refactor-fixture-code-duplication.md) | Extract shared fixture reconstruction logic - Completed in #5
 - [x] Dungeon grid rendering (7 wide × 5 high)
 - [x] Tile placement logic and dungeon expansion
 - [x] Inventory section rendering
