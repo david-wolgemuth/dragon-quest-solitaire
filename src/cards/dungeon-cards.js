@@ -5,10 +5,8 @@
  * Cards are organized by suit (SPADES, CLUBS, BLACK) and value.
  */
 
-import {
-  SPADES, CLUBS, BLACK,
-  ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, JOKER
-} from './suits.js';
+import { SPADES, CLUBS, BLACK } from './suits.js';
+import { ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, JOKER } from './values.js';
 import { buildPitTrapCard, buildPassageCard, buildEnemyCard } from './card-builders.js';
 
 /**

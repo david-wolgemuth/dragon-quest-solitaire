@@ -5,7 +5,22 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { Card, serializeCard, deserializeCard, serializeGameState, deserializeGameState, createSeededRNG } from '../url-state.js';
+
+// Import from new module locations
+import { Card } from '../src/cards/card.js';
+import { SUITS, HEARTS, CLUBS, SPADES, DIAMONDS, BLACK, RED } from '../src/cards/suits.js';
+import { VALUES, ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, JOKER } from '../src/cards/values.js';
+import { buildPitTrapCard, buildPassageCard, buildEnemyCard } from '../src/cards/card-builders.js';
+import { DUNGEON_CARDS } from '../src/cards/dungeon-cards.js';
+import { Cell } from '../src/core/cell.js';
+import { MAX_WIDTH, MAX_HEIGHT } from '../src/core/constants.js';
+import { Game } from '../src/core/game.js';
+import { GameRenderer } from '../src/core/game-renderer.js';
+import { buildPile, shuffle, allCards } from '../src/utils/card-utils.js';
+import { createStyleSheet } from '../src/utils/style-generator.js';
+import { logDebug } from '../src/utils/debug.js';
+import { showErrorOverlay } from '../src/utils/error-handler.js';
+import { serializeCard, deserializeCard, serializeGameState, deserializeGameState, createSeededRNG } from '../src/state/url-state.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -65,51 +80,56 @@ global.window = dom.window;
 global.document = dom.window.document;
 global.navigator = dom.window.navigator;
 
-// Function to load and execute a script in the window context
-const loadScript = (filename) => {
-  const filepath = path.join(__dirname, '..', filename);
-  const content = fs.readFileSync(filepath, 'utf8');
-
-  // Execute in the context of the window
-  dom.window.eval(content);
-};
-
-// Load game files in the correct order (same as index.html)
-loadScript('cards.js');
-loadScript('card-builders.js');
-loadScript('dungeon-cards.js');
-
-// url-state.js is now an ES module, so we import it at the top and assign to window
+// Make all modules globally available on window (same as main.js does)
+window.SUITS = SUITS;
+window.VALUES = VALUES;
 window.Card = Card;
+window.Cell = Cell;
+window.Game = Game;
+window.GameRenderer = GameRenderer;
+window.buildPile = buildPile;
+window.shuffle = shuffle;
+window.allCards = allCards;
+window.createStyleSheet = createStyleSheet;
+window.logDebug = logDebug;
+window.showErrorOverlay = showErrorOverlay;
 window.serializeCard = serializeCard;
 window.deserializeCard = deserializeCard;
 window.serializeGameState = serializeGameState;
 window.deserializeGameState = deserializeGameState;
 window.createSeededRNG = createSeededRNG;
+window.DUNGEON_CARDS = DUNGEON_CARDS;
+window.buildPitTrapCard = buildPitTrapCard;
+window.buildPassageCard = buildPassageCard;
+window.buildEnemyCard = buildEnemyCard;
 
-// Load index.js but wrap it to prevent main() from running
-const indexPath = path.join(__dirname, '..', 'index.js');
-let indexContent = fs.readFileSync(indexPath, 'utf8');
+// Suit constants
+window.HEARTS = HEARTS;
+window.CLUBS = CLUBS;
+window.SPADES = SPADES;
+window.DIAMONDS = DIAMONDS;
+window.BLACK = BLACK;
+window.RED = RED;
 
-// Remove the call to main() at the end
-indexContent = indexContent.replace(/\nmain\(\);?\s*$/, '');
+// Value constants
+window.ACE = ACE;
+window.TWO = TWO;
+window.THREE = THREE;
+window.FOUR = FOUR;
+window.FIVE = FIVE;
+window.SIX = SIX;
+window.SEVEN = SEVEN;
+window.EIGHT = EIGHT;
+window.NINE = NINE;
+window.TEN = TEN;
+window.JACK = JACK;
+window.QUEEN = QUEEN;
+window.KING = KING;
+window.JOKER = JOKER;
 
-// Also export classes and functions to window explicitly
-indexContent += `
-// Make classes and functions available on window for tests
-// Card, serializeCard, deserializeCard, serializeGameState, deserializeGameState, createSeededRNG
-// are already loaded from url-state.js
-window.Cell = Cell;
-window.Game = Game;
-window.GameRenderer = GameRenderer;
-`;
+// Constants
+window.MAX_WIDTH = MAX_WIDTH;
+window.MAX_HEIGHT = MAX_HEIGHT;
 
-dom.window.eval(indexContent);
-
-// Make sure Card and url-state functions are accessible on window for tests
-global.window.Card = dom.window.Card;
-global.window.serializeCard = dom.window.serializeCard;
-global.window.deserializeCard = dom.window.deserializeCard;
-global.window.serializeGameState = dom.window.serializeGameState;
-global.window.deserializeGameState = dom.window.deserializeGameState;
-global.window.createSeededRNG = dom.window.createSeededRNG;
+// Create stylesheet for card CSS
+createStyleSheet();
