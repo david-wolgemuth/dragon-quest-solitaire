@@ -10,9 +10,7 @@ This directory contains all task tracking for the project. Each todo is a separa
 
 Quick wins and critical fixes - sorted by impact and ease of implementation:
 
-- [ ] P1 | XS | [#AAK](AAK-passage-resolver-wrong-parameters.md) | Passage resolver wrong parameters - remove `this`
 - [ ] P2 | XS | [#AAM](AAM-typos-fix.md) | Fix typos in card descriptions
-- [ ] P1 | S  | [#AAL](AAL-passages-match-resolved-cards.md) | Passages match resolved cards - add face-up check
 - [ ] P0 | M  | [#AAD](AAD-critical-missing-game-functions.md) | Missing defeatDragonQueen() and resetDungeon()
 - [ ] P1 | M  | [#AAH](AAH-hidden-pit-trap-gem-reduction.md) | Hidden pit trap gem reduction not implemented
 
@@ -50,6 +48,8 @@ Everything else - larger features, design decisions needed, or lower priority:
 - [x] [#AAE](AAE-critical-fate-deck-duplication.md) | Fate deck duplication - Already fixed during refactoring
 - [x] [#AAI](AAI-generous-wizard-costs-gem.md) | Generous Wizard costs gem - Completed with PR (removed gem cost + added render)
 - [x] [#AAJ](AAJ-young-dragon-wrong-gem-amount.md) | Young Dragon gives 3 gems on critical - Fixed in this PR
+- [x] [#AAK](AAK-passage-resolver-wrong-parameters.md) | Passage resolver wrong parameters - Fixed in #12
+- [x] [#AAL](AAL-passages-match-resolved-cards.md) | Passages match resolved cards - Resolved with documentation (scenario impossible through normal gameplay)
 - [x] [#AAV](AAV-store-state-in-url.md) | Store game state in URL for QA/testing/agents - Completed in #4
 - [x] [#AAW](AAW-refactor-fixture-code-duplication.md) | Extract shared fixture reconstruction logic - Completed in #5
 - [x] Dungeon grid rendering (7 wide × 5 high)
