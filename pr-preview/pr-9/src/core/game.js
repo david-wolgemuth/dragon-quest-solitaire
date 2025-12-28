@@ -332,7 +332,7 @@ export class Game {
           <hr>
 
           <h5>${dungeonCard.name}</h5>
-          <p>${dungeonCard.description}</p>
+          ${dungeonCard.descriptionHtml || `<p>${dungeonCard.description}</p>`}
       `,
       {
         actions: [acceptButton],
