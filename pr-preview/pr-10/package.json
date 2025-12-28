@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "http-server -p 8008",
+    "dev": "python -m http.server 5173",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "preview-url": "node generate-preview-url.js",
+    "fixture:save": "node save-fixture.js",
+    "fixture:url": "node generate-fixture-url.js"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.16",
+    "http-server": "^14.1.1",
+    "jsdom": "^27.4.0",
+    "vitest": "^4.0.16"
+  }
+}
