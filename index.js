@@ -1,27 +1,9 @@
 const MAX_WIDTH = 7;
 const MAX_HEIGHT = 5;
 
-
-class Card {
-  constructor(suitKey, valueKey) {
-    if (!Object.keys(SUITS).includes(suitKey)) {
-      throw new Error(`Invalid suit key: ${suitKey}`);
-    }
-    if (!Object.keys(VALUES).includes(valueKey)) {
-      throw new Error(`Invalid value key: ${valueKey}`);
-    }
-    this.suitKey = suitKey;
-    this.valueKey = valueKey;
-  }
-
-  get suit() {
-    return SUITS[this.suitKey];
-  }
-
-  get value() {
-    return VALUES[this.valueKey];
-  }
-}
+// Note: Card class is now defined in url-state.js to avoid class redefinition issues
+// When url-state.js loads first, it defines Card with basic getters
+// This ensures Card instances created during URL deserialization remain valid
 
 class Cell {
   constructor() {
@@ -35,10 +17,10 @@ function buildPile(keyPairs) {
   return keyPairs.map(([suitKey, valueKey]) => new Card(suitKey, valueKey));
 }
 
-function shuffle(array) {
+function shuffle(array, rng = Math.random) {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
@@ -104,7 +86,46 @@ function createStyleSheet() {
 createStyleSheet();
 
 class Game {
-  constructor() {
+  constructor(options = {}) {
+    // If state is provided, restore from it
+    if (options.state) {
+      this.health = options.state.health;
+      this.inventory = options.state.inventory;
+      this.gems = options.state.gems;
+      this.fate = options.state.fate;
+
+      // Restore dungeon matrix
+      // Use saved matrix dimensions if available, otherwise calculate from cell positions
+      const matrixRows = options.state.matrixRows ||
+        Math.max(...options.state.dungeonMatrix.map(c => c.row), 0) + 1;
+      const matrixCols = options.state.matrixCols ||
+        Math.max(...options.state.dungeonMatrix.map(c => c.col), 0) + 1;
+
+      this.dungeon = {
+        stock: options.state.dungeonStock,
+        matrix: Array(matrixRows).fill(null).map(() =>
+          Array(matrixCols).fill(null).map(() => new Cell())
+        ),
+        available: []
+      };
+
+      // Populate matrix cells
+      for (const cellData of options.state.dungeonMatrix) {
+        const cell = this.dungeon.matrix[cellData.row][cellData.col];
+        cell.card = cellData.card;
+        cell.cardFaceDown = cellData.cardFaceDown;
+      }
+
+      // Update availability only - don't expand/trim the dungeon since
+      // the state already has the correct matrix size
+      this._updateDungeonAvailability();
+      return;
+    }
+
+    // Determine RNG (seeded or random)
+    const rng = options.seed ? createSeededRNG(options.seed) : Math.random;
+
+    // Initialize new game
     this.health = {
       stock: [],
       available: buildPile([
@@ -126,7 +147,8 @@ class Game {
           [DIAMONDS, QUEEN],
           [DIAMONDS, KING],
           [RED, JOKER],
-        ])
+        ]),
+        rng
       ),
       available: [],
     };
@@ -155,7 +177,8 @@ class Game {
           [HEARTS, EIGHT],
           [HEARTS, NINE],
           [HEARTS, TEN],
-        ])
+        ]),
+        rng
       ),
       available: [],
     };
@@ -190,7 +213,8 @@ class Game {
           [SPADES, QUEEN],
           [SPADES, KING],
           [BLACK, JOKER],
-        ])
+        ]),
+        rng
       ),
       matrix: [[new Cell()]],
       available: [],  // match pattern for status piles, but not used
@@ -206,6 +230,7 @@ class Game {
     const cell = this.dungeon.matrix[row][col];
     cell.cardFaceDown = false;
     cell.card = card;
+    logDebug(`🃏 Added ${card.suitKey[0]}${card.valueKey[0]} to (${row},${col})`);
     this.updateDungeon();
     this.render();
   }
@@ -213,12 +238,15 @@ class Game {
   resolveCard({ row, col }) {
     const cell = this.dungeon.matrix[row][col];
     const dungeonCard = DUNGEON_CARDS[cell.card.suit.key][cell.card.value.key];
+    logDebug(`⚔️ Resolving ${cell.card.suitKey[0]}${cell.card.valueKey[0]} at (${row},${col}): ${dungeonCard.name}`);
     const resolved = dungeonCard.resolver(this);
     if (resolved !== false) {
       cell.cardFaceDown = true;
       this.updateDungeon();
       this.render();
+      logDebug(`✅ Card resolved, flipped face down`);
     } else {
+      logDebug(`❌ Card not resolved`);
       // assume already displayed a message
     }
   }
@@ -619,6 +647,65 @@ class Game {
     renderer.renderFate();
     renderer.renderInventory();
     renderer.renderGems();
+
+    // Update URL with current game state
+    const stateString = serializeGameState(this);
+    window.history.replaceState(null, '', `?${stateString}`);
+
+    // Update test debug div with serialized state (for integration tests)
+    this._updateTestDebugDiv(stateString);
+  }
+
+  _updateTestDebugDiv(stateString) {
+    // Keep hidden div for test access via dataset.state
+    let debugDiv = document.getElementById('test-debug-state');
+    if (!debugDiv) {
+      debugDiv = document.createElement('pre');
+      debugDiv.id = 'test-debug-state';
+      debugDiv.style.cssText = `
+        display: none;
+      `;
+      document.body.appendChild(debugDiv);
+    }
+    debugDiv.textContent = stateString;
+    debugDiv.dataset.state = stateString;
+
+    // Also update debug log with state info
+    let debugLogDiv = document.getElementById('debug-log-state');
+    if (!debugLogDiv) {
+      const debugLog = document.getElementById('debug-log');
+      if (debugLog) {
+        debugLogDiv = document.createElement('div');
+        debugLogDiv.id = 'debug-log-state';
+        debugLogDiv.style.cssText = `
+          margin-top: 10px;
+          padding-top: 10px;
+          border-top: 1px solid #ccc;
+          font-size: 10px;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        `;
+        const label = document.createElement('div');
+        label.textContent = 'Serialized State:';
+        label.style.fontWeight = 'bold';
+        label.style.marginBottom = '5px';
+        debugLogDiv.appendChild(label);
+
+        const stateContent = document.createElement('div');
+        stateContent.id = 'debug-log-state-content';
+        stateContent.style.cssText = `
+          max-height: 200px;
+          overflow-y: auto;
+          white-space: pre-wrap;
+        `;
+        debugLogDiv.appendChild(stateContent);
+        debugLog.appendChild(debugLogDiv);
+      }
+    }
+    const stateContent = document.getElementById('debug-log-state-content');
+    if (stateContent) {
+      stateContent.textContent = stateString;
+    }
   }
 }
 
@@ -868,15 +955,273 @@ class GameRenderer {
   }
 }
 
-function main() {
-  let game = new Game();
-  game.render();
+// Show error overlay with full details
+function showErrorOverlay(title, message, error) {
+  const overlay = document.createElement('div');
+  overlay.id = 'error-overlay';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+  `;
 
-  const resetGameButton = document.querySelector("#reset-game");
-  resetGameButton.onclick = () => {
-    game = new Game();
-    game.render();
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: auto;
+    font-family: monospace;
+  `;
+
+  const heading = document.createElement('h1');
+  heading.textContent = '🚨 ' + title;
+  heading.style.cssText = 'color: #d32f2f; margin-top: 0;';
+
+  const msg = document.createElement('p');
+  msg.textContent = message;
+  msg.style.cssText = 'font-size: 16px; line-height: 1.5;';
+
+  const errorBox = document.createElement('pre');
+  errorBox.style.cssText = `
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 12px;
+    border-left: 4px solid #d32f2f;
+  `;
+  errorBox.textContent = error ? (error.stack || error.toString()) : 'No error details available';
+
+  const urlInfo = document.createElement('details');
+  urlInfo.style.cssText = 'margin-top: 20px;';
+  const urlSummary = document.createElement('summary');
+  urlSummary.textContent = 'URL Parameters';
+  urlSummary.style.cssText = 'cursor: pointer; font-weight: bold; margin-bottom: 10px;';
+  const urlPre = document.createElement('pre');
+  urlPre.style.cssText = 'background: #e3f2fd; padding: 10px; border-radius: 5px; font-size: 11px;';
+  urlPre.textContent = window.location.search || '(no URL parameters)';
+  urlInfo.appendChild(urlSummary);
+  urlInfo.appendChild(urlPre);
+
+  const reloadBtn = document.createElement('button');
+  reloadBtn.textContent = 'Start Fresh Game (Clear URL)';
+  reloadBtn.style.cssText = `
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+  `;
+  reloadBtn.onclick = () => {
+    window.location.href = window.location.pathname;
+  };
+
+  content.appendChild(heading);
+  content.appendChild(msg);
+  content.appendChild(errorBox);
+  content.appendChild(urlInfo);
+  content.appendChild(reloadBtn);
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+}
+
+// Create debug log element at top right corner (minimized by default)
+function createDebugLog() {
+  const container = document.createElement('div');
+  container.id = 'debug-log-container';
+  container.className = 'minimized';
+
+  const header = document.createElement('div');
+  header.id = 'debug-log-header';
+  header.innerHTML = 'Debug';
+  header.style.cssText = `
+    background: white;
+    color: blue;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border: 1px solid blue;
+    border-radius: 3px 0 0 3px;
+    user-select: none;
+  `;
+
+  const debugDiv = document.createElement('div');
+  debugDiv.id = 'debug-log';
+  debugDiv.style.cssText = `
+    background: white;
+    color: #333;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 10px;
+    overflow-y: auto;
+    border: 1px solid blue;
+    border-top: none;
+    border-radius: 0 0 0 3px;
+  `;
+
+  container.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 0;
+    z-index: 9999;
+    transition: all 0.3s ease;
+  `;
+
+  // Minimized state
+  container.classList.add('minimized');
+  updateDebugLogStyle(container, debugDiv, true);
+
+  // Toggle on click
+  header.addEventListener('click', () => {
+    const isMinimized = container.classList.toggle('minimized');
+    updateDebugLogStyle(container, debugDiv, isMinimized);
+  });
+
+  container.appendChild(header);
+  container.appendChild(debugDiv);
+  document.body.appendChild(container);
+  return debugDiv;
+}
+
+function updateDebugLogStyle(container, debugDiv, isMinimized) {
+  if (isMinimized) {
+    debugDiv.style.display = 'none';
+    container.style.width = 'auto';
+  } else {
+    debugDiv.style.display = 'block';
+    debugDiv.style.maxHeight = 'calc(100vh - 60px)';
+    debugDiv.style.width = '600px';
+    debugDiv.style.maxWidth = '90vw';
   }
 }
+
+function logDebug(message, isError = false) {
+  let debugDiv = document.getElementById('debug-log');
+  if (!debugDiv) {
+    debugDiv = createDebugLog();
+  }
+  const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+  const color = isError ? 'red' : '#333';
+  const line = document.createElement('div');
+  line.style.color = color;
+  line.textContent = `[${timestamp}] ${message}`;
+  debugDiv.appendChild(line);
+  debugDiv.scrollTop = debugDiv.scrollHeight;
+}
+
+function main() {
+  try {
+    // Check if URL contains game state
+    const urlParams = new URLSearchParams(window.location.search);
+    let game;
+
+    logDebug('🎮 Game initializing...');
+
+    if (urlParams.toString()) {
+      logDebug(`📥 Found URL params: ${urlParams.toString().substring(0, 100)}...`);
+      logDebug('🔄 Attempting to load state from URL...');
+
+      // Restore game from URL
+      try {
+        const state = deserializeGameState(urlParams.toString());
+        logDebug('✅ State deserialized successfully');
+
+        if (!state || !state.health || !state.inventory || !state.gems || !state.fate || !state.dungeonStock) {
+          throw new Error('Deserialized state is incomplete or invalid. Missing required properties.');
+        }
+
+        logDebug('✅ State validation passed');
+        logDebug(`📊 State: health=${state.health.available.length}/${state.health.stock.length}, inv=${state.inventory.stock.length}, dungeon stock=${state.dungeonStock.length}, matrix=${state.dungeonMatrix.length} cells`);
+
+        // Log matrix cell details
+        const matrixDetails = state.dungeonMatrix.map(c => {
+          const card = c.card.suitKey?.[0] + c.card.valueKey?.[0] || `${c.card.suit?.[0] || '?'}${c.card.value?.[0] || '?'}`;
+          return `(${c.row},${c.col}):${card}${c.cardFaceDown ? '↓' : '↑'}`;
+        }).join(' ');
+        logDebug(`🎴 Matrix cells: ${matrixDetails}`);
+
+        game = new Game({ state });
+        logDebug(`📊 Game: health=${game.health.available.length}/${game.health.stock.length}, inv=${game.inventory.stock.length}, dungeon stock=${game.dungeon.stock.length}, matrix=${game.dungeon.matrix.length}x${game.dungeon.matrix[0].length}`);
+
+        // Log game matrix cell details after construction
+        const gameMatrixCells = [];
+        for (let r = 0; r < game.dungeon.matrix.length; r++) {
+          for (let c = 0; c < game.dungeon.matrix[0].length; c++) {
+            const cell = game.dungeon.matrix[r][c];
+            if (cell.card) {
+              const card = cell.card.suitKey?.[0] + cell.card.valueKey?.[0];
+              gameMatrixCells.push(`(${r},${c}):${card}${cell.cardFaceDown ? '↓' : '↑'}`);
+            }
+          }
+        }
+        logDebug(`🎴 Game matrix cells: ${gameMatrixCells.join(' ')}`);
+        logDebug('✅ Game created from URL state');
+      } catch (error) {
+        logDebug(`❌ Failed to load state: ${error.message}`, true);
+        showErrorOverlay(
+          'Failed to Load Game State from URL',
+          'The URL contains game state parameters, but they could not be loaded. This might be because the URL is corrupted or from an old version. Click below to start a fresh game.',
+          error
+        );
+        throw error; // Re-throw to prevent further execution
+      }
+    } else {
+      logDebug('🆕 No URL params found, creating fresh game');
+      // Create new game
+      game = new Game();
+    }
+
+    game.render();
+    logDebug('✅ Game rendered successfully');
+
+    const resetGameButton = document.querySelector("#reset-game");
+    resetGameButton.onclick = () => {
+      logDebug('🔄 Resetting game...');
+      game = new Game();
+      game.render();
+      // Clear URL when resetting
+      window.history.replaceState(null, '', window.location.pathname);
+      logDebug('✅ Game reset complete');
+    }
+  } catch (error) {
+    logDebug(`❌ Fatal error in main(): ${error.message}`, true);
+    // Catch any errors in main() and show overlay if one wasn't already shown
+    if (!document.getElementById('error-overlay')) {
+      showErrorOverlay(
+        'Game Initialization Failed',
+        'An unexpected error occurred while starting the game.',
+        error
+      );
+    }
+  }
+}
+
+// Global error handler for uncaught errors
+window.addEventListener('error', (event) => {
+  if (!document.getElementById('error-overlay')) {
+    showErrorOverlay(
+      'Uncaught Error',
+      'An error occurred that prevented the game from working correctly.',
+      event.error
+    );
+  }
+});
 
 main();
