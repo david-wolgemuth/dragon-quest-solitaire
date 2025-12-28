@@ -9,14 +9,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    <meta name="description" content="" />
+    <meta name="description" content="A solitaire card game with dungeon crawling elements" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="card-builders.js"></script>
-    <script src="cards.js"></script>
-    <script src="dungeon-cards.js"></script>
-    <script type="module" src="url-state.js"></script>
-    <script src="index.js" defer></script>
+    <link rel="stylesheet" href="src/styles.css" />
+    <!-- Eruda mobile debugging console -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+    <!-- Load main module which imports all dependencies -->
+    <script type="module" src="src/main.js"></script>
   </head>
 
   <body>

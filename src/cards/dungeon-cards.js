@@ -1,5 +1,19 @@
+/**
+ * Dungeon Card Definitions
+ *
+ * Complete collection of all cards found in the dungeon deck.
+ * Cards are organized by suit (SPADES, CLUBS, BLACK) and value.
+ */
 
-window.DUNGEON_CARDS = {
+import { SPADES, CLUBS, BLACK } from './suits.js';
+import { ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, JOKER } from './values.js';
+import { buildPitTrapCard, buildPassageCard, buildEnemyCard } from './card-builders.js';
+
+/**
+ * All dungeon cards organized by suit and value
+ * @type {Object.<string, Object.<string, Object>>}
+ */
+export const DUNGEON_CARDS = {
   [SPADES]: {
     [ACE]: {
       name: "Exit",
@@ -88,9 +102,8 @@ window.DUNGEON_CARDS = {
       name: "Merchant",
       description: `Wildcard: Treasure, Healing, Gem, or Exit. Costs 1 one gem.`,
       /**
-       *
        * @param {Game} game
-       * @returns
+       * @returns {boolean}
        */
       resolver: function (game) {
         if (game.gems.available.length < 1) {
@@ -117,11 +130,7 @@ window.DUNGEON_CARDS = {
     [FOUR]: buildPassageCard(CLUBS, FOUR),
     [FIVE]: buildPassageCard(CLUBS, FIVE),
     [SIX]: buildPassageCard(CLUBS, SIX),
-    // [SEVEN]: buildGemCard(),
-    // [EIGHT]: buildHealingCard(),
-    // [NINE]: buildTreasureChestCard(),
-    // [TEN]: buildEnemyCard({ name: "Slime" }),
-    // [JACK]: buildEnemyCard({ name: "Skeleton" }),
+    // [SEVEN] through [JACK] are copied from SPADES below
     [QUEEN]: buildEnemyCard({
       name: "Young Dragon",
       minFateToDefeat: 10,
@@ -138,7 +147,7 @@ window.DUNGEON_CARDS = {
       resolveCriticalSuccess: function (game) {
         game.gainGem(this);
         game.gainInventory(this);
-        game.gainHealth(this );
+        game.gainHealth(this);
       },
       resolveCriticalSuccessDescription: "You will gain 1 gem, 1 item from the treasure chest, and 1 health.",
     }),
@@ -170,8 +179,14 @@ window.DUNGEON_CARDS = {
   }
 }
 
+// Copy resource and basic enemy cards from SPADES to CLUBS
 DUNGEON_CARDS[CLUBS][SEVEN] = DUNGEON_CARDS[SPADES][SEVEN];  // Gem
 DUNGEON_CARDS[CLUBS][EIGHT] = DUNGEON_CARDS[SPADES][EIGHT];  // Healing
 DUNGEON_CARDS[CLUBS][NINE] = DUNGEON_CARDS[SPADES][NINE];  // Treasure Chest
 DUNGEON_CARDS[CLUBS][TEN] = DUNGEON_CARDS[SPADES][TEN];  // Slime
 DUNGEON_CARDS[CLUBS][JACK] = DUNGEON_CARDS[SPADES][JACK];  // Skeleton
+
+// Make globally available for browser backwards compatibility
+if (typeof window !== 'undefined') {
+  window.DUNGEON_CARDS = DUNGEON_CARDS;
+}

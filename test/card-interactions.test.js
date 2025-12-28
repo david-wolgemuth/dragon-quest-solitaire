@@ -1,5 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
+// Import required modules (sets window globals)
+import '../src/cards/suits.js';
+import '../src/cards/values.js';
+import '../src/cards/card.js';
+import '../src/core/cell.js';
+import '../src/core/game.js';
+import '../src/core/game-renderer.js';
+
 // Mock the display layer to bypass UI interactions in tests
 function setupTestGame() {
   const game = new window.Game();

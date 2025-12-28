@@ -1,9 +1,17 @@
-// URL State Serialization/Deserialization
-// Enables storing and restoring game state via URL parameters
+/**
+ * URL State Serialization/Deserialization
+ *
+ * Enables storing and restoring game state via URL parameters.
+ * Supports encoding entire game state as base64-encoded JSON in URL query string.
+ */
 
-import { Card } from './src/card.js';
+import { Card } from '../cards/card.js';
 
-// Serialize a card to a plain object
+/**
+ * Serialize a card to a plain object
+ * @param {Card} card - Card instance to serialize
+ * @returns {{suit: string, value: string}} Plain object representation
+ */
 function serializeCard(card) {
   if (!card || !card.suitKey || !card.valueKey) {
     throw new Error('Invalid card: missing suitKey or valueKey');
@@ -14,7 +22,11 @@ function serializeCard(card) {
   };
 }
 
-// Deserialize a card from a plain object
+/**
+ * Deserialize a card from a plain object
+ * @param {Object} obj - Plain object with suit and value keys
+ * @returns {Card} Card instance
+ */
 function deserializeCard(obj) {
   if (!obj || typeof obj !== 'object') {
     throw new Error('Invalid card object: expected object, got ' + typeof obj);
@@ -25,8 +37,12 @@ function deserializeCard(obj) {
   return new Card(obj.suit, obj.value);
 }
 
-// Serialize game state to URL parameter (single base64-encoded JSON)
-function serializeGameState(game) {
+/**
+ * Serialize game state to URL parameter (single base64-encoded JSON)
+ * @param {Game} game - Game instance to serialize
+ * @returns {string} URL query string with encoded state
+ */
+export function serializeGameState(game) {
   const serializePile = (pile) => ({
     stock: pile.stock.map(serializeCard),
     available: pile.available.map(serializeCard)
@@ -67,8 +83,12 @@ function serializeGameState(game) {
   return `state=${encodeURIComponent(base64)}`;
 }
 
-// Deserialize game state from URL parameter
-function deserializeGameState(queryString) {
+/**
+ * Deserialize game state from URL parameter
+ * @param {string} queryString - URL query string containing state parameter
+ * @returns {Object} Deserialized game state object
+ */
+export function deserializeGameState(queryString) {
   try {
     const params = new URLSearchParams(queryString);
     const base64 = params.get('state');
@@ -189,8 +209,12 @@ function deserializeGameState(queryString) {
   }
 }
 
-// Seeded random number generator (mulberry32)
-function createSeededRNG(seed) {
+/**
+ * Seeded random number generator (mulberry32 algorithm)
+ * @param {number} seed - Initial seed value
+ * @returns {Function} Random number generator function that returns 0-1
+ */
+export function createSeededRNG(seed) {
   return function() {
     let t = seed += 0x6D2B79F5;
     t = Math.imul(t ^ t >>> 15, t | 1);
@@ -204,9 +228,6 @@ export {
   Card,
   serializeCard,
   deserializeCard,
-  serializeGameState,
-  deserializeGameState,
-  createSeededRNG
 };
 
 // Make functions and classes globally available for browser (backwards compat)

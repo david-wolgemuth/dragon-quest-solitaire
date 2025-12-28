@@ -1,5 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
+// Import required modules (sets window globals)
+import '../src/cards/suits.js';
+import '../src/cards/values.js';
+import '../src/cards/card.js';
+import '../src/cards/dungeon-cards.js';
+import '../src/core/cell.js';
+import '../src/utils/card-utils.js';
+import '../src/state/url-state.js';
+import '../src/core/game.js';
+
 describe('URL State Serialization', () => {
   let game;
 

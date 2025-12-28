@@ -6,34 +6,61 @@ A single-player dungeon-crawling card game built with vanilla JavaScript. Naviga
 
 ```
 dragon-quest-solitaire/
-├── index.html              # Main game page
-├── styles.css              # Game styling
-├── cards.js                # Card constants (SUITS, VALUES)
-├── card-builders.js        # Factory functions for card types
-├── dungeon-cards.js        # Card behavior definitions
-├── index.js                # Game logic and rendering
-├── GAME_RULES.md           # Complete game rules
-└── test/                   # Test suite (Vitest)
+├── index.html                          # Main game page (root for GitHub Pages)
+├── src/                                # Source code
+│   ├── main.js                        # Application entry point
+│   ├── styles.css                     # Game styling
+│   ├── cards/                         # Card-related modules
+│   │   ├── card.js                    # Card class
+│   │   ├── suits.js                   # Suit constants (HEARTS, CLUBS, etc.)
+│   │   ├── values.js                  # Value constants (ACE, KING, etc.)
+│   │   ├── card-builders.js           # Factory functions for card types
+│   │   └── dungeon-cards.js           # Card behavior definitions
+│   ├── core/                          # Core game logic
+│   │   ├── game.js                    # Game class (state management)
+│   │   ├── game-renderer.js           # GameRenderer class (UI rendering)
+│   │   ├── cell.js                    # Cell class (dungeon grid)
+│   │   └── constants.js               # Game constants (MAX_WIDTH, MAX_HEIGHT)
+│   ├── state/                         # State management
+│   │   └── url-state.js               # URL serialization/deserialization
+│   └── utils/                         # Utility functions
+│       ├── card-utils.js              # Card utilities (buildPile, shuffle, allCards)
+│       ├── style-generator.js         # Dynamic CSS generation
+│       ├── debug.js                   # Debug logging
+│       └── error-handler.js           # Error overlay display
+├── lib/                               # Shared utilities
+│   └── fixture-utils.js               # Fixture reconstruction utilities
+├── docs/                              # Documentation
+│   ├── GAME_RULES.md                  # Complete game rules
+│   ├── CODE_STRUCTURE_ANALYSIS.md     # Code analysis
+│   ├── TESTING_STRATEGY.md            # Testing documentation
+│   └── DEPLOYMENT.md                  # Deployment documentation
+├── test/                              # Test suite (Vitest)
+│   ├── fixtures/                      # Test fixtures
+│   └── *.test.js                      # Test files
+├── todos/                             # Task tracking
+└── AGENTS.md                          # This file (must stay at root)
 ```
 
 ## Core Architecture
 
 ### Model-View Pattern
 
-**Model** (`Game` class in `index.js`)
+**Model** (`Game` class in `src/core/game.js`)
 - Manages all game state
 - 5 resource piles: health, gems, inventory, fate, dungeon
 - Dynamic 2D dungeon grid with auto-expansion
 - Card resolution logic
+- Fully documented with JSDoc
 
-**View** (`GameRenderer` class in `index.js`)
+**View** (`GameRenderer` class in `src/core/game-renderer.js`)
 - Handles all DOM manipulation
 - Renders dungeon grid, resource piles, modals
 - Separated from game logic for testability
 
 ### Card System
 
-**Card Model** (`cards.js`)
+**Card Model** (`src/cards/card.js`)
 ```javascript
 class Card {
   suitKey: string    // HEARTS, CLUBS, DIAMONDS, SPADES, BLACK, RED
@@ -44,12 +71,17 @@ class Card {
 }
 ```
 
-**Card Behaviors** (`dungeon-cards.js`)
+**Card Constants** (`src/cards/suits.js` and `src/cards/values.js`)
+- Suit definitions with display symbols (♥️ ♣️ ♦️ ♠️)
+- Value definitions with ordering
+- Exported as ES modules
+
+**Card Behaviors** (`src/cards/dungeon-cards.js`)
 - Declarative definitions indexed by `[suit][value]`
 - Each card has: `name`, `description`, `resolver` function
 - Resolver returns `true` to mark card as resolved
 
-**Card Factories** (`card-builders.js`)
+**Card Factories** (`src/cards/card-builders.js`)
 - `buildPitTrapCard()` - Damage mechanics
 - `buildPassageCard()` - Matching pair logic
 - `buildEnemyCard()` - Combat with fate checks

@@ -1,7 +1,22 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
-// Access globals from window (loaded by setup.js)
-const { Game, serializeGameState, deserializeGameState } = window;
+// Import required modules (sets window globals)
+import '../src/cards/suits.js';
+import '../src/cards/values.js';
+import '../src/cards/card.js';
+import '../src/cards/dungeon-cards.js';
+import '../src/core/cell.js';
+import '../src/utils/card-utils.js';
+import '../src/utils/style-generator.js';
+import '../src/state/url-state.js';
+import '../src/core/game.js';
+import '../src/core/game-renderer.js';
+
+// Access globals from window
+const { Game, serializeGameState, deserializeGameState, createStyleSheet } = window;
+
+// Initialize stylesheet for rendering
+createStyleSheet();
 
 describe('Game Integration Tests', () => {
   beforeEach(() => {
