@@ -77,56 +77,31 @@ jobs:
             git push origin gh-pages
           fi
 
-      - name: Generate test scenario URLs
+      - name: Generate PR comment with all fixtures
         if: github.event.action != 'closed'
         id: scenarios
         run: |
           cd pr-repo
           PR_NUMBER=${{ github.event.pull_request.number }}
+          COMMIT_SHA=${{ github.event.pull_request.head.sha }}
 
           # Install dependencies if needed
           npm install 2>/dev/null || true
 
-          # Generate different game state scenarios from test-generated fixtures
-          EARLY_GAME=$(node generate-fixture-url.js --url-only early-game-seed1000 $PR_NUMBER)
-          MID_GAME=$(node generate-fixture-url.js --url-only mid-game-seed42 $PR_NUMBER)
-          LATE_GAME=$(node generate-fixture-url.js --url-only late-game-seed99 $PR_NUMBER)
+          # Generate markdown comment with all fixture URLs
+          COMMENT=$(node generate-pr-comment.js $PR_NUMBER $COMMIT_SHA)
 
-          # Export for use in comment
-          {
-            echo "early_game=$EARLY_GAME"
-            echo "mid_game=$MID_GAME"
-            echo "late_game=$LATE_GAME"
-          } >> $GITHUB_OUTPUT
+          # Save to output using heredoc
+          echo "comment<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment PR with preview URL
         if: github.event.action != 'closed'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pr-preview
-          message: |
-            🚀 **Preview deployed!**
-
-            ### Base Preview
-            🎮 [**Base Game**](https://david-wolgemuth.github.io/dragon-quest-solitaire/pr-preview/pr-${{ github.event.pull_request.number }}/) - Fresh start, no URL state
-
-            ### Test Scenarios with URL State
-            🌱 [**Early Game**](${{ steps.scenarios.outputs.early_game }}) - Just started, one card revealed
-            🎯 [**Mid Game**](${{ steps.scenarios.outputs.mid_game }}) - Several cards placed, fate card drawn
-            ⚔️ [**Late Game**](${{ steps.scenarios.outputs.late_game }}) - Extended dungeon, multiple turns played
-
-            <details>
-            <summary>ℹ️ About URL State</summary>
-
-            Each scenario link includes the game state in the URL. This allows you to:
-            - Test specific game situations reproducibly
-            - Share exact game states for debugging
-            - QA specific scenarios without manual setup
-
-            All scenarios use test fixtures generated from actual gameplay with deterministic seeds.
-            </details>
-
-            *Updated for commit ${{ github.event.pull_request.head.sha }}*
+          message: ${{ steps.scenarios.outputs.comment }}
 
       - name: Comment PR on removal
         if: github.event.action == 'closed'

@@ -1,7 +1,11 @@
 {
   "name": "mid-game-seed42",
-  "description": "Mid-game state after 5 card additions (seed: 42)",
-  "createdAt": "2025-12-28T12:04:01.211Z",
+  "description": "Mid-game state after 5 card additions",
+  "createdAt": "2025-12-28T12:16:50.148Z",
+  "metadata": {
+    "seed": 42,
+    "turnCount": 5
+  },
   "state": {
     "health": {
       "stock": [],
