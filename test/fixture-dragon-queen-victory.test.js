@@ -109,20 +109,31 @@ describe('Dragon Queen Victory Fixture', () => {
     game._gainCard('gems', 3);
     console.log(`Player gems: ${game.gems.available.length}`);
 
+    // CRITICAL: Ensure next fate check will be a 10 (critical success)
+    // Find the 10 of Hearts in the fate stock
+    const fateIndex = game.fate.stock.findIndex(
+      card => card.suitKey === 'HEARTS' && card.valueKey === 'TEN'
+    );
+    if (fateIndex !== -1) {
+      const fate10 = game.fate.stock.splice(fateIndex, 1)[0];
+      game.fate.stock.push(fate10); // Put on top (end of array, since we pop from end)
+      console.log('✅ Fate deck arranged: Next draw will be 10♥ (CRITICAL SUCCESS guaranteed)');
+    }
+
     console.log(`\n📊 Game State:`);
     console.log(`   Health: ${game.health.available.length}/5`);
     console.log(`   Gems: ${game.gems.available.length}`);
     console.log(`   Dungeon cards remaining: ${game.dungeon.stock.length}`);
     console.log(`   Next card to draw: Queen of Spades (Dragon Queen)`);
+    console.log(`   Next fate card: 10♥ (CRITICAL SUCCESS GUARANTEED)`);
     console.log(`\n🎮 To win:`);
     console.log(`   1. Click an available cell to draw Dragon Queen`);
-    console.log(`   2. Click Dragon Queen to fight (need fate 9+ to win, 10 for critical)`);
-    console.log(`   3. On critical success (fate 10), dragonQueenDefeated flag is set`);
-    console.log(`   4. Find and click Exit card (A♠) to claim victory!`);
-    console.log(`\n⚠️  Note: Dragon Queen requires fate 9+ to defeat`);
-    console.log(`   - Success (9): No damage, Dragon Queen defeated`);
-    console.log(`   - Critical (10): Dragon Queen defeated + victory flag set`);
-    console.log(`   - Failure (6-8): Take 3 damage`);
+    console.log(`   2. Click Dragon Queen to fight → Will get 10♥ (CRITICAL SUCCESS)`);
+    console.log(`   3. Dragon Queen defeated! Victory banner appears! 👑`);
+    console.log(`   4. Click another cell to draw Exit card (A♠)`);
+    console.log(`   5. Click Exit card to claim VICTORY! 🎉`);
+    console.log(`\n✅ This fixture guarantees critical success (fate 10)`);
+    console.log(`   The fate deck has been pre-arranged for testing purposes.`);
 
     // Save the fixture
     const state = createStateSnapshot(game);
@@ -158,6 +169,10 @@ describe('Dragon Queen Victory Fixture', () => {
     game.displayMessage = () => {};
     game.render = () => {};
 
+    // CRITICAL: Set the Dragon Queen defeated flag FIRST
+    game.dragonQueenDefeated = true;
+    console.log('✅ Dragon Queen has been defeated!');
+
     // Place some dungeon cards
     for (let i = 0; i < 5; i++) {
       let placed = false;
@@ -171,10 +186,6 @@ describe('Dragon Queen Victory Fixture', () => {
         }
       }
     }
-
-    // Set the Dragon Queen defeated flag
-    game.dragonQueenDefeated = true;
-    console.log('✅ Dragon Queen has been defeated!');
 
     // Put Exit card on top of deck
     const exitIndex = game.dungeon.stock.findIndex(
