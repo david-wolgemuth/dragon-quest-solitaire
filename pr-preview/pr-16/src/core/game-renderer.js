@@ -216,6 +216,21 @@ export class GameRenderer {
   }
 
   /**
+   * Render the victory status indicator
+   * Shows a banner when Dragon Queen has been defeated
+   */
+  renderVictoryStatus() {
+    const victoryStatusElement = document.getElementById('victory-status');
+    if (victoryStatusElement) {
+      if (this.game.dragonQueenDefeated) {
+        victoryStatusElement.style.display = 'block';
+      } else {
+        victoryStatusElement.style.display = 'none';
+      }
+    }
+  }
+
+  /**
    * Internal: Render a stats pile (health, gems, inventory, fate, or dungeon stock)
    * @private
    * @param {string} key - Pile key (health, gems, inventory, fate, dungeon)

@@ -677,6 +677,7 @@ export class Game {
     renderer.renderFate();
     renderer.renderInventory();
     renderer.renderGems();
+    renderer.renderVictoryStatus();
 
     // Update URL with current game state
     const stateString = serializeGameState(this);
