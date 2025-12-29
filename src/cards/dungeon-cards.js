@@ -29,8 +29,7 @@ export const DUNGEON_CARDS = {
         <p><strong>Victory condition:</strong> If you have defeated the Dragon Queen (Queen of Spades), exiting will end the game - <strong>you win!</strong></p>
       `,
       resolver: function (game) {
-        game.resetDungeon();
-        return true;
+        return game.resetDungeon();
       },
     },
     [TWO]: buildPitTrapCard({ hidden: true, damage: 2 }),

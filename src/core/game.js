@@ -33,6 +33,7 @@ export class Game {
   constructor(options = {}) {
     // Track game over state
     this.isGameOver = false;
+    this.dragonQueenDefeated = false;
 
     // If state is provided, restore from it
     if (options.state) {
@@ -40,6 +41,7 @@ export class Game {
       this.inventory = options.state.inventory;
       this.gems = options.state.gems;
       this.fate = options.state.fate;
+      this.dragonQueenDefeated = options.state.dragonQueenDefeated || false;
 
       // Restore dungeon matrix
       // Use saved matrix dimensions if available, otherwise calculate from cell positions
@@ -675,6 +677,7 @@ export class Game {
     renderer.renderFate();
     renderer.renderInventory();
     renderer.renderGems();
+    renderer.renderVictoryStatus();
 
     // Update URL with current game state
     const stateString = serializeGameState(this);
@@ -743,18 +746,87 @@ export class Game {
 
   /**
    * Reset the dungeon (for Ace of Spades - Exit card)
+   * @returns {boolean} false if dungeon was reset (to prevent card flipping), true if victory
    */
   resetDungeon() {
-    // TODO: Implement dungeon reset logic
-    logDebug('🔄 Reset dungeon called (not yet implemented)');
+    // Check if Dragon Queen was defeated - if so, player wins!
+    if (this.dragonQueenDefeated) {
+      logDebug('🎉 VICTORY - Player defeated Dragon Queen and escaped!');
+      const stats = this.getGameStats();
+      const message = `
+        <h2>🎉 VICTORY! 🎉</h2>
+        <p>You have defeated the Dragon Queen and escaped the dungeon!</p>
+        <hr>
+        <h3>Final Statistics</h3>
+        <p>Cards explored: ${stats.exploredCards}</p>
+        <p>Total cards placed: ${stats.totalCardsPlaced}</p>
+        <p>Health remaining: ${this.health.available.length}/5</p>
+        <p>Gems collected: ${this.gems.available.length}</p>
+        <p>Inventory items: ${this.inventory.available.length}</p>
+        <hr>
+        <p class="flavor-text">You emerge from the darkness into the light of day, victorious!</p>
+        <p><em>Refresh the page to play again.</em></p>
+      `;
+      this.displayMessage(message);
+      return true;
+    }
+
+    // Otherwise, reset dungeon for next level
+    logDebug('🔄 Resetting dungeon for next level');
+
+    // Collect all cards from the dungeon matrix
+    const dungeonCards = [];
+    for (let row = 0; row < this.dungeon.matrix.length; row++) {
+      for (let col = 0; col < this.dungeon.matrix[row].length; col++) {
+        const cell = this.dungeon.matrix[row][col];
+        if (cell.card) {
+          dungeonCards.push(cell.card);
+        }
+      }
+    }
+
+    // Add collected cards back to stock and shuffle
+    this.dungeon.stock = shuffle([...this.dungeon.stock, ...dungeonCards]);
+
+    // Reset matrix to starting state (1x1 with one face-down card)
+    this.dungeon.matrix = [[new Cell()]];
+    const centerCell = this.dungeon.matrix[0][0];
+    centerCell.card = this.dungeon.stock.pop();
+    centerCell.cardFaceDown = true;
+
+    // Update dungeon availability only (don't expand yet)
+    this._updateDungeonAvailability();
+
+    // Show message
+    const message = `
+      <h2>🚪 Entering Next Level</h2>
+      <p>You've descended deeper into the dungeon!</p>
+      <p>The dungeon has been reset, but you keep all your items and stats.</p>
+      <p class="flavor-text">The air grows colder as you venture further down...</p>
+    `;
+    this.displayMessage(message);
+
+    // Render the updated state
+    this.render();
+
+    // Return false to prevent normal card resolution flow
+    return false;
   }
 
   /**
    * Defeat the Dragon Queen (win condition)
    */
   defeatDragonQueen() {
-    // TODO: Implement Dragon Queen defeat logic
-    logDebug('👑 Dragon Queen defeated! (not yet implemented)');
+    this.dragonQueenDefeated = true;
+    logDebug('👑 Dragon Queen defeated!');
+
+    const message = `
+      <h2>🐉 Dragon Queen Defeated! 👑</h2>
+      <p>You have slain the mighty Dragon Queen with a critical strike!</p>
+      <p><strong>Now find an Exit (Ace of Spades) to escape the dungeon and claim victory!</strong></p>
+      <p class="flavor-text">The dragon's roar echoes through the halls as she falls...</p>
+    `;
+    this.displayMessage(message);
   }
 
   /**

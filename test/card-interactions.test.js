@@ -303,14 +303,14 @@ describe('Dragon Queen (Queen of Spades)', () => {
     expect(game.health.available.length).toBe(healthBefore - 3);
   });
 
-  // FIXME: Bug #3 - defeatDragonQueen() function not implemented
-  it.skip('should trigger victory on critical success (fate 10)', () => {
+  it('should set dragonQueenDefeated flag on critical success (fate 10)', () => {
     game.fateCheck = () => 10;
-    game.defeatDragonQueen = undefined; // Simulate missing function
 
-    // Action: Player gets critical hit on Dragon Queen
-    // This should call defeatDragonQueen() and trigger victory
-    expect(() => game.resolveCard({ row: 1, col: 1 })).toThrow();
+    expect(game.dragonQueenDefeated).toBe(false);
+
+    game.resolveCard({ row: 1, col: 1 });
+
+    expect(game.dragonQueenDefeated).toBe(true);
   });
 });
 
@@ -410,14 +410,37 @@ describe('Exit Card (Ace of Spades)', () => {
     game = setupTestGame();
   });
 
-  // FIXME: Bug #3 - resetDungeon() function not implemented
-  it.skip('should reset dungeon when clicked', () => {
+  it('should reset dungeon when clicked (without Dragon Queen defeated)', () => {
     placeCard(game, window.SPADES, window.ACE, 1, 1);
-    game.resetDungeon = undefined; // Simulate missing function
 
-    // Action: Player clicks exit card
-    // This should call resetDungeon() to reset the dungeon
-    expect(() => game.resolveCard({ row: 1, col: 1 })).toThrow();
+    // Place some cards in the dungeon
+    placeCard(game, window.CLUBS, window.TWO, 2, 1);
+    placeCard(game, window.CLUBS, window.THREE, 2, 2);
+
+    const dungeonStockBefore = game.dungeon.stock.length;
+
+    game.resolveCard({ row: 1, col: 1 });
+
+    // After reset, matrix should be 1x1 with one card
+    expect(game.dungeon.matrix.length).toBe(1);
+    expect(game.dungeon.matrix[0].length).toBe(1);
+    expect(game.dungeon.matrix[0][0].card).toBeTruthy();
+    expect(game.dungeon.matrix[0][0].cardFaceDown).toBe(true);
+
+    // Stock should have more cards (the ones that were in the matrix)
+    expect(game.dungeon.stock.length).toBeGreaterThan(dungeonStockBefore);
+  });
+
+  it('should trigger victory when Dragon Queen was defeated', () => {
+    placeCard(game, window.SPADES, window.ACE, 1, 1);
+    game.dragonQueenDefeated = true;
+
+    const matrixBefore = game.dungeon.matrix;
+
+    game.resolveCard({ row: 1, col: 1 });
+
+    // Matrix should NOT be reset when victory is triggered
+    expect(game.dungeon.matrix).toBe(matrixBefore);
   });
 });
 
