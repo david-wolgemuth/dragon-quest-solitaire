@@ -35,6 +35,7 @@ export function reconstructGameState(state) {
     inventory: state.inventory,
     gems: state.gems,
     fate: state.fate,
+    dragonQueenDefeated: state.dragonQueenDefeated || false,
     dungeon: {
       stock: state.dungeonStock,
       matrix: Array(matrixRows).fill(null).map(() =>
