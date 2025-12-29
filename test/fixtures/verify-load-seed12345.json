@@ -1,7 +1,7 @@
 {
   "name": "verify-load-seed12345",
   "description": "Fixture for verifying load correctness",
-  "createdAt": "2025-12-28T23:00:33.137Z",
+  "createdAt": "2025-12-29T00:19:13.957Z",
   "metadata": {
     "seed": 12345,
     "turnCount": 3
@@ -136,6 +136,7 @@
         }
       ]
     },
+    "dragonQueenDefeated": false,
     "dungeonStock": [
       {
         "suitKey": "SPADES",

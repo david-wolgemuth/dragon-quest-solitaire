@@ -1,7 +1,7 @@
 {
   "name": "late-game-seed99",
   "description": "Late-game state after 8 additions and 0 resolutions",
-  "createdAt": "2025-12-28T23:00:33.093Z",
+  "createdAt": "2025-12-29T00:19:13.914Z",
   "metadata": {
     "seed": 99,
     "turnCount": 8,
@@ -136,6 +136,7 @@
       ],
       "available": []
     },
+    "dragonQueenDefeated": false,
     "dungeonStock": [
       {
         "suitKey": "CLUBS",

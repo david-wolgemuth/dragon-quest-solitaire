@@ -1,7 +1,7 @@
 {
   "name": "early-game-seed1000",
   "description": "Early-game state - just started",
-  "createdAt": "2025-12-28T23:00:33.104Z",
+  "createdAt": "2025-12-29T00:19:13.925Z",
   "metadata": {
     "seed": 1000,
     "turnCount": 0
@@ -135,6 +135,7 @@
       ],
       "available": []
     },
+    "dragonQueenDefeated": false,
     "dungeonStock": [
       {
         "suitKey": "CLUBS",

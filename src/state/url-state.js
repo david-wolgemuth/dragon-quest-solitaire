@@ -53,6 +53,7 @@ export function serializeGameState(game) {
     inventory: serializePile(game.inventory),
     gems: serializePile(game.gems),
     fate: serializePile(game.fate),
+    dragonQueenDefeated: game.dragonQueenDefeated || false,
     dungeon: {
       stock: game.dungeon.stock.map(serializeCard),
       matrixRows: game.dungeon.matrix.length,
@@ -169,6 +170,7 @@ export function deserializeGameState(queryString) {
       inventory: deserializePile(state.inventory, 'inventory'),
       gems: deserializePile(state.gems, 'gems'),
       fate: deserializePile(state.fate, 'fate'),
+      dragonQueenDefeated: state.dragonQueenDefeated || false,
       dungeonStock: state.dungeon.stock.map((card, i) => {
         try {
           return deserializeCard(card);

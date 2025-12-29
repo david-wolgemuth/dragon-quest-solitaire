@@ -1,7 +1,7 @@
 {
   "name": "mid-game-seed42",
   "description": "Mid-game state after 5 card additions",
-  "createdAt": "2025-12-28T23:00:33.012Z",
+  "createdAt": "2025-12-29T00:19:13.846Z",
   "metadata": {
     "seed": 42,
     "turnCount": 5
@@ -136,6 +136,7 @@
         }
       ]
     },
+    "dragonQueenDefeated": false,
     "dungeonStock": [
       {
         "suitKey": "BLACK",
