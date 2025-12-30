@@ -10,8 +10,6 @@ This directory contains all task tracking for the project. Each todo is a separa
 
 Quick wins and critical fixes - sorted by impact and ease of implementation:
 
-- [ ] P2 | XS | [#AAM](AAM-typos-fix.md) | Fix typos in card descriptions
-- [ ] P0 | M  | [#AAD](AAD-critical-missing-game-functions.md) | Missing defeatDragonQueen() and resetDungeon()
 - [ ] P1 | M  | [#AAH](AAH-hidden-pit-trap-gem-reduction.md) | Hidden pit trap gem reduction not implemented
 
 ## Backlog
@@ -43,6 +41,8 @@ Everything else - larger features, design decisions needed, or lower priority:
 ## Completed
 
 - [x] [#AAA](AAA-file-organization.md) | Reorganize files into src/ and docs/ - Completed in #5
+- [x] [#AAD](AAD-critical-missing-game-functions.md) | Missing defeatDragonQueen() and resetDungeon() - Completed in #16
+- [x] [#AAM](AAM-typos-fix.md) | Fix typos in card descriptions - Completed
 - [x] [#AAB](AAB-critical-user-input-buttons.md) | User input buttons not rendered - Completed with PR (modal visibility + render calls)
 - [x] [#AAC](AAC-critical-game-over-detection.md) | No game over detection - add health check - Completed in #6
 - [x] [#AAE](AAE-critical-fate-deck-duplication.md) | Fate deck duplication - Already fixed during refactoring
