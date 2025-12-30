@@ -101,7 +101,7 @@ export function buildEnemyCard({
         ${resolveCriticalSuccessDescription}
 
       If you fail to defeat the enemy,
-        you lose you will take ${damageTakenIfUnsuccessful} damage.
+        you will take ${damageTakenIfUnsuccessful} damage.
         Game over if you lose all your health.
     `,
     descriptionHtml: `

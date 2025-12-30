@@ -115,7 +115,7 @@ export const DUNGEON_CARDS = {
   [CLUBS]: {
     [ACE]: {
       name: "Merchant",
-      description: `Wildcard: Treasure, Healing, Gem, or Exit. Costs 1 one gem.`,
+      description: `Wildcard: Treasure, Healing, Gem, or Exit. Costs 1 gem.`,
       descriptionHtml: `
         <p>A <strong>merchant</strong> offers you a choice of items.</p>
         <p><strong>Cost:</strong> 1 gem</p>
