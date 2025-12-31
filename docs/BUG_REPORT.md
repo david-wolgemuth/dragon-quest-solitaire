@@ -1,6 +1,14 @@
 # Dragon Quest Solitaire - Bug Report & Edge Cases
 
-Analysis Date: 2024-12-26
+⚠️ **NOTICE: This document is a legacy snapshot from 2024-12-26.**
+
+**For current issues and priorities, see [todos/README.md](../todos/README.md)** which is actively maintained.
+
+Many bugs listed here have been fixed. The todos/ directory contains the current source of truth for all outstanding issues.
+
+---
+
+Analysis Date: 2024-12-26 (LEGACY SNAPSHOT)
 
 ## Critical Bugs (Game-Breaking)
 

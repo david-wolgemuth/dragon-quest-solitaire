@@ -15,7 +15,16 @@ Thank you for your interest in contributing! This guide will walk you through th
 
 ## Step 1: Pick a Task
 
-Browse the [todo list](todos/README.md) and choose a task that matches your skill level:
+Browse the [todo list](todos/README.md) and choose a task that matches your skill level and impact:
+
+### Priority Levels
+
+- **P0 (Critical)**: Game-breaking bugs or essential missing features
+- **P1 (High)**: Major UX improvements that significantly enhance the game
+- **P2 (Medium)**: Nice-to-have features and polish
+- **P3 (Low)**: Cosmetic enhancements and edge cases
+
+### T-Shirt Sizes
 
 - **XS (Extra Small)**: Trivial fixes - great for first-time contributors
 - **S (Small)**: Small features or bug fixes
@@ -25,14 +34,18 @@ Browse the [todo list](todos/README.md) and choose a task that matches your skil
 
 ### Recommended Starting Points
 
-Start with tasks in the **On Deck** section - these are sorted by impact and ease:
+**New contributors**: Start with **P1 | S** or **P2 | XS-S** tasks - high impact, manageable scope.
+
+**Experienced contributors**: Tackle **P0** tasks - critical for completing the game.
+
+See the [**Recommended Implementation Order**](todos/README.md#-recommended-implementation-order) in the todo list for a strategic approach.
 
 ```bash
 # View the todo list
 cat todos/README.md
 
 # Read a specific task (example)
-cat todos/AAJ-young-dragon-wrong-gem-amount.md
+cat todos/AAH-hidden-pit-trap-gem-reduction.md
 ```
 
 ---
@@ -360,8 +373,9 @@ npm run test:coverage
 
 - **Questions about a task?** Read the detailed task file in `todos/`
 - **Not sure how to test?** Look at existing tests in `test/`
-- **Stuck on a bug?** Check [AGENTS.md](AGENTS.md) for codebase overview
+- **Stuck on a bug?** Check [CLAUDE.md](CLAUDE.md) for codebase overview
 - **Want to discuss an approach?** Open a discussion issue first
+- **Priority questions?** See [Priority Rationale](todos/README.md#-priority-rationale) in the todo list
 
 ---
 

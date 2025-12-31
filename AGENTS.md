@@ -1,4 +1,20 @@
-# Dragon Quest Solitaire - Codebase Overview
+# ⚠️ This file has been superseded by CLAUDE.md
+
+**For the codebase overview and AI agent instructions, please see [CLAUDE.md](CLAUDE.md).**
+
+This file (AGENTS.md) is kept for backwards compatibility but is no longer maintained. All updates go to CLAUDE.md.
+
+---
+
+**Quick Links:**
+- **[CLAUDE.md](CLAUDE.md)** - ⭐ Codebase overview and architecture (PRIMARY SOURCE)
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to this project
+- **[todos/README.md](todos/README.md)** - Current prioritized task list
+- **[docs/GAME_RULES.md](docs/GAME_RULES.md)** - Complete game rules
+
+---
+
+# Dragon Quest Solitaire - Codebase Overview (LEGACY - See CLAUDE.md)
 
 A single-player dungeon-crawling card game built with vanilla JavaScript. Navigate procedurally-generated dungeons, fight monsters, collect treasures, and defeat the Dragon Queen.
 
@@ -39,7 +55,8 @@ dragon-quest-solitaire/
 │   ├── fixtures/                      # Test fixtures
 │   └── *.test.js                      # Test files
 ├── todos/                             # Task tracking
-└── AGENTS.md                          # This file (must stay at root)
+├── CLAUDE.md                          # This file - AI agent instructions
+└── AGENTS.md                          # Deprecated - see CLAUDE.md
 ```
 
 ## Core Architecture
@@ -207,12 +224,13 @@ DUNGEON_CARDS[SPADES][SEVEN] = {
 ## Documentation
 
 - **CONTRIBUTING.md** - How to contribute (pick tasks, write tests, create fixtures)
-- **GAME_RULES.md** - Complete gameplay rules and mechanics
-- **CODE_STRUCTURE_ANALYSIS.md** - Detailed architecture analysis
-- **BUG_REPORT.md** - Known issues (20 bugs documented)
-- **TESTING_STRATEGY.md** - Testing approach and recommendations
+- **CLAUDE.md** - This file - codebase overview for AI agents
+- **docs/GAME_RULES.md** - Complete gameplay rules and mechanics
+- **docs/CODE_STRUCTURE_ANALYSIS.md** - Detailed architecture analysis
+- **docs/BUG_REPORT.md** - Legacy bug list (see todos/ for current issues)
+- **docs/TESTING_STRATEGY.md** - Testing approach and recommendations
 - **test/README.md** - Test suite documentation
-- **todos/README.md** - Task list with priorities and T-shirt sizes
+- **todos/README.md** - Task list with priorities and T-shirt sizes (PRIMARY SOURCE)
 
 ## Tech Stack
 
@@ -290,8 +308,17 @@ Include this URL in your PR description so reviewers can click and verify the fi
 - ✅ All card types implemented
 - ✅ Dungeon grid system working
 - ✅ Combat system operational
-- ✅ Test suite established (36 tests)
-- ⚠️ Known bugs documented (see BUG_REPORT.md)
-- ⚠️ Some features incomplete (victory screen, inventory usage)
+- ✅ Test suite established (36+ tests)
+- ✅ URL state serialization for testing
+- ✅ Confirmation modal system
+- ⚠️ Core mechanics incomplete: Gem damage reduction, item usage
+- ⚠️ UX needs improvement: Victory/defeat screens, onboarding, visual feedback
 
-See BUG_REPORT.md for prioritized list of issues to address.
+**See [todos/README.md](todos/README.md) for current prioritized task list.**
+
+Key missing features (P0):
+- Gem damage reduction UI (#AAO, #AAH)
+- Item usage logic (#AAF)
+- Victory/defeat screens (#ABI)
+
+See [Recommended Implementation Order](todos/README.md#-recommended-implementation-order) for strategic approach.
