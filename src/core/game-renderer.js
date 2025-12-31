@@ -70,7 +70,10 @@ export class GameRenderer {
           // Empty cell - clicking adds a card from the dungeon deck
           cellElement.onclick = () => {
             this.addTutorialModal(`<div>
-              the rules about adding cards to the dungeon...
+              <div class="card card-back"></div>
+              <h3>Place Dungeon Card</h3>
+              <p>Draw and place a card from the dungeon deck at this location.</p>
+              <p><strong>${this.game.dungeon.stock.length}</strong> card(s) remaining in deck.</p>
             </div>`, () => {
               this.game.addCardToDungeon({ row, col });
             });
@@ -134,10 +137,6 @@ export class GameRenderer {
    * @returns {void}
    */
   addTutorialModal(content, onAccept) {
-
-    onAccept();
-    return;  // DISABLED FOR NOW !!
-
     const tutorialModalElement = document.getElementById("tutorial-modal");
     tutorialModalElement.classList.add("visible");
 
