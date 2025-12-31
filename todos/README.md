@@ -12,7 +12,7 @@ This directory contains all task tracking for the project. Each todo is a separa
 
 These are blocking issues that prevent core gameplay or make the game feel incomplete:
 
-- [ ] P0 | M  | [#AAH](AAH-hidden-pit-trap-gem-reduction.md) | Hidden pit trap gem reduction not implemented ⚠️ **Core mechanic**
+- [x] P0 | M  | [#AAH](AAH-hidden-pit-trap-gem-reduction.md) | Hidden pit trap gem reduction - Completed
 - [ ] P0 | L  | [#AAO](AAO-gem-damage-reduction-feature.md) | Gem damage reduction feature (UI + user input) ⚠️ **Core mechanic**
 - [ ] P0 | XL | [#AAF](AAF-item-usage-logic.md) | Item usage logic (King/Queen/Jack/Jokers) ⚠️ **Core mechanic**
 - [ ] P0 | M  | [#ABI](ABI-victory-defeat-screen-improvements.md) | Victory and defeat screen improvements ⚠️ **Essential UX**
@@ -91,6 +91,7 @@ Nice visual and feature enhancements that can wait:
 
 ## ✅ Completed
 
+- [x] [#AAH](AAH-hidden-pit-trap-gem-reduction.md) | Hidden pit trap automatic gem reduction - Completed
 - [x] [#AAZ](AAZ-confirmation-modal-system.md) | Re-enable and enhance confirmation modal system - Completed
 - [x] [#ABF](ABF-place-card-confirmation-message.md) | Replace placeholder "place card" confirmation message - Completed
 - [x] [#AAA](AAA-file-organization.md) | Reorganize files into src/ and docs/ - Completed in #5
