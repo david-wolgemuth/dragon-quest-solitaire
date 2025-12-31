@@ -1,0 +1,14 @@
+{
+  "exclude": [
+    "node_modules/**",
+    "test/**",
+    "**/*.md",
+    "package.json",
+    "package-lock.json",
+    "vitest.config.js",
+    ".gitignore",
+    ".pr-preview.json",
+    "bare_pr_preview/**",
+    ".github/**"
+  ]
+}
