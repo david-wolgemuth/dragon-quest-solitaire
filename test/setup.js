@@ -31,8 +31,8 @@ const html = `
     <div id="tutorial-modal-content">
       <div id="tutorial-modal-inner-content"></div>
       <div id="tutorial-modal-actions">
-        <button id="tutorial-modal-dismiss">Dismiss</button>
-        <button id="tutorial-modal-accept">Accept</button>
+        <button id="tutorial-modal-dismiss">Cancel</button>
+        <button id="tutorial-modal-accept">Continue</button>
       </div>
     </div>
   </aside>

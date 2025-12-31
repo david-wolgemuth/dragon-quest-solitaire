@@ -1,7 +1,7 @@
 {
   "name": "deterministic-seed777",
   "description": "Fixture for verifying deterministic gameplay",
-  "createdAt": "2025-12-29T17:52:38.118Z",
+  "createdAt": "2025-12-31T22:15:22.695Z",
   "metadata": {
     "seed": 777,
     "turnCount": 6
@@ -127,14 +127,13 @@
         {
           "suitKey": "HEARTS",
           "valueKey": "EIGHT"
-        }
-      ],
-      "available": [
+        },
         {
           "suitKey": "HEARTS",
           "valueKey": "SEVEN"
         }
-      ]
+      ],
+      "available": []
     },
     "dragonQueenDefeated": false,
     "dungeonStock": [
@@ -233,31 +232,21 @@
       {
         "suitKey": "SPADES",
         "valueKey": "FOUR"
+      },
+      {
+        "suitKey": "CLUBS",
+        "valueKey": "FOUR"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "TEN"
       }
     ],
-    "matrixRows": 5,
+    "matrixRows": 3,
     "matrixCols": 3,
     "dungeonMatrix": [
       {
         "row": 1,
-        "col": 1,
-        "card": {
-          "suitKey": "CLUBS",
-          "valueKey": "FOUR"
-        },
-        "cardFaceDown": false
-      },
-      {
-        "row": 2,
-        "col": 1,
-        "card": {
-          "suitKey": "SPADES",
-          "valueKey": "TEN"
-        },
-        "cardFaceDown": true
-      },
-      {
-        "row": 3,
         "col": 1,
         "card": {
           "suitKey": "SPADES",
