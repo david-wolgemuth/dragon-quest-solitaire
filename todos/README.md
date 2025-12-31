@@ -16,6 +16,19 @@ Quick wins and critical fixes - sorted by impact and ease of implementation:
 
 Everything else - larger features, design decisions needed, or lower priority:
 
+### Confirmation System Overhaul (Action Confirmations)
+A comprehensive UX improvement to add confirmation dialogs before card actions, with user preferences and post-action feedback:
+
+- [ ] P1 | M  | [#AAZ](AAZ-confirmation-modal-system.md) | Re-enable and enhance confirmation modal system
+- [ ] P2 | S  | [#ABA](ABA-auto-resolve-metadata.md) | Add auto-resolve metadata to distinguish forced vs optional actions
+- [ ] P1 | M  | [#ABB](ABB-post-resolution-feedback.md) | Post-resolution feedback modals (show results after actions)
+- [ ] P2 | L  | [#ABC](ABC-user-preferences-system.md) | User preferences system with "don't show again" options
+- [ ] P2 | M  | [#ABD](ABD-preferences-settings-ui.md) | Settings UI to manage and reset preferences
+- [ ] P2 | S  | [#ABE](ABE-hover-preview-enhancement.md) | Hover preview tooltips for cards (UX enhancement)
+- [ ] P2 | XS | [#ABF](ABF-place-card-confirmation-message.md) | Replace placeholder "place card" confirmation message
+
+### Other Features & Improvements
+
 - [ ] P2 | S  | [#AAX](AAX-remove-test-code-from-production.md) | Remove test debug code from production
 - [ ] P2 | M  | [#AAY](AAY-rules-modal-with-html-card-descriptions.md) | Rules/about modal with HTML card descriptions
 - [ ] P2 | M  | [#AAN](AAN-async-callback-resolution-timing.md) | Async callback resolution timing for Merchant/Wizard
