@@ -310,16 +310,16 @@ Test this fix with the following fixture:
 - **Test thoroughly**: Run the full test suite
 - **Create fixtures**: Make it easy for reviewers to verify
 - **Mark todos complete**: Update todos/README.md to track progress
-- **Update docs**: If you change behavior, update relevant docs
-- **Follow existing patterns**: Look at how similar code is written
+- **Move fast**: This is unreleased - make breaking changes to get to better designs
+- **Refactor boldly**: No backwards compatibility needed, improve as you go
 
 ### ❌ DON'T
 
 - **Skip tests**: Every fix needs tests
 - **Mix concerns**: Don't fix multiple unrelated issues in one PR
 - **Break existing tests**: All tests must pass
-- **Add unnecessary changes**: Don't refactor unrelated code
-- **Forget the fixture**: Reviewers need a way to QA your work
+- **Add deprecation notices**: Just delete/replace - this is unreleased
+- **Worry about breaking changes**: Move fast and improve things
 
 ---
 
