@@ -1,7 +1,7 @@
 {
   "name": "verify-load-seed12345",
   "description": "Fixture for verifying load correctness",
-  "createdAt": "2025-12-31T22:04:50.264Z",
+  "createdAt": "2025-12-31T22:15:22.654Z",
   "metadata": {
     "seed": 12345,
     "turnCount": 3
