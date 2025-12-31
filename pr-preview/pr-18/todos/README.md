@@ -26,6 +26,7 @@ A comprehensive UX improvement to add confirmation dialogs before card actions, 
 - [ ] P2 | M  | [#ABD](ABD-preferences-settings-ui.md) | Settings UI to manage and reset preferences
 - [ ] P2 | S  | [#ABE](ABE-hover-preview-enhancement.md) | Hover preview tooltips for cards (UX enhancement)
 - [x] P2 | XS | [#ABF](ABF-place-card-confirmation-message.md) | Replace placeholder "place card" confirmation message - COMPLETED
+- [ ] P2 | M  | [#ABG](ABG-card-description-audit.md) | Audit and standardize card descriptions (before vs after action)
 
 ### Other Features & Improvements
 
