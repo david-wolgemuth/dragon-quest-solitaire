@@ -1,7 +1,7 @@
 {
   "name": "mid-game-seed42",
   "description": "Mid-game state after 5 card additions",
-  "createdAt": "2025-12-29T17:52:37.941Z",
+  "createdAt": "2025-12-31T22:04:50.206Z",
   "metadata": {
     "seed": 42,
     "turnCount": 5
@@ -127,14 +127,13 @@
         {
           "suitKey": "HEARTS",
           "valueKey": "EIGHT"
-        }
-      ],
-      "available": [
+        },
         {
           "suitKey": "HEARTS",
           "valueKey": "SEVEN"
         }
-      ]
+      ],
+      "available": []
     },
     "dragonQueenDefeated": false,
     "dungeonStock": [
@@ -233,31 +232,21 @@
       {
         "suitKey": "CLUBS",
         "valueKey": "EIGHT"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "SIX"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "TEN"
       }
     ],
-    "matrixRows": 5,
+    "matrixRows": 3,
     "matrixCols": 3,
     "dungeonMatrix": [
       {
         "row": 1,
-        "col": 1,
-        "card": {
-          "suitKey": "SPADES",
-          "valueKey": "SIX"
-        },
-        "cardFaceDown": false
-      },
-      {
-        "row": 2,
-        "col": 1,
-        "card": {
-          "suitKey": "SPADES",
-          "valueKey": "TEN"
-        },
-        "cardFaceDown": true
-      },
-      {
-        "row": 3,
         "col": 1,
         "card": {
           "suitKey": "CLUBS",

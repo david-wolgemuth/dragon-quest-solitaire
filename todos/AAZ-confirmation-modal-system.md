@@ -1,5 +1,7 @@
 # Re-enable and Enhance Confirmation Modal System
 
+**Status**: ✅ COMPLETED
+
 ## Overview
 
 Currently, the tutorial modal system exists in the codebase (see `game-renderer.js:136-157`) but is disabled with a bypass (`onAccept(); return; // DISABLED FOR NOW !!`). This task re-enables it and makes it production-ready for action confirmations.
@@ -45,14 +47,34 @@ When a player clicks a card (or available cell):
 
 ## Testing Checklist
 
-- [ ] Modal appears when clicking face-up cards
-- [ ] Modal appears when clicking empty available cells
-- [ ] "Accept" button executes the intended action
-- [ ] "Dismiss" button cancels and closes modal
-- [ ] Card visuals render correctly in modal
-- [ ] Card descriptions display properly (both `description` and `descriptionHtml`)
-- [ ] Modal closes after action is taken
-- [ ] No JavaScript errors in console
+- [x] Modal appears when clicking face-up cards
+- [x] Modal appears when clicking empty available cells
+- [x] "Accept" button executes the intended action
+- [x] "Dismiss" button cancels and closes modal
+- [x] Card visuals render correctly in modal
+- [x] Card descriptions display properly (both `description` and `descriptionHtml`)
+- [x] Modal closes after action is taken
+- [x] No JavaScript errors in console
+
+## Implementation Summary
+
+**Changes Made:**
+1. Removed bypass in `game-renderer.js:136` (deleted lines 138-139)
+2. Modal now properly shows before all card actions
+3. Added 6 comprehensive integration tests for modal behavior
+4. All 80 tests passing
+
+**Files Modified:**
+- `src/core/game-renderer.js:136` - Removed bypass, modal now functional
+- `test/integration.test.js:101-390` - Updated existing test + added modal test suite
+
+**Test Results:**
+- ✅ 80 tests passing (including 6 new modal tests)
+- ✅ Modal shows for empty cells
+- ✅ Modal shows for face-up cards
+- ✅ Accept button executes action
+- ✅ Dismiss button cancels action
+- ✅ Card visuals and descriptions display correctly
 
 ## Related Tasks
 

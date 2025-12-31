@@ -1,5 +1,7 @@
 # Improve "Place Card" Confirmation Message
 
+**Status**: ✅ COMPLETED
+
 ## Overview
 
 Currently, when clicking an empty cell to place a new dungeon card, the confirmation modal shows placeholder text: "the rules about adding cards to the dungeon..." (see `game-renderer.js:73`). This needs to be replaced with proper, helpful content.
@@ -131,15 +133,38 @@ When placing the last or second-to-last card:
 
 ## Testing Checklist
 
-- [ ] Placeholder text is removed
-- [ ] Proper message shows when clicking empty cell
-- [ ] Card back visual displays correctly
-- [ ] Remaining card count is accurate
-- [ ] Message is clear and understandable
-- [ ] Accept button places the card
-- [ ] Dismiss button cancels without placing
-- [ ] First placement (if different) shows correct message
-- [ ] Last card warning shows when appropriate
+- [x] Placeholder text is removed
+- [x] Proper message shows when clicking empty cell
+- [x] Card back visual displays correctly
+- [x] Remaining card count is accurate
+- [x] Message is clear and understandable
+- [x] Accept button places the card
+- [x] Dismiss button cancels without placing
+- [ ] First placement (if different) shows correct message (not implemented - using same message)
+- [ ] Last card warning shows when appropriate (not implemented - future enhancement)
+
+## Implementation Summary
+
+**Changes Made:**
+1. Replaced placeholder text in `game-renderer.js:72-76`
+2. Now shows proper heading, description, and deck count
+3. Includes card back visual
+
+**New Message:**
+```html
+<div class="card card-back"></div>
+<h3>Place Dungeon Card</h3>
+<p>Draw and place a card from the dungeon deck at this location.</p>
+<p><strong>{count}</strong> card(s) remaining in deck.</p>
+```
+
+**Files Modified:**
+- `src/core/game-renderer.js:72-76` - Replaced placeholder with proper message
+
+**Verified:**
+- ✅ Integration test covers this: "shows deck count in place card modal"
+- ✅ Message is clear and informative
+- ✅ Card back visual displays
 
 ## Edge Cases
 

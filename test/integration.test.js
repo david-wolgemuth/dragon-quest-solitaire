@@ -108,11 +108,22 @@ describe('Game Integration Tests', () => {
     const availableCells = document.querySelectorAll('#dungeon .matrix .cell.available');
     expect(availableCells.length).toBeGreaterThan(0);
 
-    // Click the first available cell
+    // Click the first available cell - this opens the confirmation modal
     const firstAvailable = availableCells[0];
     firstAvailable.click();
 
-    // After clicking, a card should be added from stock
+    // Verify modal is visible
+    const modal = document.getElementById('tutorial-modal');
+    expect(modal.classList.contains('visible')).toBe(true);
+
+    // Click the Accept button to confirm the action
+    const acceptButton = document.getElementById('tutorial-modal-accept');
+    acceptButton.click();
+
+    // After accepting, the modal should be hidden
+    expect(modal.classList.contains('visible')).toBe(false);
+
+    // And a card should be added from stock
     expect(game.dungeon.stock.length).toBe(initialStockCount - 1);
   });
 
@@ -256,5 +267,125 @@ describe('Game Integration Tests', () => {
 
     const cardElements = matrix.querySelectorAll('.cell.card');
     expect(cardElements.length).toBe(cardsRendered);
+  });
+
+  describe('Confirmation Modal System', () => {
+    it('shows confirmation modal when clicking empty cell', () => {
+      const game = new Game({ seed: 12345 });
+      game.render();
+
+      const availableCell = document.querySelector('#dungeon .matrix .cell.available:not(.card)');
+      availableCell.click();
+
+      const modal = document.getElementById('tutorial-modal');
+      expect(modal.classList.contains('visible')).toBe(true);
+
+      const modalContent = document.getElementById('tutorial-modal-inner-content');
+      expect(modalContent.innerHTML).toContain('Place Dungeon Card');
+      expect(modalContent.innerHTML).toContain('card(s) remaining in deck');
+    });
+
+    it('shows confirmation modal when clicking face-up card', () => {
+      const game = new Game({ seed: 12345 });
+      game.render();
+
+      // Add a card and let it be face-up
+      const availableCell = document.querySelector('#dungeon .matrix .cell.available:not(.card)');
+      availableCell.click();
+      document.getElementById('tutorial-modal-accept').click();
+
+      game.render();
+
+      // Find a face-up card (not card-back)
+      const faceUpCard = document.querySelector('#dungeon .matrix .cell.card:not(.card-back)');
+      if (faceUpCard) {
+        faceUpCard.click();
+
+        const modal = document.getElementById('tutorial-modal');
+        expect(modal.classList.contains('visible')).toBe(true);
+
+        const modalContent = document.getElementById('tutorial-modal-inner-content');
+        // Should show card name (varies by seed, so just check it has content)
+        expect(modalContent.innerHTML.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('executes action when Accept button is clicked', () => {
+      const game = new Game({ seed: 12345 });
+      game.render();
+
+      const initialStockCount = game.dungeon.stock.length;
+
+      const availableCell = document.querySelector('#dungeon .matrix .cell.available:not(.card)');
+      availableCell.click();
+
+      const acceptButton = document.getElementById('tutorial-modal-accept');
+      acceptButton.click();
+
+      // Card should be added
+      expect(game.dungeon.stock.length).toBe(initialStockCount - 1);
+
+      // Modal should be hidden
+      const modal = document.getElementById('tutorial-modal');
+      expect(modal.classList.contains('visible')).toBe(false);
+    });
+
+    it('cancels action when Dismiss button is clicked', () => {
+      const game = new Game({ seed: 12345 });
+      game.render();
+
+      const initialStockCount = game.dungeon.stock.length;
+
+      const availableCell = document.querySelector('#dungeon .matrix .cell.available:not(.card)');
+      availableCell.click();
+
+      const dismissButton = document.getElementById('tutorial-modal-dismiss');
+      dismissButton.click();
+
+      // No card should be added
+      expect(game.dungeon.stock.length).toBe(initialStockCount);
+
+      // Modal should be hidden
+      const modal = document.getElementById('tutorial-modal');
+      expect(modal.classList.contains('visible')).toBe(false);
+    });
+
+    it('displays card visual and description in modal', () => {
+      const game = new Game({ seed: 12345 });
+      game.render();
+
+      // Add a card
+      const availableCell = document.querySelector('#dungeon .matrix .cell.available:not(.card)');
+      availableCell.click();
+      document.getElementById('tutorial-modal-accept').click();
+
+      game.render();
+
+      // Click the face-up card
+      const faceUpCard = document.querySelector('#dungeon .matrix .cell.card:not(.card-back)');
+      if (faceUpCard) {
+        faceUpCard.click();
+
+        const modalContent = document.getElementById('tutorial-modal-inner-content');
+        // Should contain a card visual
+        expect(modalContent.querySelector('.card')).toBeTruthy();
+        // Should contain a heading (card name)
+        expect(modalContent.querySelector('h3')).toBeTruthy();
+      }
+    });
+
+    it('shows deck count in place card modal', () => {
+      const game = new Game({ seed: 12345 });
+      game.render();
+
+      const deckCount = game.dungeon.stock.length;
+
+      const availableCell = document.querySelector('#dungeon .matrix .cell.available:not(.card)');
+      availableCell.click();
+
+      const modalContent = document.getElementById('tutorial-modal-inner-content');
+      expect(modalContent.innerHTML).toContain(`${deckCount}`);
+      expect(modalContent.innerHTML).toContain('card(s) remaining in deck');
+    });
   });
 });

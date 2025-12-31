@@ -1,7 +1,7 @@
 {
   "name": "verify-load-seed12345",
   "description": "Fixture for verifying load correctness",
-  "createdAt": "2025-12-29T17:52:38.058Z",
+  "createdAt": "2025-12-31T22:04:50.264Z",
   "metadata": {
     "seed": 12345,
     "turnCount": 3
@@ -127,14 +127,13 @@
         {
           "suitKey": "HEARTS",
           "valueKey": "NINE"
-        }
-      ],
-      "available": [
+        },
         {
           "suitKey": "HEARTS",
           "valueKey": "SIX"
         }
-      ]
+      ],
+      "available": []
     },
     "dragonQueenDefeated": false,
     "dungeonStock": [
@@ -233,31 +232,21 @@
       {
         "suitKey": "SPADES",
         "valueKey": "JACK"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "TEN"
+      },
+      {
+        "suitKey": "SPADES",
+        "valueKey": "QUEEN"
       }
     ],
-    "matrixRows": 5,
+    "matrixRows": 3,
     "matrixCols": 3,
     "dungeonMatrix": [
       {
         "row": 1,
-        "col": 1,
-        "card": {
-          "suitKey": "SPADES",
-          "valueKey": "TEN"
-        },
-        "cardFaceDown": false
-      },
-      {
-        "row": 2,
-        "col": 1,
-        "card": {
-          "suitKey": "SPADES",
-          "valueKey": "QUEEN"
-        },
-        "cardFaceDown": true
-      },
-      {
-        "row": 3,
         "col": 1,
         "card": {
           "suitKey": "CLUBS",
