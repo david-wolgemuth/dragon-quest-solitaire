@@ -1,7 +1,8 @@
 /**
  * Integration test for #AAH - Hidden Pit Trap Gem Reduction
  *
- * Creates a fixture demonstrating automatic gem usage when hitting hidden pit traps.
+ * Creates fixtures demonstrating automatic gem usage when hitting hidden pit traps.
+ * Saves fixtures to test/fixtures/ for PR comment generation.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -11,6 +12,65 @@ import { CLUBS, SPADES } from '../src/cards/suits.js';
 import { TWO, THREE, FOUR, FIVE, SIX } from '../src/cards/values.js';
 import { Cell } from '../src/core/cell.js';
 import { Card } from '../src/cards/card.js';
+import fs from 'fs';
+import path from 'path';
+
+/**
+ * Save a fixture to disk
+ */
+function saveFixture(game, name, description, metadata = {}) {
+  const fixtureData = {
+    name,
+    description,
+    createdAt: new Date().toISOString(),
+    metadata: {
+      issue: 'AAH',
+      ...metadata
+    },
+    state: {
+      health: {
+        stock: game.health.stock.map(c => ({ suitKey: c.suitKey, valueKey: c.valueKey })),
+        available: game.health.available.map(c => ({ suitKey: c.suitKey, valueKey: c.valueKey }))
+      },
+      inventory: {
+        stock: game.inventory.stock.map(c => ({ suitKey: c.suitKey, valueKey: c.valueKey })),
+        available: game.inventory.available.map(c => ({ suitKey: c.suitKey, valueKey: c.valueKey }))
+      },
+      gems: {
+        stock: game.gems.stock.map(c => ({ suitKey: c.suitKey, valueKey: c.valueKey })),
+        available: game.gems.available.map(c => ({ suitKey: c.suitKey, valueKey: c.valueKey }))
+      },
+      fate: {
+        stock: game.fate.stock.map(c => ({ suitKey: c.suitKey, valueKey: c.valueKey })),
+        available: game.fate.available.map(c => ({ suitKey: c.suitKey, valueKey: c.valueKey }))
+      },
+      dragonQueenDefeated: game.dragonQueenDefeated || false,
+      dungeonStock: game.dungeon.stock.map(c => ({ suitKey: c.suitKey, valueKey: c.valueKey })),
+      matrixRows: game.dungeon.matrix.length,
+      matrixCols: game.dungeon.matrix[0]?.length || 0,
+      dungeonMatrix: game.dungeon.matrix.flatMap((row, rowIdx) =>
+        row.map((cell, colIdx) =>
+          cell.card ? {
+            row: rowIdx,
+            col: colIdx,
+            card: { suitKey: cell.card.suitKey, valueKey: cell.card.valueKey },
+            cardFaceDown: cell.cardFaceDown
+          } : null
+        ).filter(c => c !== null)
+      )
+    }
+  };
+
+  const fixturesDir = path.join(process.cwd(), 'test', 'fixtures');
+  if (!fs.existsSync(fixturesDir)) {
+    fs.mkdirSync(fixturesDir, { recursive: true });
+  }
+
+  const fixturePath = path.join(fixturesDir, `${name}.json`);
+  fs.writeFileSync(fixturePath, JSON.stringify(fixtureData, null, 2));
+
+  return fixtureData;
+}
 
 describe('#AAH Integration - Hidden Pit Trap Gem Reduction', () => {
   it('creates a fixture demonstrating gem reduction on hidden traps', () => {
@@ -41,7 +101,7 @@ describe('#AAH Integration - Hidden Pit Trap Gem Reduction', () => {
     game.dungeon.matrix[1][3].cardFaceDown = true;
     game.dungeon.matrix[1][3].available = false; // Not yet available
 
-    // Row 1, Col 1: Gem card for comparison - 7 of Spades
+    // Row 1, Col 1: Gem card for comparison - 6 of Spades
     const gemCard = new Card(SPADES, SIX);
     game.dungeon.matrix[1][1].card = gemCard;
     game.dungeon.matrix[1][1].cardFaceDown = true;
@@ -55,44 +115,24 @@ describe('#AAH Integration - Hidden Pit Trap Gem Reduction', () => {
 
     // Update dungeon stock to remove placed cards
     game.dungeon.stock = game.dungeon.stock.filter(card =>
-      !(card.suit.key === 'CLUBS' && ['TWO', 'THREE'].includes(card.value.key)) &&
-      !(card.suit.key === 'SPADES' && card.value.key === 'SIX')
+      !(card.suitKey === 'CLUBS' && ['TWO', 'THREE'].includes(card.valueKey)) &&
+      !(card.suitKey === 'SPADES' && card.valueKey === 'SIX')
     );
 
     // Verify setup
     expect(game.health.available.length).toBe(3); // 3/5 health
     expect(game.gems.available.length).toBe(5); // 5 gems
 
-    // Serialize the game state
-    const stateString = serializeGameState(game);
-    const fixtureUrl = `http://localhost:8008/?state=${encodeURIComponent(stateString)}`;
+    // Save fixture
+    const fixtureData = saveFixture(
+      game,
+      'aah-gem-reduction-progressive',
+      '#AAH: Progressive gem reduction (2 traps)',
+      { scenario: 'progressive', health: 3, gems: 5 }
+    );
 
-    console.log('\n🎮 QA FIXTURE - Hidden Pit Trap Gem Reduction (#AAH)');
-    console.log('═══════════════════════════════════════════════════════\n');
-    console.log('📍 Fixture URL (copy and paste into browser):');
-    console.log(fixtureUrl);
-    console.log('\n📋 Test Scenario:');
-    console.log('  • Player Health: 3/5 ❤️');
-    console.log('  • Player Gems: 5 💎');
-    console.log('  • Hidden Pit Trap (2 damage) ready to click - middle card');
-    console.log('  • Hidden Pit Trap (3 damage) will become available after');
-    console.log('\n✅ Expected Behavior:');
-    console.log('  1. Click the first face-down card (2 of Clubs - Hidden Pit Trap)');
-    console.log('  2. Card reveals as "Hidden Pit Trap (2 damage)"');
-    console.log('  3. Modal shows gem consumption (-2 gems)');
-    console.log('  4. After accepting: Gems: 5 → 3, Health: stays at 3');
-    console.log('  5. Next card becomes available');
-    console.log('  6. Click second trap (3 of Clubs - 3 damage)');
-    console.log('  7. Gems: 3 → 0, Health: 3 → 2 (only 1 damage after using 3 gems)');
-    console.log('\n🐛 Bug Behavior (if not fixed):');
-    console.log('  • Gems would NOT be used automatically');
-    console.log('  • Health would drop from 3 → 1 → would be DEAD');
-    console.log('  • Game over without using gems');
-    console.log('\n══════════════════════════════════════════════════════════\n');
-
-    // Basic validation that fixture is valid
-    expect(stateString).toBeTruthy();
-    expect(stateString.length).toBeGreaterThan(100);
+    expect(fixtureData).toBeTruthy();
+    expect(fixtureData.state.gems.available.length).toBe(5);
   });
 
   it('creates a fixture showing full damage negation with enough gems', () => {
@@ -115,27 +155,19 @@ describe('#AAH Integration - Hidden Pit Trap Gem Reduction', () => {
     game.dungeon.matrix[1][1].available = true;
 
     game.dungeon.stock = game.dungeon.stock.filter(card =>
-      !(card.suit.key === 'CLUBS' && card.value.key === 'TWO')
+      !(card.suitKey === 'CLUBS' && card.valueKey === 'TWO')
     );
 
-    const stateString = serializeGameState(game);
-    const fixtureUrl = `http://localhost:8008/?state=${encodeURIComponent(stateString)}`;
+    // Save fixture
+    const fixtureData = saveFixture(
+      game,
+      'aah-gem-reduction-full-negation',
+      '#AAH: Full damage negation (2 gems = 2 damage)',
+      { scenario: 'full-negation', health: 5, gems: 2 }
+    );
 
-    console.log('\n🎮 QA FIXTURE - Full Damage Negation (#AAH)');
-    console.log('═══════════════════════════════════════════════════════\n');
-    console.log('📍 Fixture URL:');
-    console.log(fixtureUrl);
-    console.log('\n📋 Test Scenario:');
-    console.log('  • Health: 5/5 ❤️ (full)');
-    console.log('  • Gems: 2 💎 (exactly enough for trap)');
-    console.log('  • Hidden Pit Trap (2 damage) - center card');
-    console.log('\n✅ Expected Behavior:');
-    console.log('  1. Click the face-down card');
-    console.log('  2. Modal shows: "Used 2 gems to reduce damage"');
-    console.log('  3. After: Gems: 2 → 0, Health: STAYS AT 5 (no damage!)');
-    console.log('\n══════════════════════════════════════════════════════════\n');
-
-    expect(stateString).toBeTruthy();
+    expect(fixtureData).toBeTruthy();
+    expect(fixtureData.state.gems.available.length).toBe(2);
   });
 
   it('creates a fixture showing no gems available (takes full damage)', () => {
@@ -157,26 +189,18 @@ describe('#AAH Integration - Hidden Pit Trap Gem Reduction', () => {
     game.dungeon.matrix[1][1].available = true;
 
     game.dungeon.stock = game.dungeon.stock.filter(card =>
-      !(card.suit.key === 'CLUBS' && card.value.key === 'TWO')
+      !(card.suitKey === 'CLUBS' && card.valueKey === 'TWO')
     );
 
-    const stateString = serializeGameState(game);
-    const fixtureUrl = `http://localhost:8008/?state=${encodeURIComponent(stateString)}`;
+    // Save fixture
+    const fixtureData = saveFixture(
+      game,
+      'aah-gem-reduction-no-gems',
+      '#AAH: No gems - takes full damage',
+      { scenario: 'no-gems', health: 3, gems: 0 }
+    );
 
-    console.log('\n🎮 QA FIXTURE - No Gems Available (#AAH)');
-    console.log('═══════════════════════════════════════════════════════\n');
-    console.log('📍 Fixture URL:');
-    console.log(fixtureUrl);
-    console.log('\n📋 Test Scenario:');
-    console.log('  • Health: 3/5 ❤️');
-    console.log('  • Gems: 0 💎 (none available)');
-    console.log('  • Hidden Pit Trap (2 damage)');
-    console.log('\n✅ Expected Behavior:');
-    console.log('  1. Click the face-down card');
-    console.log('  2. Modal shows: "Lose 2 health"');
-    console.log('  3. After: Health: 3 → 1, Gems: stays at 0');
-    console.log('\n══════════════════════════════════════════════════════════\n');
-
-    expect(stateString).toBeTruthy();
+    expect(fixtureData).toBeTruthy();
+    expect(fixtureData.state.gems.available.length).toBe(0);
   });
 });
