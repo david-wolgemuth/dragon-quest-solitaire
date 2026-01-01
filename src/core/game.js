@@ -237,10 +237,39 @@ export class Game {
    * Lose health
    * @param {Object} dungeonCard - The card that triggered this
    * @param {number} [amount=1] - Amount of health to lose
+   * @param {Object} [options={}] - Options for health loss
+   * @param {boolean} [options.gems=false] - Automatically use gems to reduce damage
    */
-  loseHealth(dungeonCard, amount) {
+  loseHealth(dungeonCard, amount = 1, options = {}) {
+    // Automatically use gems to reduce damage if specified
+    let gemsUsed = 0;
+    if (options.gems) {
+      gemsUsed = Math.min(amount, this.gems.available.length);
+      if (gemsUsed > 0) {
+        // Directly modify gem count without modal
+        for (let i = 0; i < gemsUsed; i++) {
+          const gemCard = this.gems.available.pop();
+          this.gems.stock.push(gemCard);
+        }
+        amount -= gemsUsed;
+      }
+    }
+
+    // If damage was fully negated by gems, still show resolution
+    if (amount <= 0 && gemsUsed > 0) {
+      this.displayResolution(dungeonCard, gemsUsed, "gems", () => {
+        // Gems already consumed above
+        this.render();
+      });
+      return;
+    }
+
+    // Show resolution for remaining damage
     this.displayResolution(dungeonCard, -(amount || 1), "health", () => {
       this._loseCard("health", amount);
+      if (gemsUsed > 0) {
+        // Already consumed gems above
+      }
       this.render();
     });
   }
